@@ -79,6 +79,7 @@ MyKernel=$(wget --no-check-certificate -qO- "$URLKernel" |grep "$KNA/" |grep "/x
 
 # 检查理论上内核是否支持原版 BBR
 function version_ge(){ test "$(echo "$@" | tr " " "\n" | sort -rV | head -n 1)" == "$1" ; }
+
 kernel_vvv=$(uname -r | cut -d- -f1)
 if version_ge ${kernel_vvv} 4.9  ; then BBRKernel="${green}是${jiacu}" ; else BBRKernel="${red}否${jiacu}" ; fi
 if version_ge ${kernel_vvv} 4.10 && ! version_ge ${kernel_vvv} 4.13 ; then YKKernel="${green}是${jiacu}" ; else YKKernel="${red}否${jiacu}" ; fi
@@ -119,7 +120,7 @@ echo -e  "  ${green}(22) ${jiacu}卸载 锐速"
 # echo -e  "  ${green}(11) ${jiacu}安装 最新内核"
 # echo -e  "  ${green}(12) ${jiacu}安装 指定内核"
 # echo -e  "  ${green}(13) ${jiacu}安装 锐速内核"
-echo -e  "  ${green}(99) ${white}返回\n"
+echo -e  "  ${green}(99) ${jiacu}返回\n"
 rm -rf /tmp/system_kernel_list ; }
 
 
@@ -191,8 +192,8 @@ if [[ $YKKernel == "${green}是${jiacu}" ]]; then
     _bbr_tsunami
     bbrname=tsunami
     _enable_bbr
-    if [[ ` sysctl net.ipv4.tcp_available_congestion_control | awk '{print $3}' ` == tsunami ]]; then echo -e "\n${bold}${white}已开启 ${green}Yankee 版魔改 BBR${white} ...${normal}\n"
-    else echo -e "\n  ${bold}${red}错误 ${green}Yankee 版魔改 BBR${white} 开启失败！${normal}\n" ; exit 1 ; fi
+    if [[ ` sysctl net.ipv4.tcp_available_congestion_control | awk '{print $3}' ` == tsunami ]]; then echo -e "\n${bold}已开启 ${green}Yankee 版魔改 BBR${jiacu} ...${normal}\n"
+    else echo -e "\n  ${bold}${red}错误 ${green}Yankee 版魔改 BBR${jiacu} 开启失败！${normal}\n" ; exit 1 ; fi
 else
     echo -e "\n  ${bold}当前内核不支持 ${green}Yankee${jiacu} 版魔改 BBR，需要安装 ${green}4.11.12${jiacu} 内核 ...${normal}"
     _online_ubuntu_bbr_firmware
@@ -220,7 +221,7 @@ if [[ $NQLKernel == "${green}是${jiacu}" ]]; then
     bbrname=nanqinlang
     _enable_bbr
     if [[ ` sysctl net.ipv4.tcp_available_congestion_control | awk '{print $3}' ` == nanqinlang ]]; then echo -e "\n${bold}已开启 ${green}南琴浪${jiacu} 版魔改 BBR ...${normal}\n"
-    else echo -e "\n${bold}${red}错误 ${green}南琴浪 版魔改 BBR${white} 开启失败！${normal}\n" ; exit 1 ; fi
+    else echo -e "\n${bold}${red}错误 ${green}南琴浪 版魔改 BBR${jiacu} 开启失败！${normal}\n" ; exit 1 ; fi
 else
     echo -e "\n  ${bold}当前内核不支持 ${green}南琴浪${jiacu} 版魔改 BBR，需要安装 ${green}4.11.12${jiacu} 内核 ...${normal}"
     _online_ubuntu_bbr_firmware
@@ -276,7 +277,7 @@ case $input in
 esac
 [[ `grep "Advanced options for Ubuntu" /etc/default/grub` ]] && sed -i 's/GRUB_DEFAULT=.*/GRUB_DEFAULT=""/' /etc/default/grub && update-grub > /dev/null 2>&1
 wget --no-check-certificate -qO /tmp/appex.sh "https://raw.githubusercontent.com/0oVicero0/serverSpeeder_Install/master/appex.sh" && echo | bash /tmp/appex.sh 'uninstall'
-echo -e "${bold}${red}已卸载 锐速，但安装的内核仍保留${normal}\n" ; }
+echo -e "  ${bold}${red}已卸载 锐速，但安装的内核仍保留${normal}\n" ; }
 
 
 # 卸载 BBR
@@ -287,8 +288,8 @@ case $input in
     *  ) echo ; _read_response ;;
 esac
 tcp_control=` sysctl net.ipv4.tcp_available_congestion_control | awk '{print $3}' `
-if [[ $tcp_control =~ ("nanqinlang"|"tsunami"|"bbr"|"bbr_powered") ]]; then bbrname=$tcp_control ; _disable_bbr ; echo -e "${bold}${red}已卸载 BBR，但安装的内核仍保留${normal}\n"
-else echo -e "${bold}${red}错误 ${white}你并没有使用本脚本安装 BBR ...${normal}\n" ; _read_response ; fi ; }
+if [[ $tcp_control =~ ("nanqinlang"|"tsunami"|"bbr"|"bbr_powered") ]]; then bbrname=$tcp_control ; _disable_bbr ; echo -e "  ${bold}${red}已卸载 BBR，但安装的内核仍保留${normal}\n"
+else echo -e "\n  ${bold}${red}错误 ${jiacu}你并没有使用本脚本安装 BBR ...${normal}\n" ; _read_response ; fi ; }
 
 
 
@@ -464,7 +465,7 @@ function _online_ubuntu_bbr_firmware() {
 mkdir -p /lib/firmware/bnx2
 if [[ -f /lib/firmware/bnx2/fw.lock ]]; then
     touch /lib/firmware/bnx2/fw.lock
-    echo -e "${bold}下载可能缺少的固件 ... ${normal}\n"
+    echo -e "  ${bold}下载可能缺少的固件 ... ${normal}\n"
     wget -qO /lib/firmware/bnx2/bnx2-mips-06-6.2.3.fw https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Linux%20Firmware/bnx2-mips-06-6.2.3.fw
     wget -qO /lib/firmware/bnx2/bnx2-mips-09-6.2.1b.fw https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Linux%20Firmware/bnx2-mips-09-6.2.1b.fw
     wget -qO /lib/firmware/bnx2/bnx2-rv2p-09ax-6.0.17.fw https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Linux%20Firmware/bnx2-rv2p-09ax-6.0.17.fw
@@ -476,7 +477,7 @@ fi ; }
 
 # 安装 4.11.12 的内核（For BBR）
 function _bbr_kernel_4_11_12() {
-echo -e "\n${bold}安装 4.11.12 内核 ... ${normal}\n"
+echo -e "\n  ${bold}安装 4.11.12 内核 ... ${normal}\n"
 wget --no-check-certificate -qO 1.deb https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Linux%20Kernel/BBR/linux-headers-4.11.12-all.deb
 wget --no-check-certificate -qO 2.deb https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Linux%20Kernel/BBR/linux-headers-4.11.12-amd64.deb
 wget --no-check-certificate -qO 3.deb https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Linux%20Kernel/BBR/linux-image-4.11.12-generic-amd64.deb
@@ -501,16 +502,14 @@ deb_kernel_name="linux-image-${latest_version}-amd64.deb"
 # 下载、安装 最新版内核（For BBR）
 function _install_latest_kernel() {
 _get_latest_version
-[ $? -ne 0 ] && echo -e "${red}Error:${plain} Get latest kernel version failed." && exit 1
-wget -c -t3 -T60 -O "${deb_kernel_name}" "${deb_kernel_url}"
-if [ $? -ne 0 ]; then
-    echo -e "${red}Error:${plain} Download ${deb_kernel_name} failed, please check it."
-    exit 1
-fi
-dpkg -i "${deb_kernel_name}"
+[ $? -ne 0 ] && echo -e "\n  ${red}${bold}错误${jiacu} 获取最新内核失败" && exit 1
+wget -c -t3 -T60 -qO "${deb_kernel_name}" "${deb_kernel_url}"
+if [ $? -ne 0 ]; then echo -e "\n  ${red}${bold}错误${jiacu} 下载 ${deb_kernel_name} 失败，请检查！" ; exit 1 ; fi
+
+dpkg -i "${deb_kernel_name}" > /dev/null 2>&1
 rm -fv "${deb_kernel_name}"
 echo -ne "${bold}更新引导 ...  "
-update-grub > /dev/null 2>&1 && echo "${green}DONE${normal}" ; }
+update-grub > /dev/null 2>&1 && echo "${green}完成${normal}" ; }
 
 
 
@@ -527,7 +526,7 @@ if [[ $CODENAME == stretch ]]; then
     [[ ! `dpkg -l | grep libssl1.0.0` ]] && { echo -e "\n  ${red}错误${bold} 安装 libssl1.0.0  失败！${normal}" ; exit 1 ; } ; }
 else
     [[ ! `dpkg -l | grep libssl1.0.0` ]] && { echo -e "\n  ${bold}安装 libssl1.0.0 ...${normal}"  ; DEBIAN_FRONTEND=noninteractive apt-get install -y libssl1.0.0 > /dev/null 2>&1
-    [[ ! `dpkg -l | grep libssl1.0.0` ]] && { echo -e "\n$  {red}错误${bold} 安装 libssl1.0.0  失败！${normal}" ; exit 1 ; } ; }
+    [[ ! `dpkg -l | grep libssl1.0.0` ]] && { echo -e "\n$  ${red}错误${bold} 安装 libssl1.0.0  失败！${normal}" ; exit 1 ; } ; }
 fi
 
 which make > /dev/null 2>&1 ; [ $? -ne '0' ] && { echo -e "\n  ${bold}安装 make ...${normal}" ; DEBIAN_FRONTEND=noninteractive apt-get install -y make > /dev/null 2>&1
@@ -634,8 +633,8 @@ if [ $kernel_total > 1 ]; then
     done
 fi
 
-echo -ne "${bold}更新引导 ...  "
-update-grub > /dev/null 2>&1 && echo "${green}DONE${normal}" ; }
+echo -ne "\n  ${bold}更新引导 ...  "
+update-grub > /dev/null 2>&1 && echo "${green}完成${normal}" ; }
 
 
 
