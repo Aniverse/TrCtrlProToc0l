@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 # Author: Aniverse
-# https://github.com/Aniverse/inexistence
+# https://github.com/Aniverse/TrCtrlProToc0l
 #
 #
 # https://github.com/FunctionClub/YankeeBBR
@@ -25,7 +25,7 @@ dim=$(tput dim); underline=$(tput smul); reset_underline=$(tput rmul); standout=
 reset_standout=$(tput rmso); normal=$(tput sgr0); alert=${white}${on_red}; title=${standout};
 baihuangse=${white}${on_yellow}; bailanse=${white}${on_blue}; bailvse=${white}${on_green};
 baiqingse=${white}${on_cyan}; baihongse=${white}${on_red}; baizise=${white}${on_magenta};
-heibaise=${black}${on_white};
+heibaise=${black}${on_white}; jiacu=${normal}${bold}
 shanshuo=$(tput blink); wuguangbiao=$(tput civis); guangbiao=$(tput cnorm)
 
 #  -----------------------------------------------------------------------------------
@@ -43,14 +43,14 @@ CODENAME=`  cat /etc/os-release | grep VERSION= | tr '[A-Z]' '[a-z]' | sed 's/\"
 
 #  -----------------------------------------------------------------------------------
 
-[[ $EUID -ne 0 ]] && echo -e "\n${red}错误${normal}${bold} 请使用 root 运行本脚本！${normal}" && exit 1
+[[ $EUID -ne 0 ]] && echo -e "\n${red}错误${jiacu} 请使用 root 运行本脚本！${normal}" && exit 1
 [[ ! $DeBUG == 1 ]] &&
-[[ -d /proc/vz ]] && echo -e "\n${red}错误${normal}${bold} 不支持 OpenVZ！${normal}" && exit 1
+[[ -d /proc/vz ]] && echo -e "\n${red}错误${jiacu} 不支持 OpenVZ！${normal}" && exit 1
 [[ ! $DeBUG == 1 ]] &&
-[[ ! $KernelBit == 64 ]] && echo -e "\n${red}错误${normal}${bold} 不支持非 64 位系统！${normal}" && exit 1
-[[ -z "$(dpkg -l |grep 'grub-')" ]] && echo "\n${red}错误${normal}${bold} 未发现 grub！${normal}" && exit 1
+[[ ! $KernelBit == 64 ]] && echo -e "\n${red}错误${jiacu} 不支持非 64 位系统！${normal}" && exit 1
+[[ -z "$(dpkg -l |grep 'grub-')" ]] && echo -e "\n${red}错误${jiacu} 未发现 grub！${normal}" && exit 1
 [[ ! $DeBUG == 1 ]] &&
-[[ ! $SysSupport == 1 ]] && echo "\n${red}错误${normal}${bold} 不支持 Debian 8、Debian 9、Ubuntu 16.04 以外的系统！${normal}" && exit 1
+[[ ! $SysSupport == 1 ]] && echo -e "\n${red}错误${jiacu} 不支持 Debian 8、Debian 9、Ubuntu 16.04 以外的系统！${normal}" && exit 1
 
 # 菜单
 function _menu() { clear ; echo
@@ -71,34 +71,34 @@ lbit=$( getconf LONG_BIT )
 [[ $tcp_control == "nanqinlang" ]] && tcp_c_name="nanqinlang (南琴浪 版 魔改 BBR)"
 
 # 检查理论上内核是否支持锐速
-SSKernel="${red}否${white}"
+SSKernel="${red}否${jiacu}"
 URLKernel='https://raw.githubusercontent.com/0oVicero0/serverSpeeder_kernel/master/serverSpeeder.txt'
 AcceVer=$(wget --no-check-certificate -qO- "$URLKernel" |grep "$KNA/" |grep "/x$KernelBit/" |grep "/$running_kernel/" |awk -F'/' '{print $NF}' |sort -n -k 2 -t '_' |tail -n 1)
 MyKernel=$(wget --no-check-certificate -qO- "$URLKernel" |grep "$KNA/" |grep "/x$KernelBit/" |grep "/$running_kernel/" |grep "$AcceVer" |tail -n 1)
-[[ ! -z "$MyKernel" ]] && SSKernel="${green}是${white}"
+[[ ! -z "$MyKernel" ]] && SSKernel="${green}是${jiacu}"
 
 # 检查理论上内核是否支持原版 BBR
 function version_ge(){ test "$(echo "$@" | tr " " "\n" | sort -rV | head -n 1)" == "$1" ; }
 kernel_vvv=$(uname -r | cut -d- -f1)
-if version_ge ${kernel_vvv} 4.9  ; then BBRKernel="${green}是${white}" ; else BBRKernel="${red}否${white}" ; fi
-if version_ge ${kernel_vvv} 4.10 && ! version_ge ${kernel_vvv} 4.13 ; then YKKernel="${green}是${white}" ; else YKKernel="${red}否${white}" ; fi
-if version_ge ${kernel_vvv} 4.10 && ! version_ge ${kernel_vvv} 4.16 ; then NQLKernel="${green}是${white}" ; else NQLKernel="${red}否${white}" ; fi
+if version_ge ${kernel_vvv} 4.9  ; then BBRKernel="${green}是${jiacu}" ; else BBRKernel="${red}否${jiacu}" ; fi
+if version_ge ${kernel_vvv} 4.10 && ! version_ge ${kernel_vvv} 4.13 ; then YKKernel="${green}是${jiacu}" ; else YKKernel="${red}否${jiacu}" ; fi
+if version_ge ${kernel_vvv} 4.10 && ! version_ge ${kernel_vvv} 4.16 ; then NQLKernel="${green}是${jiacu}" ; else NQLKernel="${red}否${jiacu}" ; fi
 
 # 检查 锐速 与 BBR 是否已启用
-[[ ` ps aux | grep appex | grep -v grep ` ]] && SSrunning="${green}是${white}" || SSrunning="${red}否${white}"
+[[ ` ps aux | grep appex | grep -v grep ` ]] && SSrunning="${green}是${jiacu}" || SSrunning="${red}否${jiacu}"
 export tcp_control=$(sysctl net.ipv4.tcp_available_congestion_control | awk '{print $3}')
-if [[ $tcp_control =~ ("nanqinlang"|"tsunami") ]]; then bbrinuse="${green}是${white}"
-elif [[ `echo $tcp_control | grep bbr` ]]; then bbrinuse="${green}是${white}"
-else bbrinuse="${red}否${white}" ; fi
+if [[ $tcp_control =~ ("nanqinlang"|"tsunami") ]]; then bbrinuse="${green}是${jiacu}"
+elif [[ `echo $tcp_control | grep bbr` ]]; then bbrinuse="${green}是${jiacu}"
+else bbrinuse="${red}否${jiacu}" ; fi
 
 dpkg -l | grep linux-image   | awk '{print $2}' >> /tmp/system_kernel_list
 dpkg -l | grep linux-headers | awk '{print $2}' >> /tmp/system_kernel_list
 
 echo -e  " ${baizise}${bold}                                   El Psy Congroo!                                   ${normal} "
-echo -e  "  ${bold}${white}"
-echo -e  "  当前操作系统                         ${green}$DISTROU $osversion $CODENAME (x$lbit)${white}"
-echo -e  "  当前正在使用的 TCP 拥塞控制算法      ${green}$tcp_c_name${white}"
-echo -e  "  当前正在使用的系统内核               ${green}$running_kernel${white}"
+echo -e  "  ${bold}"
+echo -e  "  当前操作系统                         ${green}$DISTROU $osversion $CODENAME (x$lbit)${jiacu}"
+echo -e  "  当前正在使用的 TCP 拥塞控制算法      ${green}$tcp_c_name${jiacu}"
+echo -e  "  当前正在使用的系统内核               ${green}$running_kernel${jiacu}"
 echo -e  "  当前 BBR  是否已启用                 $bbrinuse"
 echo -e  "  当前内核是否支持 原版 BBR            $BBRKernel"
 echo -e  "  当前内核是否支持 Yankee 版魔改 BBR   $YKKernel"
@@ -110,15 +110,15 @@ echo -e  "\n  当前系统内所有已安装的内核列表\n"
 cat -n /tmp/system_kernel_list | sed 's/\t/ /g' | sed "s/ linux-/) ${green}linux-/g" | sed "s/     /  ${magenta}(0/g" | sed "s/    /  ${magenta}(/g"
 echo -e  "\n  ${yellow}${bold}使用本脚本前请先阅读本脚本 GitHub 上的 README；作者水平菜，不保证脚本不会翻车${normal}\n"
 
-echo -e  "  ${green}(01) ${white}安装 原版 BBR"
-echo -e  "  ${green}(02) ${white}安装 魔改 BBR (tsunami)"
-echo -e  "  ${green}(03) ${white}安装 魔改 BBR (nanqinlang)"
-echo -e  "  ${green}(04) ${white}安装 锐速"
-echo -e  "  ${green}(21) ${white}卸载 BBR"
-echo -e  "  ${green}(22) ${white}卸载 锐速"
-# echo -e  "  ${green}(11) ${white}安装 最新内核"
-# echo -e  "  ${green}(12) ${white}安装 指定内核"
-# echo -e  "  ${green}(13) ${white}安装 锐速内核"
+echo -e  "  ${green}(01) ${jiacu}安装 原版 BBR"
+echo -e  "  ${green}(02) ${jiacu}安装 魔改 BBR (tsunami)"
+echo -e  "  ${green}(03) ${jiacu}安装 魔改 BBR (nanqinlang)"
+echo -e  "  ${green}(04) ${jiacu}安装 锐速"
+echo -e  "  ${green}(21) ${jiacu}卸载 BBR"
+echo -e  "  ${green}(22) ${jiacu}卸载 锐速"
+# echo -e  "  ${green}(11) ${jiacu}安装 最新内核"
+# echo -e  "  ${green}(12) ${jiacu}安装 指定内核"
+# echo -e  "  ${green}(13) ${jiacu}安装 锐速内核"
 echo -e  "  ${green}(99) ${white}返回\n"
 rm -rf /tmp/system_kernel_list ; }
 
@@ -164,19 +164,19 @@ function _obbr_install() {
 
 [[ `grep "Advanced options for Ubuntu" /etc/default/grub` ]] && sed -i 's/GRUB_DEFAULT=.*/GRUB_DEFAULT=""/' /etc/default/grub
 
-if [[ $BBRKernel == "${green}是${white}" ]]; then
-    echo -e "\n  ${bold}${white}理论上当前内核已支持 ${green}原版 BBR${white}，不安装新内核，直接启用 BBR ...${normal}"
+if [[ $BBRKernel == "${green}是${jiacu}" ]]; then
+    echo -e "\n  ${bold}理论上当前内核已支持 ${green}原版 BBR，不安装新内核，直接启用 BBR ...${normal}"
     bbrname=bbr
     _enable_bbr
-    if [[ ` sysctl net.ipv4.tcp_available_congestion_control | awk '{print $3}' ` == bbr ]]; then echo -e "\n${bold}${white}BBR 已启用 ...\n${normal}"
-    else echo -e "\n${bold}${red}错误 ${white}BBR 开启失败！${normal}\n" ; exit 1 ; fi
+    if [[ ` sysctl net.ipv4.tcp_available_congestion_control | awk '{print $3}' ` == bbr ]]; then echo -e "\n${bold}BBR 已启用 ...\n${normal}"
+    else echo -e "\n${bold}${red}错误 BBR 开启失败！${normal}\n" ; exit 1 ; fi
 else
-    echo -e "\n  ${bold}${white}当前内核不支持 BBR，需要安装 ${green}4.11.12${white} 内核以启用 BBR ...${normal}"
+    echo -e "\n  ${bold}当前内核不支持 BBR，需要安装 ${green}4.11.12${jiacu} 内核以启用 BBR ...${normal}"
     _online_ubuntu_bbr_firmware
     _bbr_kernel_4_11_12
     bbrname=bbr
     _enable_bbr
-    [[ ! $DeBUG == 1 ]] && echo -e "\n  ${bold}${white}即将重启系统，重启后 ${green}BBR${white} 将会启动 ... ${normal}\n" && reboot
+    [[ ! $DeBUG == 1 ]] && echo -e "\n  ${bold}即将重启系统，重启后 ${green}BBR${jiacu} 将会启动 ... ${normal}\n" && reboot
 fi ; }
 
 
@@ -185,8 +185,8 @@ function _ykbbr_install() {
 
 [[ `grep "Advanced options for Ubuntu" /etc/default/grub` ]] && sed -i 's/GRUB_DEFAULT=.*/GRUB_DEFAULT=0/' /etc/default/grub
 
-if [[ $YKKernel == "${green}是${white}" ]]; then
-    echo -e "\n  ${bold}${white}理论上当前内核已支持 ${green}Yankee${white} 版魔改 BBR，安装并启用魔改 BBR ...${normal}"
+if [[ $YKKernel == "${green}是${jiacu}" ]]; then
+    echo -e "\n  ${bold}理论上当前内核已支持 ${green}Yankee${jiacu} 版魔改 BBR，安装并启用魔改 BBR ...${normal}"
     _check_essential
     _bbr_tsunami
     bbrname=tsunami
@@ -194,7 +194,7 @@ if [[ $YKKernel == "${green}是${white}" ]]; then
     if [[ ` sysctl net.ipv4.tcp_available_congestion_control | awk '{print $3}' ` == tsunami ]]; then echo -e "\n${bold}${white}已开启 ${green}Yankee 版魔改 BBR${white} ...${normal}\n"
     else echo -e "\n  ${bold}${red}错误 ${green}Yankee 版魔改 BBR${white} 开启失败！${normal}\n" ; exit 1 ; fi
 else
-    echo -e "\n  ${bold}${white}当前内核不支持 ${green}Yankee${white} 版魔改 BBR，需要安装 ${green}4.11.12${white} 内核 ...${normal}"
+    echo -e "\n  ${bold}当前内核不支持 ${green}Yankee${jiacu} 版魔改 BBR，需要安装 ${green}4.11.12${jiacu} 内核 ...${normal}"
     _online_ubuntu_bbr_firmware
     _check_essential
     _bbr_kernel_4_11_12
@@ -203,7 +203,7 @@ else
     _bbr_tsunami_autoinstall_after_reboot
     bbrname=tsunami
     _enable_bbr
-    [[ ! $DeBUG == 1 ]] && echo -e "\n  ${bold}${white}即将重启系统，重启后会自动安装 ${green}Yankee${white} 版魔改 BBR ... ${normal}\n" && reboot
+    [[ ! $DeBUG == 1 ]] && echo -e "\n  ${bold}即将重启系统，重启后会自动安装 ${green}Yankee${jiacu} 版魔改 BBR ... ${normal}\n" && reboot
 fi ; }
 
 
@@ -213,16 +213,16 @@ function _nqlbbr_install() {
 
 [[ `grep "Advanced options for Ubuntu" /etc/default/grub` ]] && sed -i 's/GRUB_DEFAULT=.*/GRUB_DEFAULT=""/' /etc/default/grub
 
-if [[ $NQLKernel == "${green}是${white}" ]]; then
-    echo -e "\n  ${bold}${white}理论上当前内核已支持 ${green}南琴浪 版魔改 BBR，安装并启用魔改 BBR ...${normal}"
+if [[ $NQLKernel == "${green}是${jiacu}" ]]; then
+    echo -e "\n  ${bold}理论上当前内核已支持 ${green}南琴浪${jiacu} 版魔改 BBR，安装并启用魔改 BBR ...${normal}"
     _check_essential
     _bbr_nanqinlang
     bbrname=nanqinlang
     _enable_bbr
-    if [[ ` sysctl net.ipv4.tcp_available_congestion_control | awk '{print $3}' ` == nanqinlang ]]; then echo -e "\n${bold}${white}已开启 ${green}南琴浪 版魔改 BBR${white} ...${normal}\n"
+    if [[ ` sysctl net.ipv4.tcp_available_congestion_control | awk '{print $3}' ` == nanqinlang ]]; then echo -e "\n${bold}已开启 ${green}南琴浪${jiacu} 版魔改 BBR ...${normal}\n"
     else echo -e "\n${bold}${red}错误 ${green}南琴浪 版魔改 BBR${white} 开启失败！${normal}\n" ; exit 1 ; fi
 else
-    echo -e "\n  ${bold}${white}当前内核不支持 ${green}南琴浪${white} 版魔改 BBR，需要安装 ${green}4.11.12${white} 内核 ...${normal}"
+    echo -e "\n  ${bold}当前内核不支持 ${green}南琴浪${jiacu} 版魔改 BBR，需要安装 ${green}4.11.12${jiacu} 内核 ...${normal}"
     _online_ubuntu_bbr_firmware
     _check_essential
     _bbr_kernel_4_11_12
@@ -231,45 +231,45 @@ else
     _bbr_nanqinlang_autoinstall_after_reboot
     bbrname=nanqinlang
     _enable_bbr
-        [[ ! $DeBUG == 1 ]] && echo -e "\n  ${bold}${white}即将重启系统，重启后会自动安装 ${green}南琴浪${white} 版魔改 BBR ... ${normal}\n" && reboot
+        [[ ! $DeBUG == 1 ]] && echo -e "\n  ${bold}即将重启系统，重启后会自动安装 ${green}南琴浪${jiacu} 版魔改 BBR ... ${normal}\n" && reboot
 fi ; }
 
 
 
 # 安装 锐速
 function _ss_install() {
-if [[ $SSKernel == "${green}是${white}" ]]; then
-    echo -e "\n${bold}${white}理论上当前内核已支持 ${green}锐速${white}，直接安装锐速 ... ${normal}\n"
+if [[ $SSKernel == "${green}是${jiacu}" ]]; then
+    echo -e "\n  ${bold}理论上当前内核已支持 ${green}锐速${jiacu}，直接安装 ... ${normal}\n"
     _serverspeeder_direct_install
-elif [[ $SSKernel == "${red}否${white}" ]] && [[ $DISTRO == ubuntu ]]; then
-    echo -e "\n${bold}${white}当前内核不支持 锐速，安装 ${green}3.16.0-43${white} 内核 ... ${normal}\n"
+elif [[ $SSKernel == "${red}否${jiacu}" ]] && [[ $DISTRO == ubuntu ]]; then
+    echo -e "\n  ${bold}当前内核不支持 锐速，安装 ${green}3.16.0-43${jiacu} 内核 ... ${normal}\n"
     kernelver=3.16.0-43-generic
     _ubuntu_serverspeeder_kernel_repo
     _ubuntu_serverspeeder_updategrub
     _serverspeeder_autoinstall_after_reboot
-    [[ ! $DeBUG == 1 ]] && echo -e "\n${bold}${white}即将重启系统，重启后会自动安装锐速 ... ${normal}\n" && reboot
-elif [[ $SSKernel == "${red}否${white}" ]] && [[ $CODENAME == jessie ]]; then
-    echo -e "\n${bold}${white}当前内核不支持 锐速，安装 ${green}3.12.1${white} 内核 ... ${normal}\n"
+    [[ ! $DeBUG == 1 ]] && echo -e "\n  ${bold}即将重启系统，重启后会自动安装 ${green}锐速${jiacu} ... ${normal}\n" && reboot
+elif [[ $SSKernel == "${red}否${jiacu}" ]] && [[ $CODENAME == jessie ]]; then
+    echo -e "\n  ${bold}当前内核不支持 锐速，安装 ${green}3.12.1${jiacu} 内核 ... ${normal}\n"
     kernel_version=3.12-1
     _debian_serverspeeder_kernel_312
     _delete_kernel
     _serverspeeder_autoinstall_after_reboot
-    [[ ! $DeBUG == 1 ]] && echo -e "\n${bold}${white}即将重启系统，重启后会自动安装锐速 ... ${normal}\n" && reboot
-elif [[ $SSKernel == "${red}否${white}" ]] && [[ $CODENAME == stretch ]]; then
-    echo -e "\n${bold}${white}当前内核不支持 锐速，安装 ${green}3.16.0-4${white} 内核 ... ${normal}\n"
+    [[ ! $DeBUG == 1 ]] && echo -e "\n  ${bold}即将重启系统，重启后会自动安装 ${green}锐速${jiacu} ... ${normal}\n" && reboot
+elif [[ $SSKernel == "${red}否${jiacu}" ]] && [[ $CODENAME == stretch ]]; then
+    echo -e "\n  ${bold}当前内核不支持 锐速，安装 ${green}3.16.0-4${jiacu} 内核 ... ${normal}\n"
     kernel_version=3.16.0-4
     _debian_serverspeeder_kernel_316
     _delete_kernel
     _stretch_enable_rclocal
     _serverspeeder_autoinstall_after_reboot
-    [[ ! $DeBUG == 1 ]] && echo -e "\n${bold}${white}即将重启系统，重启后会自动安装锐速 ... ${normal}\n" && reboot
+    [[ ! $DeBUG == 1 ]] && echo -e "\n  ${bold}即将重启系统，重启后会自动安装 ${green}锐速${jiacu} ... ${normal}\n" && reboot
 fi ; }
 
 
 
 # 卸载 锐速
 function _ss_uninstall() {
-echo -ne "\n  ${bold}${red}警告 ${white}即将开始卸载 ${green}锐速${white}，敲 回车 继续，否则退出${normal} " ; read input
+echo -ne "\n  ${bold}${red}警告 ${jiacu}即将开始卸载 ${green}锐速${jiacu}，敲 回车 继续，否则退出${normal} " ; read input
 case $input in
     "" ) echo ;;
     *  ) echo ; _read_response ;;
@@ -281,7 +281,7 @@ echo -e "${bold}${red}已卸载 锐速，但安装的内核仍保留${normal}\n"
 
 # 卸载 BBR
 function _bbr_uninstall() {
-echo -ne "\n  ${bold}${red}警告 ${white}即将开始卸载 ${green}BBR${white}，敲 回车 继续，否则退出${normal} " ; read input
+echo -ne "\n  ${bold}${red}警告 ${jiacu}即将开始卸载 ${green}BBR${jiacu}，敲 回车 继续，否则退出${normal} " ; read input
 case $input in
     "" ) echo ;;
     *  ) echo ; _read_response ;;
@@ -397,7 +397,7 @@ echo "exit 0" >> /etc/rc.local ; }
 function _debian_serverspeeder_kernel_312() {
 wget --no-check-certificate -qO 1.deb https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Linux%20Kernel/ServerSpeeder/linux-headers-3.12-1.deb
 wget --no-check-certificate -qO 2.deb https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Linux%20Kernel/ServerSpeeder/linux-image-3.12-1.deb
-dpkg -i [12].deb > /dev/null 2>&1 || { echo -e "${bold}${red}错误${white} 安装 内核 失败！${normal}" ; exit 1 ; }
+dpkg -i [12].deb > /dev/null 2>&1 || { echo -e "\n  ${bold}${red}错误${jiacu} 安装 内核 失败！${normal}" ; exit 1 ; }
 rm  -rf [12].deb ; }
 
 
@@ -405,7 +405,7 @@ rm  -rf [12].deb ; }
 # Debian 安装 3.16.0-4 内核（For ServerSpeeder）
 function _debian_serverspeeder_kernel_316() {
 wget --no-check-certificate -qO 1.deb https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Linux%20Kernel/ServerSpeeder/linux-image-3.16.0-4.deb
-dpkg -i 1.deb > /dev/null 2>&1 || { echo -e "${bold}${red}错误${white} 安装 内核 失败！${normal}" ; exit 1 ; }
+dpkg -i 1.deb > /dev/null 2>&1 || { echo -e "\n  ${bold}${red}错误${jiacu} 安装 内核 失败！${normal}" ; exit 1 ; }
 rm  -rf 1.deb ; }
 
 
@@ -415,7 +415,7 @@ function _ubuntu_serverspeeder_kernel_440() {
 wget --no-check-certificate -qO 1.deb https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Linux%20Kernel/ServerSpeeder/linux-image-4.4.0-47.deb
 wget --no-check-certificate -qO 2.deb https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Linux%20Kernel/ServerSpeeder/linux-headers-4.4.0-47-all.deb
 wget --no-check-certificate -qO 3.deb https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Linux%20Kernel/ServerSpeeder/linux-headers-4.4.0-47.deb
-dpkg -i [123].deb > /dev/null 2>&1 || { echo -e "${bold}${red}错误${white} 安装 内核 失败！${normal}" ; exit 1 ; }
+dpkg -i [123].deb > /dev/null 2>&1 || { echo -e "\n  ${bold}${red}错误${jiacu} 安装 内核 失败！${normal}" ; exit 1 ; }
 rm  -rf [123].deb ; }
 
 
@@ -425,12 +425,12 @@ function _ubuntu_serverspeeder_kernel_repo() {
 sed -i '/deb http:\/\/security.ubuntu.com\/ubuntu trusty-security main/'d /etc/apt/sources.list
 echo "deb http://security.ubuntu.com/ubuntu trusty-security main" >> /etc/apt/sources.list
 echo -ne "更新系统源 ...  "
-apt-get update > /dev/null 2>&1 && echo "${green}DONE${normal}"
+apt-get update > /dev/null 2>&1 && echo "${green}${bold}完成${normal}"
 echo -ne "安装内核 ...  "
-DEBIAN_FRONTEND=noninteractive apt-get -y install linux-image-extra-$kernelver linux-image-$kernelver linux-headers-$kernelver > /dev/null 2>&1 && echo "${green}DONE${normal}" || { echo -e "${bold}${red}错误${white} 安装 内核 失败！${normal}" ; exit 1 ; }
+DEBIAN_FRONTEND=noninteractive apt-get -y install linux-image-extra-$kernelver linux-image-$kernelver linux-headers-$kernelver > /dev/null 2>&1 && echo "${green}${bold}完成${normal}" || { echo "${bold}${red}失败${normal}" ; exit 1 ; }
 sed -i '/deb http:\/\/security.ubuntu.com\/ubuntu trusty-security main/'d /etc/apt/sources.list
 echo -ne "更新系统源 ...  "
-apt-get update > /dev/null 2>&1 && echo "${green}DONE${normal}" ; }
+apt-get update > /dev/null 2>&1 && echo "${green}${bold}完成${normal}" ; }
 
 
 
@@ -439,7 +439,7 @@ function _ubuntu_serverspeeder_updategrub() {
 sed -i 's/GRUB_DEFAULT=.*/GRUB_DEFAULT="Advanced options for Ubuntu>Ubuntu, with Linux kernelver"/' /etc/default/grub
 sed -i "s/kernelver/$kernelver/" /etc/default/grub
 echo -ne "${bold}更新引导 ...  "
-update-grub > /dev/null 2>&1 && echo "${green}DONE${normal}" ; }
+update-grub > /dev/null 2>&1 && echo "${green}${bold}完成${normal}" ; }
 
 
 
@@ -464,7 +464,7 @@ function _online_ubuntu_bbr_firmware() {
 mkdir -p /lib/firmware/bnx2
 if [[ -f /lib/firmware/bnx2/fw.lock ]]; then
     touch /lib/firmware/bnx2/fw.lock
-    echo -e "${bold}${white}下载可能缺少的固件 ... ${normal}\n"
+    echo -e "${bold}下载可能缺少的固件 ... ${normal}\n"
     wget -qO /lib/firmware/bnx2/bnx2-mips-06-6.2.3.fw https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Linux%20Firmware/bnx2-mips-06-6.2.3.fw
     wget -qO /lib/firmware/bnx2/bnx2-mips-09-6.2.1b.fw https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Linux%20Firmware/bnx2-mips-09-6.2.1b.fw
     wget -qO /lib/firmware/bnx2/bnx2-rv2p-09ax-6.0.17.fw https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Linux%20Firmware/bnx2-rv2p-09ax-6.0.17.fw
@@ -476,14 +476,14 @@ fi ; }
 
 # 安装 4.11.12 的内核（For BBR）
 function _bbr_kernel_4_11_12() {
-echo -e "\n${bold}${white}安装 4.11.12 内核 ... ${normal}\n"
+echo -e "\n${bold}安装 4.11.12 内核 ... ${normal}\n"
 wget --no-check-certificate -qO 1.deb https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Linux%20Kernel/BBR/linux-headers-4.11.12-all.deb
 wget --no-check-certificate -qO 2.deb https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Linux%20Kernel/BBR/linux-headers-4.11.12-amd64.deb
 wget --no-check-certificate -qO 3.deb https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Linux%20Kernel/BBR/linux-image-4.11.12-generic-amd64.deb
-dpkg -i [123].deb > /dev/null 2>&1 || { echo -e "${bold}${red}错误${white} 安装 内核 失败！${normal}" ; exit 1 ; }
+dpkg -i [123].deb > /dev/null 2>&1 || { echo -e "\n  ${bold}${red}错误${jiacu} 安装 内核 失败！${normal}" ; exit 1 ; }
 rm -rf [123].deb
 echo -ne "${bold}更新引导 ...  "
-update-grub > /dev/null 2>&1 && echo "${green}DONE${normal}" ; }
+update-grub > /dev/null 2>&1 && echo "${green}${bold}完成${normal}" ; }
 
 
 
@@ -518,35 +518,35 @@ update-grub > /dev/null 2>&1 && echo "${green}DONE${normal}" ; }
 function _check_essential() {
 
 if [[ $CODENAME == stretch ]]; then
-    [[ ! `dpkg -l | grep libssl1.0.0` ]] && { echo -e "\n${white}${bold}安装 libssl1.0.0 ...${normal}"
+    [[ ! `dpkg -l | grep libssl1.0.0` ]] && { echo -e "\n  {bold}安装 libssl1.0.0 ...${normal}"
     echo -e "\ndeb http://ftp.hk.debian.org/debian jessie main\c" >> /etc/apt/sources.list
     apt-get update > /dev/null 2>&1
     apt-get install -y libssl1.0.0 > /dev/null 2>&1
     sed  -i '/deb http:\/\/ftp\.hk\.debian\.org\/debian jessie main/d' /etc/apt/sources.list
     apt-get update > /dev/null 2>&1
-    [[ ! `dpkg -l | grep libssl1.0.0` ]] && { echo -e "\n${red}错误${white}${bold} 安装 libssl1.0.0  失败！${normal}" ; exit 1 ; } ; }
+    [[ ! `dpkg -l | grep libssl1.0.0` ]] && { echo -e "\n  ${red}错误${bold} 安装 libssl1.0.0  失败！${normal}" ; exit 1 ; } ; }
 else
-    [[ ! `dpkg -l | grep libssl1.0.0` ]] && { echo -e "\n${bold}${white}安装 libssl1.0.0 ...${normal}"  ; DEBIAN_FRONTEND=noninteractive apt-get install -y libssl1.0.0 > /dev/null 2>&1
-    [[ ! `dpkg -l | grep libssl1.0.0` ]] && { echo -e "\n${red}错误${white}${bold} 安装 libssl1.0.0  失败！${normal}" ; exit 1 ; } ; }
+    [[ ! `dpkg -l | grep libssl1.0.0` ]] && { echo -e "\n  ${bold}安装 libssl1.0.0 ...${normal}"  ; DEBIAN_FRONTEND=noninteractive apt-get install -y libssl1.0.0 > /dev/null 2>&1
+    [[ ! `dpkg -l | grep libssl1.0.0` ]] && { echo -e "\n$  {red}错误${bold} 安装 libssl1.0.0  失败！${normal}" ; exit 1 ; } ; }
 fi
 
-which make > /dev/null 2>&1 ; [ $? -ne '0' ] && { echo -e "\n${white}${bold}安装 make ...${normal}" ; DEBIAN_FRONTEND=noninteractive apt-get install -y make > /dev/null 2>&1
-which make > /dev/null 2>&1 ; [ $? -ne '0' ] && { echo -e "\n${red}错误${white}${bold} 安装 make 失败！${normal}" ; exit 1 ; } ; }
+which make > /dev/null 2>&1 ; [ $? -ne '0' ] && { echo -e "\n  ${bold}安装 make ...${normal}" ; DEBIAN_FRONTEND=noninteractive apt-get install -y make > /dev/null 2>&1
+which make > /dev/null 2>&1 ; [ $? -ne '0' ] && { echo -e "\n  ${red}错误${bold} 安装 make 失败！${normal}" ; exit 1 ; } ; }
 
-which awk  > /dev/null 2>&1 ; [ $? -ne '0' ] && { echo -e "\n${white}${bold}安装 awk ...${normal}"  ; DEBIAN_FRONTEND=noninteractive apt-get install -y gawk > /dev/null 2>&1
-which awk  > /dev/null 2>&1 ; [ $? -ne '0' ] && { echo -e "\n${red}错误${white}${bold} 安装 awk 失败！${normal}"  ; exit 1 ; } ; }
+which awk  > /dev/null 2>&1 ; [ $? -ne '0' ] && { echo -e "\n  ${bold}安装 awk ...${normal}"  ; DEBIAN_FRONTEND=noninteractive apt-get install -y gawk > /dev/null 2>&1
+which awk  > /dev/null 2>&1 ; [ $? -ne '0' ] && { echo -e "\n  ${red}错误${bold} 安装 awk 失败！${normal}"  ; exit 1 ; } ; }
 
-which gcc  > /dev/null 2>&1 ; [ $? -ne '0' ] && { echo -e "\n${white}${bold}安装 gcc ...${normal}"  ; DEBIAN_FRONTEND=noninteractive apt-get install -y gcc  > /dev/null 2>&1
-which gcc  > /dev/null 2>&1 ; [ $? -ne '0' ] && { echo -e "\n${red}错误${white}${bold} 安装 gcc 失败！${normal}"  ; exit 1 ; } ; }
+which gcc  > /dev/null 2>&1 ; [ $? -ne '0' ] && { echo -e "\n  ${bold}安装 gcc ...${normal}"  ; DEBIAN_FRONTEND=noninteractive apt-get install -y gcc  > /dev/null 2>&1
+which gcc  > /dev/null 2>&1 ; [ $? -ne '0' ] && { echo -e "\n  ${red}错误${bold} 安装 gcc 失败！${normal}"  ; exit 1 ; } ; }
 
 gcc_ok=0 ; gcc_ver=` gcc --version | grep -Eo '[0-9]+\.[0-9]+\.[0-9]+' | head -n1 `
 gcc_ver_1=` echo $gcc_ver | awk -F. '{print $1}' ` ; gcc_ver_2=` echo $gcc_ver | awk -F. '{print $2}' `
 [[ -n $gcc_ver_1 ]] && [[ $gcc_ver_1 -gt 4 ]] && gcc_ok=1
 [[ $gcc_ver_1 == 4 ]] && [[ -n $gcc_ver_2 ]] && [[ $gcc_ver_2 -ge 9 ]] && gcc_ok=1
-[[ $gcc_ok == 0 ]] && { echo -e "\n${red}错误${white}${bold} gcc 版本低于 4.9！${normal}" ; exit 1 ; }
+[[ $gcc_ok == 0 ]] && { echo -e "\n  ${red}错误${bold} gcc 版本低于 4.9！${normal}" ; exit 1 ; }
 
-[[ ! `dpkg -l | grep build-essential` ]] && { echo -e "\n${white}${bold}安装 build-essential ...${normal}"  ; DEBIAN_FRONTEND=noninteractive apt-get install -y build-essential > /dev/null 2>&1
-[[ ! `dpkg -l | grep build-essential` ]] && { echo -e "\n${red}错误${white}${bold} 安装 build-essential  失败！${normal}" ; exit 1 ; } ; } ; }
+[[ ! `dpkg -l | grep build-essential` ]] && { echo -e "\n  ${bold}安装 build-essential ...${normal}"  ; DEBIAN_FRONTEND=noninteractive apt-get install -y build-essential > /dev/null 2>&1
+[[ ! `dpkg -l | grep build-essential` ]] && { echo -e "\n  ${red}错误${bold} 安装 build-essential  失败！${normal}" ; exit 1 ; } ; } ; }
 
 
 
@@ -619,7 +619,7 @@ sysctl -p > /dev/null 2>&1 ; }
 
 # 删除其他内核，并更新引导
 function _delete_kernel() {
-echo -e "\n${bold}${white}卸载多余内核 ... ${normal}\n"
+echo -e "\n${bold}卸载多余内核 ... ${normal}\n"
 kernel_total=` dpkg -l | grep -E linux-[image,headers] | awk '{print $2}' | grep -v "${kernel_version}" | wc -l `
 
 for ddd in debconf-set-selections debconf-get-selections ; do
