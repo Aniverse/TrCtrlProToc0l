@@ -1,4 +1,5 @@
 # TrCtrlProToc0l
+> WARNING: This script may cause system reboot failure  
 
 ![01](https://github.com/Aniverse/TrCtrlProToc0l/raw/master/Images/01.png)
 
@@ -26,7 +27,7 @@ Online 独服的 Ubuntu 和 Debian 系统对于锐速挑内核，用 Ubuntu 的 
 
 ## Drawbacks
 
-- **Only supports Debian 8, Debian 9, Ubuntu 16.04 **  
+- **Only supports Debian 8, Debian 9, Ubuntu 16.04**  
 本脚本作为 `inexistence` 中 `mingling` 的延伸，我认为不需要去支持原本 `inexistence` 就不支持的系统  
 本来这类脚本也有很多，如有需要你可以去用那些适配范围更广的脚本  
 
