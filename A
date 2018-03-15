@@ -30,7 +30,9 @@ shanshuo=$(tput blink); wuguangbiao=$(tput civis); guangbiao=$(tput cnorm)
 
 #  -----------------------------------------------------------------------------------
 
-SysSupport=0
+SysSupport=0 ; DeBUG=0
+[[ $1 == -d ]] && DeBUG=1
+
 KernelBit=` getconf LONG_BIT `
 DISTRO=`  awk -F'[= "]' '/PRETTY_NAME/{print $3}' /etc/os-release | tr 'A-Z' 'a-z'  `
 DISTROU=`  awk -F'[= "]' '/PRETTY_NAME/{print $3}' /etc/os-release  `
@@ -42,9 +44,12 @@ CODENAME=`  cat /etc/os-release | grep VERSION= | tr '[A-Z]' '[a-z]' | sed 's/\"
 #  -----------------------------------------------------------------------------------
 
 [[ $EUID -ne 0 ]] && echo -e "\n${red}错误${normal}${bold} 请使用 root 运行本脚本！${normal}" && exit 1
+[[ ! $DeBUG == 1 ]] &&
 [[ -d /proc/vz ]] && echo -e "\n${red}错误${normal}${bold} 不支持 OpenVZ！${normal}" && exit 1
+[[ ! $DeBUG == 1 ]] &&
 [[ ! $KernelBit == 64 ]] && echo -e "\n${red}错误${normal}${bold} 不支持非 64 位系统！${normal}" && exit 1
 [[ -z "$(dpkg -l |grep 'grub-')" ]] && echo "\n${red}错误${normal}${bold} 未发现 grub！${normal}" && exit 1
+[[ ! $DeBUG == 1 ]] &&
 [[ ! $SysSupport == 1 ]] && echo "\n${red}错误${normal}${bold} 不支持 Debian 8、Debian 9、Ubuntu 16.04 以外的系统！${normal}" && exit 1
 
 # 菜单
@@ -160,19 +165,18 @@ function _obbr_install() {
 [[ `grep "Advanced options for Ubuntu" /etc/default/grub` ]] && sed -i 's/GRUB_DEFAULT=.*/GRUB_DEFAULT=""/' /etc/default/grub
 
 if [[ $BBRKernel == "${green}是${white}" ]]; then
-    echo -e "\n${bold}${white}理论上当前内核已支持 ${green}原版 BBR${white}，不安装新内核，直接启用 BBR ...${normal}"
+    echo -e "\n  ${bold}${white}理论上当前内核已支持 ${green}原版 BBR${white}，不安装新内核，直接启用 BBR ...${normal}"
     bbrname=bbr
     _enable_bbr
     if [[ ` sysctl net.ipv4.tcp_available_congestion_control | awk '{print $3}' ` == bbr ]]; then echo -e "\n${bold}${white}BBR 已启用 ...\n${normal}"
     else echo -e "\n${bold}${red}错误 ${white}BBR 开启失败！${normal}\n" ; exit 1 ; fi
 else
-    echo -e "\n${bold}${white}当前内核不支持 BBR，需要安装 ${green}4.11.12${white} 内核以启用 BBR ...${normal}"
+    echo -e "\n  ${bold}${white}当前内核不支持 BBR，需要安装 ${green}4.11.12${white} 内核以启用 BBR ...${normal}"
     _online_ubuntu_bbr_firmware
     _bbr_kernel_4_11_12
     bbrname=bbr
     _enable_bbr
-    echo -e "\n${bold}${white}即将重启系统，重启后 ${green}BBR${white} 将会启动 ... ${normal}\n"
-    reboot
+    [[ ! $DeBUG == 1 ]] && echo -e "\n  ${bold}${white}即将重启系统，重启后 ${green}BBR${white} 将会启动 ... ${normal}\n" && reboot
 fi ; }
 
 
@@ -182,15 +186,15 @@ function _ykbbr_install() {
 [[ `grep "Advanced options for Ubuntu" /etc/default/grub` ]] && sed -i 's/GRUB_DEFAULT=.*/GRUB_DEFAULT=0/' /etc/default/grub
 
 if [[ $YKKernel == "${green}是${white}" ]]; then
-    echo -e "\n${bold}${white}理论上当前内核已支持 ${green}Yankee${white} 版魔改 BBR，安装并启用魔改 BBR ...${normal}"
+    echo -e "\n  ${bold}${white}理论上当前内核已支持 ${green}Yankee${white} 版魔改 BBR，安装并启用魔改 BBR ...${normal}"
     _check_essential
     _bbr_tsunami
     bbrname=tsunami
     _enable_bbr
     if [[ ` sysctl net.ipv4.tcp_available_congestion_control | awk '{print $3}' ` == tsunami ]]; then echo -e "\n${bold}${white}已开启 ${green}Yankee 版魔改 BBR${white} ...${normal}\n"
-    else echo -e "\n${bold}${red}错误 ${green}Yankee 版魔改 BBR${white} 开启失败！${normal}\n" ; exit 1 ; fi
+    else echo -e "\n  ${bold}${red}错误 ${green}Yankee 版魔改 BBR${white} 开启失败！${normal}\n" ; exit 1 ; fi
 else
-    echo -e "\n${bold}${white}当前内核不支持 ${green}Yankee${white} 版魔改 BBR，需要安装 ${green}4.11.12${white} 内核 ...${normal}"
+    echo -e "\n  ${bold}${white}当前内核不支持 ${green}Yankee${white} 版魔改 BBR，需要安装 ${green}4.11.12${white} 内核 ...${normal}"
     _online_ubuntu_bbr_firmware
     _check_essential
     _bbr_kernel_4_11_12
@@ -199,8 +203,7 @@ else
     _bbr_tsunami_autoinstall_after_reboot
     bbrname=tsunami
     _enable_bbr
-    echo -e "\n${bold}${white}即将重启系统，重启后会自动安装 ${green}Yankee${white} 版魔改 BBR ... ${normal}\n"
-    reboot
+    [[ ! $DeBUG == 1 ]] && echo -e "\n  ${bold}${white}即将重启系统，重启后会自动安装 ${green}Yankee${white} 版魔改 BBR ... ${normal}\n" && reboot
 fi ; }
 
 
@@ -210,8 +213,8 @@ function _nqlbbr_install() {
 
 [[ `grep "Advanced options for Ubuntu" /etc/default/grub` ]] && sed -i 's/GRUB_DEFAULT=.*/GRUB_DEFAULT=""/' /etc/default/grub
 
-if [[ $YKKernel == "${green}是${white}" ]]; then
-    echo -e "\n${bold}${white}理论上当前内核已支持 ${green}南琴浪 版魔改 BBR，安装并启用魔改 BBR ...${normal}"
+if [[ $NQLKernel == "${green}是${white}" ]]; then
+    echo -e "\n  ${bold}${white}理论上当前内核已支持 ${green}南琴浪 版魔改 BBR，安装并启用魔改 BBR ...${normal}"
     _check_essential
     _bbr_nanqinlang
     bbrname=nanqinlang
@@ -219,7 +222,7 @@ if [[ $YKKernel == "${green}是${white}" ]]; then
     if [[ ` sysctl net.ipv4.tcp_available_congestion_control | awk '{print $3}' ` == nanqinlang ]]; then echo -e "\n${bold}${white}已开启 ${green}南琴浪 版魔改 BBR${white} ...${normal}\n"
     else echo -e "\n${bold}${red}错误 ${green}南琴浪 版魔改 BBR${white} 开启失败！${normal}\n" ; exit 1 ; fi
 else
-    echo -e "\n${bold}${white}当前内核不支持 ${green}南琴浪${white} 版魔改 BBR，需要安装 ${green}4.11.12${white} 内核 ...${normal}"
+    echo -e "\n  ${bold}${white}当前内核不支持 ${green}南琴浪${white} 版魔改 BBR，需要安装 ${green}4.11.12${white} 内核 ...${normal}"
     _online_ubuntu_bbr_firmware
     _check_essential
     _bbr_kernel_4_11_12
@@ -228,8 +231,7 @@ else
     _bbr_nanqinlang_autoinstall_after_reboot
     bbrname=nanqinlang
     _enable_bbr
-    echo -e "\n${bold}${white}即将重启系统，重启后会自动安装 ${green}南琴浪${white} 版魔改 BBR ... ${normal}\n"
-    reboot
+        [[ ! $DeBUG == 1 ]] && echo -e "\n  ${bold}${white}即将重启系统，重启后会自动安装 ${green}南琴浪${white} 版魔改 BBR ... ${normal}\n" && reboot
 fi ; }
 
 
@@ -245,16 +247,14 @@ elif [[ $SSKernel == "${red}否${white}" ]] && [[ $DISTRO == ubuntu ]]; then
     _ubuntu_serverspeeder_kernel_repo
     _ubuntu_serverspeeder_updategrub
     _serverspeeder_autoinstall_after_reboot
-    echo -e "\n${bold}${white}即将重启系统，重启后会自动安装锐速 ... ${normal}\n"
-    reboot
+    [[ ! $DeBUG == 1 ]] && echo -e "\n${bold}${white}即将重启系统，重启后会自动安装锐速 ... ${normal}\n" && reboot
 elif [[ $SSKernel == "${red}否${white}" ]] && [[ $CODENAME == jessie ]]; then
     echo -e "\n${bold}${white}当前内核不支持 锐速，安装 ${green}3.12.1${white} 内核 ... ${normal}\n"
     kernel_version=3.12-1
     _debian_serverspeeder_kernel_312
     _delete_kernel
     _serverspeeder_autoinstall_after_reboot
-    echo -e "\n${bold}${white}即将重启系统，重启后会自动安装锐速 ... ${normal}\n"
-    reboot
+    [[ ! $DeBUG == 1 ]] && echo -e "\n${bold}${white}即将重启系统，重启后会自动安装锐速 ... ${normal}\n" && reboot
 elif [[ $SSKernel == "${red}否${white}" ]] && [[ $CODENAME == stretch ]]; then
     echo -e "\n${bold}${white}当前内核不支持 锐速，安装 ${green}3.16.0-4${white} 内核 ... ${normal}\n"
     kernel_version=3.16.0-4
@@ -262,8 +262,7 @@ elif [[ $SSKernel == "${red}否${white}" ]] && [[ $CODENAME == stretch ]]; then
     _delete_kernel
     _stretch_enable_rclocal
     _serverspeeder_autoinstall_after_reboot
-    echo -e "\n${bold}${white}即将重启系统，重启后会自动安装锐速 ... ${normal}\n"
-    reboot
+    [[ ! $DeBUG == 1 ]] && echo -e "\n${bold}${white}即将重启系统，重启后会自动安装锐速 ... ${normal}\n" && reboot
 fi ; }
 
 
@@ -466,11 +465,11 @@ mkdir -p /lib/firmware/bnx2
 if [[ -f /lib/firmware/bnx2/fw.lock ]]; then
     touch /lib/firmware/bnx2/fw.lock
     echo -e "${bold}${white}下载可能缺少的固件 ... ${normal}\n"
-    wget -qO /lib/firmware/bnx2/bnx2-mips-06-6.2.3.fw https://github.com/Aniverse/inexistence/raw/master/03.Files/firmware/bnx2-mips-06-6.2.3.fw
-    wget -qO /lib/firmware/bnx2/bnx2-mips-09-6.2.1b.fw https://github.com/Aniverse/inexistence/raw/master/03.Files/firmware/bnx2-mips-09-6.2.1b.fw
-    wget -qO /lib/firmware/bnx2/bnx2-rv2p-09ax-6.0.17.fw https://github.com/Aniverse/inexistence/raw/master/03.Files/firmware/bnx2-rv2p-09ax-6.0.17.fw
-    wget -qO /lib/firmware/bnx2/bnx2-rv2p-09-6.0.17.fw https://github.com/Aniverse/inexistence/raw/master/03.Files/firmware/bnx2-rv2p-09-6.0.17.fw
-    wget -qO /lib/firmware/bnx2/bnx2-rv2p-06-6.0.15.fw https://github.com/Aniverse/inexistence/raw/master/03.Files/firmware/bnx2-rv2p-06-6.0.15.fw
+    wget -qO /lib/firmware/bnx2/bnx2-mips-06-6.2.3.fw https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Linux%20Firmware/bnx2-mips-06-6.2.3.fw
+    wget -qO /lib/firmware/bnx2/bnx2-mips-09-6.2.1b.fw https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Linux%20Firmware/bnx2-mips-09-6.2.1b.fw
+    wget -qO /lib/firmware/bnx2/bnx2-rv2p-09ax-6.0.17.fw https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Linux%20Firmware/bnx2-rv2p-09ax-6.0.17.fw
+    wget -qO /lib/firmware/bnx2/bnx2-rv2p-09-6.0.17.fw https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Linux%20Firmware/bnx2-rv2p-09-6.0.17.fw
+    wget -qO /lib/firmware/bnx2/bnx2-rv2p-06-6.0.15.fw https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Linux%20Firmware/bnx2-rv2p-06-6.0.15.fw
 fi ; }
 
 
