@@ -5,7 +5,7 @@
 ## Usage
 
 ```
-bash -c "$(wget --no-check-certificate -qO- https://github.com/Aniverse/TrCtrlProToc0l/raw/master/TrCtrlProToc0l.sh)"
+bash -c "$(wget --no-check-certificate -qO- https://github.com/Aniverse/TrCtrlProToc0l/raw/master/A)"
 ```
 
 ## Features
@@ -31,7 +31,7 @@ Online 独服的 Ubuntu 和 Debian 系统对于锐速挑内核，用 Ubuntu 的 
 本来这类脚本也有很多，如有需要你可以去用那些适配范围更广的脚本  
 
 - **Author is too young too simple and always naive**  
-本脚本在 Vultr Cloud Compute 上测试通过，但不保证在别的环境上都能正常工作  
+本脚本在 Vultr Cloud Compute 上测试通过，但不保证在所有环境上都能正常工作  
 
 ## More screenshots
 
@@ -39,6 +39,7 @@ Online 独服的 Ubuntu 和 Debian 系统对于锐速挑内核，用 Ubuntu 的 
 ![03](https://github.com/Aniverse/TrCtrlProToc0l/raw/master/Images/03.png)
 ![04](https://github.com/Aniverse/TrCtrlProToc0l/raw/master/Images/04.png)
 ![05](https://github.com/Aniverse/TrCtrlProToc0l/raw/master/Images/05.png)
+![06](https://github.com/Aniverse/TrCtrlProToc0l/raw/master/Images/06.png)
 
 ## To Do List
 
