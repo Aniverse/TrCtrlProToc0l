@@ -1,6 +1,8 @@
 # TrCtrlProToc0l
 > WARNING: This script may cause system reboot failure  
 
+This is the choice of Steins;Gate.  
+
 ![01](https://github.com/Aniverse/TrCtrlProToc0l/raw/master/Images/01.png)
 
 ## Usage
