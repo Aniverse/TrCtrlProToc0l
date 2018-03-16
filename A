@@ -166,13 +166,13 @@ function _obbr_install() {
 [[ `grep "Advanced options for Ubuntu" /etc/default/grub` ]] && sed -i 's/GRUB_DEFAULT=.*/GRUB_DEFAULT=""/' /etc/default/grub
 
 if [[ $BBRKernel == "${green}是${jiacu}" ]]; then
-    echo -e "\n  ${bold}理论上当前内核已支持 ${green}原版 BBR，不安装新内核，直接启用 BBR ...${normal}"
+    echo -ne "\n  ${bold}理论上当前内核已支持 ${green}原版 BBR，不安装新内核，直接启用 BBR ...${normal} "
     bbrname=bbr
-    _enable_bbr
-    if [[ ` sysctl net.ipv4.tcp_available_congestion_control | awk '{print $3}' ` == bbr ]]; then echo -e "\n${bold}BBR 已启用 ...\n${normal}"
+    _enable_bbr ; echo
+    if [[ ` sysctl net.ipv4.tcp_available_congestion_control | awk '{print $3}' ` == bbr ]]; then echo -e "\n  ${bold}BBR 已启用 ...\n${normal}"
     else echo -e "\n${bold}${red}错误 BBR 开启失败！${normal}\n" ; exit 1 ; fi
 else
-    echo -e "\n  ${bold}当前内核不支持 BBR，需要安装 ${green}4.11.12${jiacu} 内核以启用 BBR ...${normal}"
+    echo -e "\n  ${bold}当前内核不支持 BBR，需要安装 ${green}4.11.12${jiacu} 内核以启用 BBR ...${normal} "
     _online_ubuntu_bbr_firmware
     _bbr_kernel_4_11_12
     bbrname=bbr
@@ -187,12 +187,12 @@ function _ykbbr_install() {
 [[ `grep "Advanced options for Ubuntu" /etc/default/grub` ]] && sed -i 's/GRUB_DEFAULT=.*/GRUB_DEFAULT=0/' /etc/default/grub
 
 if [[ $YKKernel == "${green}是${jiacu}" ]]; then
-    echo -e "\n  ${bold}理论上当前内核已支持 ${green}Yankee${jiacu} 版魔改 BBR，安装并启用魔改 BBR ...${normal}"
+    echo -ne "\n  ${bold}理论上当前内核已支持 ${green}Yankee${jiacu} 版魔改 BBR，安装并启用魔改 BBR ...${normal} "
     _check_essential
     _bbr_tsunami
     bbrname=tsunami
-    _enable_bbr
-    if [[ ` sysctl net.ipv4.tcp_available_congestion_control | awk '{print $3}' ` == tsunami ]]; then echo -e "\n${bold}已开启 ${green}Yankee 版魔改 BBR${jiacu} ...${normal}\n"
+    _enable_bbr ; echo
+    if [[ ` sysctl net.ipv4.tcp_available_congestion_control | awk '{print $3}' ` == tsunami ]]; then echo -e "\n  ${bold}已开启 ${green}Yankee 版魔改 BBR${jiacu} ...${normal}\n"
     else echo -e "\n  ${bold}${red}错误 ${green}Yankee 版魔改 BBR${jiacu} 开启失败！${normal}\n" ; exit 1 ; fi
 else
     echo -e "\n  ${bold}当前内核不支持 ${green}Yankee${jiacu} 版魔改 BBR，需要安装 ${green}4.11.12${jiacu} 内核 ...${normal}"
@@ -215,15 +215,15 @@ function _nqlbbr_install() {
 [[ `grep "Advanced options for Ubuntu" /etc/default/grub` ]] && sed -i 's/GRUB_DEFAULT=.*/GRUB_DEFAULT=""/' /etc/default/grub
 
 if [[ $NQLKernel == "${green}是${jiacu}" ]]; then
-    echo -e "\n  ${bold}理论上当前内核已支持 ${green}南琴浪${jiacu} 版魔改 BBR，安装并启用魔改 BBR ...${normal}"
+    echo -ne "\n  ${bold}理论上当前内核已支持 ${green}南琴浪${jiacu} 版魔改 BBR，安装并启用魔改 BBR ...${normal} "
     _check_essential
     _bbr_nanqinlang
     bbrname=nanqinlang
-    _enable_bbr
+    _enable_bbr ; echo
     if [[ ` sysctl net.ipv4.tcp_available_congestion_control | awk '{print $3}' ` == nanqinlang ]]; then echo -e "\n${bold}已开启 ${green}南琴浪${jiacu} 版魔改 BBR ...${normal}\n"
-    else echo -e "\n${bold}${red}错误 ${green}南琴浪 版魔改 BBR${jiacu} 开启失败！${normal}\n" ; exit 1 ; fi
+    else echo -e "\n  ${bold}${red}错误 ${green}南琴浪 版魔改 BBR${jiacu} 开启失败！${normal}\n" ; exit 1 ; fi
 else
-    echo -e "\n  ${bold}当前内核不支持 ${green}南琴浪${jiacu} 版魔改 BBR，需要安装 ${green}4.11.12${jiacu} 内核 ...${normal}"
+    echo -e "\n  ${bold}当前内核不支持 ${green}南琴浪${jiacu} 版魔改 BBR，需要安装 ${green}4.11.12${jiacu} 内核 ...${normal} "
     _online_ubuntu_bbr_firmware
     _check_essential
     _bbr_kernel_4_11_12
@@ -242,6 +242,7 @@ function _ss_install() {
 if [[ $SSKernel == "${green}是${jiacu}" ]]; then
     echo -e "\n  ${bold}理论上当前内核已支持 ${green}锐速${jiacu}，直接安装 ... ${normal}\n"
     _serverspeeder_direct_install
+    echo -e "\n${bold}${green}锐速${jiacu} 安装完成 ... ${normal}\n"
 elif [[ $SSKernel == "${red}否${jiacu}" ]] && [[ $DISTRO == ubuntu ]]; then
     echo -e "\n  ${bold}当前内核不支持 锐速，安装 ${green}3.16.0-43${jiacu} 内核 ... ${normal}\n"
     kernelver=3.16.0-43-generic
@@ -477,14 +478,15 @@ fi ; }
 
 # 安装 4.11.12 的内核（For BBR）
 function _bbr_kernel_4_11_12() {
-echo -e "\n  ${bold}安装 4.11.12 内核 ... ${normal}\n"
+echo -e "\n  ${bold}安装 4.11.12 内核 ... ${normal}  "
 wget --no-check-certificate -qO 1.deb https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Linux%20Kernel/BBR/linux-headers-4.11.12-all.deb
 wget --no-check-certificate -qO 2.deb https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Linux%20Kernel/BBR/linux-headers-4.11.12-amd64.deb
 wget --no-check-certificate -qO 3.deb https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Linux%20Kernel/BBR/linux-image-4.11.12-generic-amd64.deb
 dpkg -i [123].deb > /dev/null 2>&1 || { echo -e "\n  ${bold}${red}错误${jiacu} 安装 内核 失败！${normal}" ; exit 1 ; }
 rm -rf [123].deb
-echo -ne "${bold}更新引导 ...  "
-update-grub > /dev/null 2>&1 && echo "${green}${bold}完成${normal}" ; }
+#echo -ne "  ${bold}更新引导 ...  "
+update-grub > /dev/null 2>&1 #&& echo "${green}${bold}完成${normal}"
+echo ; }
 
 
 
@@ -517,26 +519,26 @@ update-grub > /dev/null 2>&1 && echo "${green}完成${normal}" ; }
 function _check_essential() {
 
 if [[ $CODENAME == stretch ]]; then
-    [[ ! `dpkg -l | grep libssl1.0.0` ]] && { echo -e "\n  {bold}安装 libssl1.0.0 ...${normal}"
+    [[ ! `dpkg -l | grep libssl1.0.0` ]] && { echo -ne "\n  {bold}安装 libssl1.0.0 ...${normal} "
     echo -e "\ndeb http://ftp.hk.debian.org/debian jessie main\c" >> /etc/apt/sources.list
     apt-get update > /dev/null 2>&1
     apt-get install -y libssl1.0.0 > /dev/null 2>&1
     sed  -i '/deb http:\/\/ftp\.hk\.debian\.org\/debian jessie main/d' /etc/apt/sources.list
-    apt-get update > /dev/null 2>&1
+    apt-get update > /dev/null 2>&1 ; echo
     [[ ! `dpkg -l | grep libssl1.0.0` ]] && { echo -e "\n  ${red}错误${bold} 安装 libssl1.0.0  失败！${normal}" ; exit 1 ; } ; }
 else
-    [[ ! `dpkg -l | grep libssl1.0.0` ]] && { echo -e "\n  ${bold}安装 libssl1.0.0 ...${normal}"  ; DEBIAN_FRONTEND=noninteractive apt-get install -y libssl1.0.0 > /dev/null 2>&1
-    [[ ! `dpkg -l | grep libssl1.0.0` ]] && { echo -e "\n$  ${red}错误${bold} 安装 libssl1.0.0  失败！${normal}" ; exit 1 ; } ; }
+    [[ ! `dpkg -l | grep libssl1.0.0` ]] && { echo -ne "\n  ${bold}安装 libssl1.0.0 ...${normal} "  ; DEBIAN_FRONTEND=noninteractive apt-get install -y libssl1.0.0 > /dev/null 2>&1 ; echo
+    [[ ! `dpkg -l | grep libssl1.0.0` ]] && { echo -e  "\n$  ${red}错误${bold} 安装 libssl1.0.0  失败！${normal}" ; exit 1 ; } ; }
 fi
 
-which make > /dev/null 2>&1 ; [ $? -ne '0' ] && { echo -e "\n  ${bold}安装 make ...${normal}" ; DEBIAN_FRONTEND=noninteractive apt-get install -y make > /dev/null 2>&1
-which make > /dev/null 2>&1 ; [ $? -ne '0' ] && { echo -e "\n  ${red}错误${bold} 安装 make 失败！${normal}" ; exit 1 ; } ; }
+which make > /dev/null 2>&1 ; [ $? -ne '0' ] && { echo -ne "\n  ${bold}安装 make ...${normal} " ; DEBIAN_FRONTEND=noninteractive apt-get install -y make > /dev/null 2>&1 ; echo
+which make > /dev/null 2>&1 ; [ $? -ne '0' ] && { echo -e  "\n  ${red}错误${bold} 安装 make 失败！${normal}" ; exit 1 ; } ; }
 
-which awk  > /dev/null 2>&1 ; [ $? -ne '0' ] && { echo -e "\n  ${bold}安装 awk ...${normal}"  ; DEBIAN_FRONTEND=noninteractive apt-get install -y gawk > /dev/null 2>&1
-which awk  > /dev/null 2>&1 ; [ $? -ne '0' ] && { echo -e "\n  ${red}错误${bold} 安装 awk 失败！${normal}"  ; exit 1 ; } ; }
+which awk  > /dev/null 2>&1 ; [ $? -ne '0' ] && { echo -ne "\n  ${bold}安装 awk ...${normal} "  ; DEBIAN_FRONTEND=noninteractive apt-get install -y gawk > /dev/null 2>&1 ; echo
+which awk  > /dev/null 2>&1 ; [ $? -ne '0' ] && { echo -e  "\n  ${red}错误${bold} 安装 awk 失败！${normal}"  ; exit 1 ; } ; }
 
-which gcc  > /dev/null 2>&1 ; [ $? -ne '0' ] && { echo -e "\n  ${bold}安装 gcc ...${normal}"  ; DEBIAN_FRONTEND=noninteractive apt-get install -y gcc  > /dev/null 2>&1
-which gcc  > /dev/null 2>&1 ; [ $? -ne '0' ] && { echo -e "\n  ${red}错误${bold} 安装 gcc 失败！${normal}"  ; exit 1 ; } ; }
+which gcc  > /dev/null 2>&1 ; [ $? -ne '0' ] && { echo -ne "\n  ${bold}安装 gcc ...${normal} "  ; DEBIAN_FRONTEND=noninteractive apt-get install -y gcc  > /dev/null 2>&1 ; echo
+which gcc  > /dev/null 2>&1 ; [ $? -ne '0' ] && { echo -e  "\n  ${red}错误${bold} 安装 gcc 失败！${normal}"  ; exit 1 ; } ; }
 
 gcc_ok=0 ; gcc_ver=` gcc --version | grep -Eo '[0-9]+\.[0-9]+\.[0-9]+' | head -n1 `
 gcc_ver_1=` echo $gcc_ver | awk -F. '{print $1}' ` ; gcc_ver_2=` echo $gcc_ver | awk -F. '{print $2}' `
@@ -544,8 +546,8 @@ gcc_ver_1=` echo $gcc_ver | awk -F. '{print $1}' ` ; gcc_ver_2=` echo $gcc_ver |
 [[ $gcc_ver_1 == 4 ]] && [[ -n $gcc_ver_2 ]] && [[ $gcc_ver_2 -ge 9 ]] && gcc_ok=1
 [[ $gcc_ok == 0 ]] && { echo -e "\n  ${red}错误${bold} gcc 版本低于 4.9！${normal}" ; exit 1 ; }
 
-[[ ! `dpkg -l | grep build-essential` ]] && { echo -e "\n  ${bold}安装 build-essential ...${normal}"  ; DEBIAN_FRONTEND=noninteractive apt-get install -y build-essential > /dev/null 2>&1
-[[ ! `dpkg -l | grep build-essential` ]] && { echo -e "\n  ${red}错误${bold} 安装 build-essential  失败！${normal}" ; exit 1 ; } ; } ; }
+[[ ! `dpkg -l | grep build-essential` ]] && { echo -ne "\n  ${bold}安装 build-essential ...${normal} "  ; DEBIAN_FRONTEND=noninteractive apt-get install -y build-essential > /dev/null 2>&1 ; echo
+[[ ! `dpkg -l | grep build-essential` ]] && { echo -e  "\n  ${red}错误${bold} 安装 build-essential  失败！${normal}" ; exit 1 ; } ; } ; }
 
 
 
@@ -618,7 +620,7 @@ sysctl -p > /dev/null 2>&1 ; }
 
 # 删除其他内核，并更新引导
 function _delete_kernel() {
-echo -e "\n${bold}卸载多余内核 ... ${normal}\n"
+echo -e "\n  ${bold}卸载多余内核 ... ${normal}\n"
 kernel_total=` dpkg -l | grep -E linux-[image,headers] | awk '{print $2}' | grep -v "${kernel_version}" | wc -l `
 
 for ddd in debconf-set-selections debconf-get-selections ; do
@@ -627,7 +629,7 @@ for ddd in debconf-set-selections debconf-get-selections ; do
 if [ $kernel_total > 1 ]; then
     for (( integer = 1 ; integer <= ${kernel_total} ; integer++ )) ; do
         kernel_tobe_del=` dpkg -l | grep -E linux-[image,headers] | awk '{print $2}' | grep -v "${kernel_version}" | head -${integer} `
-        echo -ne "Removing ${kernel_tobe_del} ... "
+        echo -ne "  Removing ${kernel_tobe_del} ... "
         echo `debconf-get-selections ${deb_del} | grep removing-running-kernel | grep $running_kernel | sed s/true/false/` | debconf-set-selections
         DEBIAN_FRONTEND=noninteractive apt-get -y purge $kernel_tobe_del > /dev/null 2>&1 && echo "$(tput setaf 2)DONE$(tput sgr0)" || echo "$(tput setaf 1)FAILED$(tput sgr0)"
     done
