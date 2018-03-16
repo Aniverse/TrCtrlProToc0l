@@ -463,7 +463,7 @@ function _serverspeeder_direct_install() { wget --no-check-certificate -qO /tmp/
 # Online.net 独服补充固件（For BBR）
 function _online_ubuntu_bbr_firmware() {
 mkdir -p /lib/firmware/bnx2
-if [[ -f /lib/firmware/bnx2/fw.lock ]]; then
+if [[ ! -f /lib/firmware/bnx2/fw.lock ]]; then
     touch /lib/firmware/bnx2/fw.lock
     echo -e "  ${bold}下载可能缺少的固件 ... ${normal}\n"
     wget -qO /lib/firmware/bnx2/bnx2-mips-06-6.2.3.fw https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Linux%20Firmware/bnx2-mips-06-6.2.3.fw
