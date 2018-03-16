@@ -220,7 +220,7 @@ if [[ $NQLKernel == "${green}是${jiacu}" ]]; then
     _bbr_nanqinlang
     bbrname=nanqinlang
     _enable_bbr ; echo
-    if [[ ` sysctl net.ipv4.tcp_available_congestion_control | awk '{print $3}' ` == nanqinlang ]]; then echo -e "\n${bold}已开启 ${green}南琴浪${jiacu} 版魔改 BBR ...${normal}\n"
+    if [[ ` sysctl net.ipv4.tcp_available_congestion_control | awk '{print $3}' ` == nanqinlang ]]; then echo -e "\n  ${bold}已开启 ${green}南琴浪${jiacu} 版魔改 BBR ...${normal}\n"
     else echo -e "\n  ${bold}${red}错误 ${green}南琴浪 版魔改 BBR${jiacu} 开启失败！${normal}\n" ; exit 1 ; fi
 else
     echo -e "\n  ${bold}当前内核不支持 ${green}南琴浪${jiacu} 版魔改 BBR，需要安装 ${green}4.11.12${jiacu} 内核 ...${normal} "
@@ -240,25 +240,24 @@ fi ; }
 # 安装 锐速
 function _ss_install() {
 if [[ $SSKernel == "${green}是${jiacu}" ]]; then
-    echo -e "\n  ${bold}理论上当前内核已支持 ${green}锐速${jiacu}，直接安装 ... ${normal}\n"
+    echo -e "\n  ${bold}理论上当前内核已支持 ${green}锐速${jiacu}，直接安装 ... ${normal} "
     _serverspeeder_direct_install
-    echo -e "\n${bold}${green}锐速${jiacu} 安装完成 ... ${normal}\n"
 elif [[ $SSKernel == "${red}否${jiacu}" ]] && [[ $DISTRO == ubuntu ]]; then
-    echo -e "\n  ${bold}当前内核不支持 锐速，安装 ${green}3.16.0-43${jiacu} 内核 ... ${normal}\n"
+    echo -ne "\n  ${bold}当前内核不支持 锐速，安装 ${green}3.16.0-43${jiacu} 内核 ... ${normal} "
     kernelver=3.16.0-43-generic
     _ubuntu_serverspeeder_kernel_repo
     _ubuntu_serverspeeder_updategrub
     _serverspeeder_autoinstall_after_reboot
     [[ ! $DeBUG == 1 ]] && echo -e "\n  ${bold}即将重启系统，重启后会自动安装 ${green}锐速${jiacu} ... ${normal}\n" && reboot
 elif [[ $SSKernel == "${red}否${jiacu}" ]] && [[ $CODENAME == jessie ]]; then
-    echo -e "\n  ${bold}当前内核不支持 锐速，安装 ${green}3.12.1${jiacu} 内核 ... ${normal}\n"
+    echo -ne "\n  ${bold}当前内核不支持 锐速，安装 ${green}3.12.1${jiacu} 内核 ... ${normal} "
     kernel_version=3.12-1
     _debian_serverspeeder_kernel_312
     _delete_kernel
     _serverspeeder_autoinstall_after_reboot
     [[ ! $DeBUG == 1 ]] && echo -e "\n  ${bold}即将重启系统，重启后会自动安装 ${green}锐速${jiacu} ... ${normal}\n" && reboot
 elif [[ $SSKernel == "${red}否${jiacu}" ]] && [[ $CODENAME == stretch ]]; then
-    echo -e "\n  ${bold}当前内核不支持 锐速，安装 ${green}3.16.0-4${jiacu} 内核 ... ${normal}\n"
+    echo -ne "\n  ${bold}当前内核不支持 锐速，安装 ${green}3.16.0-4${jiacu} 内核 ... ${normal} "
     kernel_version=3.16.0-4
     _debian_serverspeeder_kernel_316
     _delete_kernel
@@ -400,7 +399,7 @@ function _debian_serverspeeder_kernel_312() {
 wget --no-check-certificate -qO 1.deb https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Linux%20Kernel/ServerSpeeder/linux-headers-3.12-1.deb
 wget --no-check-certificate -qO 2.deb https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Linux%20Kernel/ServerSpeeder/linux-image-3.12-1.deb
 dpkg -i [12].deb > /dev/null 2>&1 || { echo -e "\n  ${bold}${red}错误${jiacu} 安装 内核 失败！${normal}" ; exit 1 ; }
-rm  -rf [12].deb ; }
+rm  -rf [12].deb ; echo ; }
 
 
 
@@ -408,7 +407,7 @@ rm  -rf [12].deb ; }
 function _debian_serverspeeder_kernel_316() {
 wget --no-check-certificate -qO 1.deb https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Linux%20Kernel/ServerSpeeder/linux-image-3.16.0-4.deb
 dpkg -i 1.deb > /dev/null 2>&1 || { echo -e "\n  ${bold}${red}错误${jiacu} 安装 内核 失败！${normal}" ; exit 1 ; }
-rm  -rf 1.deb ; }
+rm  -rf 1.deb ; echo ; }
 
 
 
@@ -418,7 +417,7 @@ wget --no-check-certificate -qO 1.deb https://github.com/Aniverse/BitTorrentClie
 wget --no-check-certificate -qO 2.deb https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Linux%20Kernel/ServerSpeeder/linux-headers-4.4.0-47-all.deb
 wget --no-check-certificate -qO 3.deb https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Linux%20Kernel/ServerSpeeder/linux-headers-4.4.0-47.deb
 dpkg -i [123].deb > /dev/null 2>&1 || { echo -e "\n  ${bold}${red}错误${jiacu} 安装 内核 失败！${normal}" ; exit 1 ; }
-rm  -rf [123].deb ; }
+rm  -rf [123].deb ; echo ; }
 
 
 
@@ -426,12 +425,12 @@ rm  -rf [123].deb ; }
 function _ubuntu_serverspeeder_kernel_repo() {
 sed -i '/deb http:\/\/security.ubuntu.com\/ubuntu trusty-security main/'d /etc/apt/sources.list
 echo "deb http://security.ubuntu.com/ubuntu trusty-security main" >> /etc/apt/sources.list
-echo -ne "更新系统源 ...  "
-apt-get update > /dev/null 2>&1 && echo "${green}${bold}完成${normal}"
+echo -ne "添加源，更新 ...  "
+apt-get update > /dev/null 2>&1 & echo "${green}${bold}完成${normal}"
 echo -ne "安装内核 ...  "
 DEBIAN_FRONTEND=noninteractive apt-get -y install linux-image-extra-$kernelver linux-image-$kernelver linux-headers-$kernelver > /dev/null 2>&1 && echo "${green}${bold}完成${normal}" || { echo "${bold}${red}失败${normal}" ; exit 1 ; }
 sed -i '/deb http:\/\/security.ubuntu.com\/ubuntu trusty-security main/'d /etc/apt/sources.list
-echo -ne "更新系统源 ...  "
+echo -ne "删除源，更新 ...  "
 apt-get update > /dev/null 2>&1 && echo "${green}${bold}完成${normal}" ; }
 
 
