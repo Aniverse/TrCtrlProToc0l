@@ -170,14 +170,14 @@ if [[ $BBRKernel == "${green}是${jiacu}" ]]; then
     bbrname=bbr
     _enable_bbr ; echo
     if [[ ` sysctl net.ipv4.tcp_available_congestion_control | awk '{print $3}' ` == bbr ]]; then echo -e "\n  ${bold}BBR 已启用 ...\n${normal}"
-    else echo -e "\n${bold}${red}错误 BBR 开启失败！${normal}\n" ; exit 1 ; fi
+    else echo -e "\n  ${bold}${red}错误 BBR 开启失败！${normal}\n" ; exit 1 ; fi
 else
     echo -e "\n  ${bold}当前内核不支持 BBR，需要安装 ${green}4.11.12${jiacu} 内核以启用 BBR ...${normal} "
     _online_ubuntu_bbr_firmware
     _bbr_kernel_4_11_12
     bbrname=bbr
     _enable_bbr
-    [[ ! $DeBUG == 1 ]] && echo -e "\n  ${bold}即将重启系统，重启后 ${green}BBR${jiacu} 将会启动 ... ${normal}\n" && reboot
+    [[ ! $DeBUG == 1 ]] && echo -ne "\n  ${bold}即将重启系统，重启后 ${green}BBR${jiacu} 将会启动 ... ${normal}" && reboot
 fi ; }
 
 
@@ -204,7 +204,7 @@ else
     _bbr_tsunami_autoinstall_after_reboot
     bbrname=tsunami
     _enable_bbr
-    [[ ! $DeBUG == 1 ]] && echo -e "\n  ${bold}即将重启系统，重启后会自动安装 ${green}Yankee${jiacu} 版魔改 BBR ... ${normal}\n" && reboot
+    [[ ! $DeBUG == 1 ]] && echo -ne "\n  ${bold}即将重启系统，重启后会自动安装 ${green}Yankee${jiacu} 版魔改 BBR ... ${normal}" && reboot
 fi ; }
 
 
@@ -232,7 +232,7 @@ else
     _bbr_nanqinlang_autoinstall_after_reboot
     bbrname=nanqinlang
     _enable_bbr
-        [[ ! $DeBUG == 1 ]] && echo -e "\n  ${bold}即将重启系统，重启后会自动安装 ${green}南琴浪${jiacu} 版魔改 BBR ... ${normal}\n" && reboot
+    [[ ! $DeBUG == 1 ]] && echo -ne "\n  ${bold}即将重启系统，重启后会自动安装 ${green}南琴浪${jiacu} 版魔改 BBR ... ${normal}" && reboot
 fi ; }
 
 
@@ -248,14 +248,14 @@ elif [[ $SSKernel == "${red}否${jiacu}" ]] && [[ $DISTRO == ubuntu ]]; then
     _ubuntu_serverspeeder_kernel_repo
     _ubuntu_serverspeeder_updategrub
     _serverspeeder_autoinstall_after_reboot
-    [[ ! $DeBUG == 1 ]] && echo -e "\n  ${bold}即将重启系统，重启后会自动安装 ${green}锐速${jiacu} ... ${normal}\n" && reboot
+    [[ ! $DeBUG == 1 ]] && echo -ne "\n  ${bold}即将重启系统，重启后会自动安装 ${green}锐速${jiacu} ... ${normal}" && reboot
 elif [[ $SSKernel == "${red}否${jiacu}" ]] && [[ $CODENAME == jessie ]]; then
     echo -ne "\n  ${bold}当前内核不支持 锐速，安装 ${green}3.12.1${jiacu} 内核 ... ${normal} "
     kernel_version=3.12-1
     _debian_serverspeeder_kernel_312
     _delete_kernel
     _serverspeeder_autoinstall_after_reboot
-    [[ ! $DeBUG == 1 ]] && echo -e "\n  ${bold}即将重启系统，重启后会自动安装 ${green}锐速${jiacu} ... ${normal}\n" && reboot
+    [[ ! $DeBUG == 1 ]] && echo -ne "\n  ${bold}即将重启系统，重启后会自动安装 ${green}锐速${jiacu} ... ${normal}" && reboot
 elif [[ $SSKernel == "${red}否${jiacu}" ]] && [[ $CODENAME == stretch ]]; then
     echo -ne "\n  ${bold}当前内核不支持 锐速，安装 ${green}3.16.0-4${jiacu} 内核 ... ${normal} "
     kernel_version=3.16.0-4
@@ -263,7 +263,7 @@ elif [[ $SSKernel == "${red}否${jiacu}" ]] && [[ $CODENAME == stretch ]]; then
     _delete_kernel
     _stretch_enable_rclocal
     _serverspeeder_autoinstall_after_reboot
-    [[ ! $DeBUG == 1 ]] && echo -e "\n  ${bold}即将重启系统，重启后会自动安装 ${green}锐速${jiacu} ... ${normal}\n" && reboot
+    [[ ! $DeBUG == 1 ]] && echo -ne "\n  ${bold}即将重启系统，重启后会自动安装 ${green}锐速${jiacu} ... ${normal}" && reboot
 fi ; }
 
 
@@ -477,14 +477,14 @@ fi ; }
 
 # 安装 4.11.12 的内核（For BBR）
 function _bbr_kernel_4_11_12() {
-echo -e "\n  ${bold}安装 4.11.12 内核 ... ${normal}  "
+echo -ne "\n  ${bold}安装 4.11.12 内核 ... ${normal} "
 wget --no-check-certificate -qO 1.deb https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Linux%20Kernel/BBR/linux-headers-4.11.12-all.deb
 wget --no-check-certificate -qO 2.deb https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Linux%20Kernel/BBR/linux-headers-4.11.12-amd64.deb
 wget --no-check-certificate -qO 3.deb https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Linux%20Kernel/BBR/linux-image-4.11.12-generic-amd64.deb
 dpkg -i [123].deb > /dev/null 2>&1 || { echo -e "\n  ${bold}${red}错误${jiacu} 安装 内核 失败！${normal}" ; exit 1 ; }
-rm -rf [123].deb
-#echo -ne "  ${bold}更新引导 ...  "
-update-grub > /dev/null 2>&1 #&& echo "${green}${bold}完成${normal}"
+rm -rf [123].deb ; echo
+echo -ne "  ${bold}更新引导 ...  "
+update-grub > /dev/null 2>&1 && echo "${green}${bold}完成${normal}"
 echo ; }
 
 
