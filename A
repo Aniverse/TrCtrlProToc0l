@@ -307,6 +307,7 @@ else echo -e "\n  ${bold}${red}错误 ${jiacu}你并没有使用本脚本安装 
 # 安装 指定内核（BBR）
 function _selected_kernel_install() {
 _get_version
+_install_required
 kernel_version=$required_version
 _delete_kernel ; }
 
@@ -620,8 +621,12 @@ while [[ -z "${required_version}" ]]; do
     echo -ne "\n  ${yellow}输入你想要的内核版本号 （敲回车则使用最新内核）：${normal}" ; read -e required_version
     [[ -z "${required_version}" ]] && required_version=`  wget -qO- http://kernel.ubuntu.com/~kernel-ppa/mainline/ | awk -F'\"v' '/v[4-9]./{print $2}' | cut -d/ -f1 | grep -v -  | sort -V | tail -1  `
     [[ -z ` wget -qO- http://kernel.ubuntu.com/~kernel-ppa/mainline/v${required_version}/ ` ]] && { echo -e "\n  ${red}错误${jiacu} 这个内核不存在或无法使用本脚本下载，请重新输入！${normal}" ; unset required_version ; }
-done
+done ; }
 
+
+
+# 确定安装内核？
+function _install_required() {
 digit_ver_image=`dpkg -l | grep linux-image | awk '{print $2}' | awk -F '-' '{print $3}' | grep "${required_version}"`
 digit_ver_headers=`dpkg -l | grep linux-headers | awk '{print $2}' | awk -F '-' '{print $3}' | grep "${required_version}"`
 [[ $DeBUG == 1 ]] && echo "${required_version}"
@@ -642,7 +647,7 @@ image_url="http://kernel.ubuntu.com/~kernel-ppa/mainline/v${required_version}/${
 
 echo -ne "\n  ${bold}安装 ${green}$required_version${jiacu} 内核 ... ${normal}"
 wget -qO kernel.deb $image_url || { echo -e "\n  ${red}错误${jiacu} 内核 下载失败！${normal}\n" ; exit 1 ; }
-dpkg -i kernel.deb || { echo -e "\n  ${red}错误${jiacu} 内核 安装失败！${normal}\n" ; exit 1 ; }
+dpkg -i kernel.deb > /dev/null 2>&1 || { echo -e "\n  ${red}错误${jiacu} 内核 安装失败！${normal}\n" ; exit 1 ; }
 
 rm kernel.deb ; }
 
@@ -657,11 +662,11 @@ headers_bit_url="http://kernel.ubuntu.com/~kernel-ppa/mainline/v${required_versi
 
 echo -ne "\n  ${bold}安装 ${green}$required_version${jiacu} headers_all ... ${normal}"
 wget -qO headers1.deb $headers_all_url || { echo -e "\n  ${red}错误${jiacu} headers_all 下载失败！${normal}\n" ; exit 1 ; }
-dpkg -i headers1.deb || { echo -e "\n  ${red}错误${jiacu} headers_all 安装失败！${normal}\n" ; exit 1 ; }
+dpkg -i headers1.deb > /dev/null 2>&1 || { echo -e "\n  ${red}错误${jiacu} headers_all 安装失败！${normal}\n" ; exit 1 ; }
 
 echo -ne "\n  ${bold}安装 ${green}$required_version${jiacu} headers ... ${normal}"
 wget -qO headers2.deb $headers_bit_url || { echo -e "\n  ${red}错误${jiacu} headers 下载失败！${normal}\n" ; exit 1 ; }
-dpkg -i headers2.deb || { echo -e "\n  ${red}错误${jiacu} headers_all 安装失败！${normal}\n" ; exit 1 ; }
+dpkg -i headers2.deb > /dev/null 2>&1 || { echo -e "\n  ${red}错误${jiacu} headers_all 安装失败！${normal}\n" ; exit 1 ; }
 rm headers1.deb headers2.deb ; }
 
 
