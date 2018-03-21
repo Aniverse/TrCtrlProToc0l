@@ -116,10 +116,10 @@ echo -e  "  ${green}(01) ${jiacu}安装 原版 BBR"
 echo -e  "  ${green}(02) ${jiacu}安装 魔改 BBR (tsunami)"
 echo -e  "  ${green}(03) ${jiacu}安装 魔改 BBR (nanqinlang)"
 echo -e  "  ${green}(04) ${jiacu}安装 锐速"
-echo -e  "  ${green}(21) ${jiacu}卸载 BBR"
-echo -e  "  ${green}(22) ${jiacu}卸载 锐速"
 echo -e  "  ${green}(11) ${jiacu}安装 指定内核"
 # echo -e  "  ${green}(12) ${jiacu}安装 特定的锐速内核"
+echo -e  "  ${green}(21) ${jiacu}卸载 BBR"
+echo -e  "  ${green}(22) ${jiacu}卸载 锐速"
 echo -e  "  ${green}(99) ${jiacu}返回\n"
 rm -rf /tmp/system_kernel_list ; }
 
@@ -619,13 +619,14 @@ fi ; }
 function _get_version() {
 unset required_version
 while [[ -z "${required_version}" ]]; do
-    echo -ne "\n  输入你想要的内核版本号 （敲回车则使用最新内核）：" ; read -e required_version
+    echo -ne "\n  ${yellow}输入你想要的内核版本号 （敲回车则使用最新内核）：${normal}" ; read -e required_version
     [[ -z "${required_version}" ]] && required_version=`  wget -qO- http://kernel.ubuntu.com/~kernel-ppa/mainline/ | awk -F'\"v' '/v[4-9]./{print $2}' | cut -d/ -f1 | grep -v -  | sort -V | tail -1  `
     [[ -z ` wget -qO- http://kernel.ubuntu.com/~kernel-ppa/mainline/v${required_version}/ ` ]] && { echo -e "\n  ${red}错误${jiacu} 这个内核不存在或无法使用本脚本下载，请重新输入！${normal}" ; unset required_version ; }
 done
 
 digit_ver_image=`dpkg -l | grep linux-image | awk '{print $2}' | awk -F '-' '{print $3}' | grep "${required_version}"`
 digit_ver_headers=`dpkg -l | grep linux-headers | awk '{print $2}' | awk -F '-' '{print $3}' | grep "${required_version}"`
+[[ $DeBUG == 1 ]] && "${required_version}"
 
 if [[ -z $digit_ver_image ]]; then _install_required_kernel
 else echo -e "\n  ${bold}${green}$required_version${jiacu} 内核已安装 ...${normal}\n" ; fi
@@ -637,6 +638,7 @@ else echo -e "\n  ${bold}${green}$required_version${jiacu} 头文件已安装 ..
 
 # 安装自选版本的内核
 function _install_required_kernel() {
+[[ $DeBUG == 1 ]] && "${required_version}"
 image_name=`wget -qO- http://kernel.ubuntu.com/~kernel-ppa/mainline/v${required_version}/ | grep "linux-image" | grep "lowlatency" | awk -F'\">' '/amd64.deb/{print $2}' | cut -d'<' -f1 | head -1`
 image_url="http://kernel.ubuntu.com/~kernel-ppa/mainline/v${required_version}/${image_name}"
 
