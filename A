@@ -65,11 +65,14 @@ running_kernel=` uname -r `
 arch=$( uname -m )
 lbit=$( getconf LONG_BIT )
 
-[[ $tcp_control == "cubic" ]] && tcp_c_name="cubic (系统默认算法)"
+tcp_c_name=$tcp_control
+[[ $tcp_control == "reno" ]] && tcp_c_name="reno (系统自带算法)"
+[[ $tcp_control == "cubic" ]] && tcp_c_name="cubic (系统自带算法)"
 [[ $tcp_control == "bbr" ]] && tcp_c_name="bbr (原版 BBR)"
 [[ $tcp_control == "bbr_powered" ]] && tcp_c_name="bbr_powered (Vicer 脚本版 魔改 BBR)"
 [[ $tcp_control == "tsunami" ]] && tcp_c_name="tsunami (Yankee 版 魔改 BBR)"
 [[ $tcp_control == "nanqinlang" ]] && tcp_c_name="nanqinlang (南琴浪 版 魔改 BBR)"
+
 
 # 检查理论上内核是否支持锐速
 SSKernel="${red}否${jiacu}"
@@ -309,7 +312,8 @@ function _selected_kernel_install() {
 _get_version
 _install_required
 kernel_version=$required_version
-_delete_kernel ; }
+_delete_kernel 
+echo ; }
 
 
 
@@ -562,9 +566,9 @@ else wget --no-check-certificate -q https://raw.githubusercontent.com/nanqinlang
 
 echo "obj-m := tcp_nanqinlang.o" > Makefile
 make -C /lib/modules/$(uname -r)/build M=`pwd` modules CC=`which gcc` > /dev/null 2>&1
-cp -rf tcp_nanqinlang.ko /lib/modules/$(uname -r)/kernel/net/ipv4
+cp -rf tcp_nanqinlang.ko /lib/modules/$(uname -r)/kernel/net/ipv4 > /dev/null 2>&1
 insmod /lib/modules/$(uname -r)/kernel/net/ipv4/tcp_nanqinlang.ko > /dev/null 2>&1
-depmod -a
+depmod -a > /dev/null 2>&1
 
 rm -rf tcp_nanqinlang.c Makefile ; }
 
@@ -576,8 +580,8 @@ wget --no-check-certificate -qO tcp_tsunami.c https://github.com/Aniverse/BitTor
 echo "obj-m:=tcp_tsunami.o" > Makefile
 make -C /lib/modules/$(uname -r)/build M=`pwd` modules CC=`which gcc` > /dev/null 2>&1
 insmod tcp_tsunami.ko > /dev/null 2>&1
-cp -rf ./tcp_tsunami.ko /lib/modules/$(uname -r)/kernel/net/ipv4
-depmod -a
+cp -rf ./tcp_tsunami.ko /lib/modules/$(uname -r)/kernel/net/ipv4 > /dev/null 2>&1
+depmod -a > /dev/null 2>&1
 modprobe tcp_tsunami > /dev/null 2>&1
 rm -rf tcp_tsunami.c Makefile ; }
 
