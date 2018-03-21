@@ -626,7 +626,7 @@ done
 
 digit_ver_image=`dpkg -l | grep linux-image | awk '{print $2}' | awk -F '-' '{print $3}' | grep "${required_version}"`
 digit_ver_headers=`dpkg -l | grep linux-headers | awk '{print $2}' | awk -F '-' '{print $3}' | grep "${required_version}"`
-[[ $DeBUG == 1 ]] && "${required_version}"
+[[ $DeBUG == 1 ]] && echo "${required_version}"
 
 if [[ -z $digit_ver_image ]]; then _install_required_kernel
 else echo -e "\n  ${bold}${green}$required_version${jiacu} 内核已安装 ...${normal}\n" ; fi
@@ -638,12 +638,12 @@ else echo -e "\n  ${bold}${green}$required_version${jiacu} 头文件已安装 ..
 
 # 安装自选版本的内核
 function _install_required_kernel() {
-[[ $DeBUG == 1 ]] && "${required_version}"
+[[ $DeBUG == 1 ]] && echo "${required_version}"
 image_name=`wget -qO- http://kernel.ubuntu.com/~kernel-ppa/mainline/v${required_version}/ | grep "linux-image" | grep "lowlatency" | awk -F'\">' '/amd64.deb/{print $2}' | cut -d'<' -f1 | head -1`
 image_url="http://kernel.ubuntu.com/~kernel-ppa/mainline/v${required_version}/${image_name}"
 
 echo -ne "\n  ${bold}安装 ${green}$required_version${jiacu} 内核 ... ${normal}"
-wget -qO kernel.deb $kernel_url || { echo -e "\n  ${red}错误${jiacu} 内核 下载失败！${normal}\n" ; exit 1 ; }
+wget -qO kernel.deb $image_url || { echo -e "\n  ${red}错误${jiacu} 内核 下载失败！${normal}\n" ; exit 1 ; }
 dpkg -i kernel.deb || { echo -e "\n  ${red}错误${jiacu} 内核 安装失败！${normal}\n" ; exit 1 ; }
 
 rm kernel.deb ; }
