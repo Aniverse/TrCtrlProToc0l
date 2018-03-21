@@ -12,8 +12,8 @@
 # http://xiaofd.win/onekey-ruisu.html
 # https://teddysun.com/489.html
 
-ScriptVersion=1.0
-ScriptDate=2018.03.15
+ScriptVersion=1.1.1
+ScriptDate=2018.03.21
 
 # 颜色 -----------------------------------------------------------------------------------
 
@@ -502,7 +502,7 @@ fi ; }
 
 # 安装 4.11.12 的内核（For BBR）
 function _bbr_kernel_4_11_12() {
-echo -ne "\n  ${bold}安装 4.11.12 内核 ... ${normal} "
+echo -ne "\n  ${bold}安装 4.11.12 内核及其头文件 ... ${normal} "
 wget --no-check-certificate -qO 1.deb https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Linux%20Kernel/BBR/linux-headers-4.11.12-all.deb
 wget --no-check-certificate -qO 2.deb https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Linux%20Kernel/BBR/linux-headers-4.11.12-amd64.deb
 wget --no-check-certificate -qO 3.deb https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Linux%20Kernel/BBR/linux-image-4.11.12-generic-amd64.deb
@@ -731,7 +731,7 @@ systemctl start rc-local ; }
 
 
 # 询问是否继续（重启版）
-function _ask_continue2() { echo -ne "\n${bold}输入 ${bailvse}回车${jiacu} 继续，完成后会直接重启；按 ${baihongse}Ctrl+C${jiacu} 退出${normal}" ; read response ; echo ; }
+function _ask_continue2() { echo -ne "\n  ${bold}输入 ${bailvse}回车${jiacu} 继续，完成后会直接重启；按 ${baihongse}Ctrl+C${jiacu} 退出${normal} " ; read response ; echo ; }
 
 
 
