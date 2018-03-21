@@ -307,8 +307,6 @@ else echo -e "\n  ${bold}${red}错误 ${jiacu}你并没有使用本脚本安装 
 # 安装 指定内核（BBR）
 function _selected_kernel_install() {
 _get_version
-_install_required_kernel
-_install_required_headers
 kernel_version=$required_version
 _delete_kernel ; }
 
