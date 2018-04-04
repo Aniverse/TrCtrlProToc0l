@@ -12,7 +12,7 @@
 # http://xiaofd.win/onekey-ruisu.html
 # https://teddysun.com/489.html
 
-ScriptVersion=1.3.3.Alpha
+ScriptVersion=1.3.3.Beta
 ScriptDate=2018.04.04
 
 # 颜色 -----------------------------------------------------------------------------------
@@ -535,7 +535,7 @@ apt-get update > /dev/null 2>&1 && echo "${green}${bold}完成${normal}" ; }
 function _ubuntu_serverspeeder_updategrub() {
 sed -i 's/GRUB_DEFAULT=.*/GRUB_DEFAULT="Advanced options for Ubuntu>Ubuntu, with Linux kernelver"/' /etc/default/grub
 sed -i "s/kernelver/$kernelver/" /etc/default/grub
-echo -ne "\n${bold}更新引导 ...  "
+echo -ne "\n  ${bold}更新引导 ...  "
 update-grub > /dev/null 2>&1 && echo "${green}${bold}完成${normal}" ; }
 
 
