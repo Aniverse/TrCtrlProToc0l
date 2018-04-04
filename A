@@ -12,7 +12,7 @@
 # http://xiaofd.win/onekey-ruisu.html
 # https://teddysun.com/489.html
 
-ScriptVersion=1.3.9.Alpha.4
+ScriptVersion=1.4.0.Alpha.1
 ScriptDate=2018.04.04
 
 # 颜色 -----------------------------------------------------------------------------------
@@ -62,7 +62,8 @@ function _menu() { clear ; echo
 [ -f /etc/redhat-release ] && KNA=$(awk '{print $1}' /etc/redhat-release)
 [ -f /etc/os-release ] && KNA=$(awk -F'[= "]' '/PRETTY_NAME/{print $3}' /etc/os-release)
 [ -f /etc/lsb-release ] && KNA=$(awk -F'[="]+' '/DISTRIB_ID/{print $2}' /etc/lsb-release)
-tcp_control=` sysctl net.ipv4.tcp_available_congestion_control | awk '{print $3}' `
+tcp_control=` awk '{print $1}' /proc/sys/net/ipv4/tcp_available_congestion_control `
+tcp_control_all=` cat /proc/sys/net/ipv4/tcp_available_congestion_control `
 running_kernel=` uname -r `
 arch=$( uname -m )
 lbit=$( getconf LONG_BIT )
@@ -110,6 +111,8 @@ echo -e  " ${baizise}${bold}                                   El Psy Congroo!  
 echo -e  "  ${bold}"
 echo -e  "  当前操作系统                         ${green}$DISTROU $osversion $CODENAME (x$lbit)${jiacu}"
 echo -e  "  当前正在使用的 TCP 拥塞控制算法      ${green}$tcp_c_name${jiacu}"
+[[ $DeBUG == 1 ]] && 
+echo -e  "  当前可以使用的 TCP 拥塞控制算法      ${green}$tcp_control_all${jiacu}"
 echo -e  "  当前正在使用的系统内核               ${green}$running_kernel${jiacu}"
 echo -e  "  当前 BBR  是否已启用                 $bbrinuse"
 echo -e  "  当前内核是否支持 原版 BBR            $BBRKernel"
@@ -150,7 +153,7 @@ rm -f /tmp/system_kernel_list ; }
 
 # action
 function _read_response() {
-echo -ne "  ${yellow}你想做什么？(默认返回) ${normal}${baiqingse}" ; read -e response ; echo -n "${normal}"
+echo -ne "  ${yellow}你想做什么？(默认返回) ${normal}" ; read -e response ; echo -n "${normal}"
 case $response in
     1 | 01) # 安装 原版 BBR
             _obbr_install ;;
@@ -163,7 +166,7 @@ case $response in
         11) # 安装 最新内核
             _selected_kernel_install ;;
         12) # 安装 4.11.12 内核
-            _online_ubuntu_bbr_firmware ; _bbr_kernel_4_11_12 ; kernel_version=4.11.12 && _delete_kernel ;;
+            _online_ubuntu_bbr_firmware ; _bbr_kernel_4_11_12 ;;
         13) # 安装 特定的锐速内核
             _selected_ss_kernel_install ;;
         21) # 卸载 BBR
@@ -210,7 +213,7 @@ if [[ $BBRKernel == "${green}是${jiacu}" ]]; then
     else echo -e "\n  ${bold}${red}错误 BBR 开启失败！${normal}\n" ; exit 1 ; fi
 else
     _ask_continue2
-    echo -e "  ${bold}当前内核不支持 BBR，需要安装 ${green}4.11.12${jiacu} 内核以启用 BBR ...${normal} "
+    echo -e "  ${bold}当前内核不支持 BBR，需要安装 ${green}4.11.12${jiacu} 内核以启用 BBR ...${normal} \n"
     _online_ubuntu_bbr_firmware
     _bbr_kernel_4_11_12
     bbrname=bbr
@@ -226,7 +229,7 @@ function _ykbbr_install() {
 [[ `grep "Advanced options for Ubuntu" /etc/default/grub` ]] && sed -i 's/GRUB_DEFAULT=.*/GRUB_DEFAULT=0/' /etc/default/grub
 
 if [[ $YKKernel == "${green}是${jiacu}" ]]; then
-    echo -e "\n  ${bold}理论上当前内核已支持 ${green}Yankee${jiacu} 版魔改 BBR，安装并启用魔改 BBR ...${normal}"
+    echo -e "\n  ${bold}理论上当前内核已支持 ${green}Yankee${jiacu} 版魔改 BBR，安装并启用魔改 BBR ...${normal}\n"
     _check_headers
     _check_essential
     _bbr_tsunami
@@ -256,7 +259,7 @@ function _nqlbbr_install() {
 [[ `grep "Advanced options for Ubuntu" /etc/default/grub` ]] && sed -i 's/GRUB_DEFAULT=.*/GRUB_DEFAULT=""/' /etc/default/grub
 
 if [[ $NQLKernel == "${green}是${jiacu}" ]]; then
-    echo -ne "\n  ${bold}理论上当前内核已支持 ${green}南琴浪${jiacu} 版魔改 BBR，安装并启用魔改 BBR ...${normal} "
+    echo -ne "\n  ${bold}理论上当前内核已支持 ${green}南琴浪${jiacu} 版魔改 BBR，安装并启用魔改 BBR ...${normal} \n"
     _check_headers
     _check_essential
     _bbr_nanqinlang
@@ -335,7 +338,7 @@ case $input in
 esac
 tcp_control=` sysctl net.ipv4.tcp_available_congestion_control | awk '{print $3}' `
 if [[ $tcp_control =~ ("nanqinlang"|"tsunami"|"bbr"|"bbr_powered") ]]; then bbrname=$tcp_control ; _disable_bbr ; echo -e "  ${bold}${red}已卸载 BBR，但安装的内核仍保留${normal}\n"
-else echo -e "\n  ${bold}${red}错误 ${jiacu}你并没有使用本脚本安装 BBR ...${normal}\n" ; _read_response ; fi ; }
+else echo -e "  ${bold}${red}错误 ${jiacu}你并没有使用本脚本安装 BBR ...${normal}\n" ; _read_response ; fi ; }
 
 
 
@@ -343,8 +346,6 @@ else echo -e "\n  ${bold}${red}错误 ${jiacu}你并没有使用本脚本安装 
 function _selected_kernel_install() {
 _get_version
 _install_required
-kernel_version=$required_version
-_delete_kernel
 echo ; }
 
 
@@ -355,13 +356,10 @@ function _selected_ss_kernel_install() {
 if   [[ $DISTRO == ubuntu ]]; then
      echo -e "\n  ${bold}安装 ${green}4.4.0-47${jiacu} 内核 ...${normal}"
      _ubuntu_serverspeeder_kernel_440
-     kernel_version=4.4.0-47
 elif [[ $DISTRO == debian ]]; then
      echo -e "\n  ${bold}安装 ${green}3.16.0-4${jiacu} 内核 ...${normal}"
      _debian_serverspeeder_kernel_316
-     kernel_version=3.16.0-4
 fi
-_delete_kernel
 echo ; }
 
 
@@ -599,7 +597,7 @@ function _online_ubuntu_bbr_firmware() {
 mkdir -p /lib/firmware/bnx2
 if [[ ! -f /lib/firmware/bnx2/fw.lock ]]; then
     touch /lib/firmware/bnx2/fw.lock
-    echo -e "\n  ${bold}下载可能缺少的固件 ... ${normal}"
+    echo -e "  ${bold}下载可能缺少的固件 ... ${normal}"
     wget -qO /lib/firmware/bnx2/bnx2-mips-06-6.2.3.fw https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Linux%20Firmware/bnx2-mips-06-6.2.3.fw
     wget -qO /lib/firmware/bnx2/bnx2-mips-09-6.2.1b.fw https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Linux%20Firmware/bnx2-mips-09-6.2.1b.fw
     wget -qO /lib/firmware/bnx2/bnx2-rv2p-09ax-6.0.17.fw https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Linux%20Firmware/bnx2-rv2p-09ax-6.0.17.fw
@@ -701,6 +699,7 @@ sed -i '/net.core.default_qdisc.*/d' /etc/sysctl.conf
 sed -i '/net.ipv4.tcp_congestion_control.*/d' /etc/sysctl.conf
 echo "net.core.default_qdisc = fq" >> /etc/sysctl.conf
 echo "net.ipv4.tcp_congestion_control = $bbrname" >> /etc/sysctl.conf
+# sysctl -w net.ipv4.tcp_congestion_control=$bbrname >> $Outputs 2>&1
 sysctl -p >> $Outputs 2>&1 ; }
 
 
@@ -720,7 +719,7 @@ function _check_headers() {
 required_version=$(  uname -r | cut  -d- -f1  )
 headers_exits=`  dpkg -l | grep linux-headers | awk '{print $2}' | awk -F '-' '{print $3}' | grep $required_version | wc -l  `
 if [[ $headers_exits == 0 ]]; then
-    echo -e "\n  ${red}错误${jiacu} 没有安装与内核对应的头文件，先尝试安装内核头文件 ...${normal} "
+    echo -e "  ${red}错误${jiacu} 没有安装与内核对应的头文件，先尝试安装内核头文件 ...${normal} "
     _install_required_headers
 fi ; }
 
