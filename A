@@ -12,7 +12,7 @@
 # http://xiaofd.win/onekey-ruisu.html
 # https://teddysun.com/489.html
 
-ScriptVersion=1.3.9.Alpha.3
+ScriptVersion=1.3.9.Alpha.4
 ScriptDate=2018.04.04
 
 # 颜色 -----------------------------------------------------------------------------------
@@ -119,10 +119,10 @@ echo -e  "  当前内核是否支持 Vicer  版锐速       $SSKernel"
 echo -e  "  当前 锐速 是否已启用                 $SSrunning"
 
 [[ $DeBUG == 1 ]] && echo &&
-echo -e  "  当前 CPU  调度方式                 ` cat /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor 2>/dev/null | head -1  `" && 
-echo -e  "  当前 硬盘 调度算法                 ` cat /sys/block/sda/queue/scheduler 2>/dev/null | cut -d '[' -f2|cut -d ']'  -f1  `" && 
-echo -e  "  当前 硬盘 文件系统                 ` cat /etc/fstab 2>/dev/null | grep -v ^# | grep -P " / |/home" | awk '{print $3}' `" && 
-echo -e  "  当前 硬盘 挂载方式                 ` cat /etc/fstab 2>/dev/null | grep -v ^# | grep -P " / |/home" | awk '{print $4}' `"
+echo -e  "  当前 CPU  调度方式                   ` cat /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor 2>/dev/null | head -1  `" && 
+echo -e  "  当前 硬盘 调度算法                   ` cat /sys/block/sda/queue/scheduler 2>/dev/null | cut -d '[' -f2|cut -d ']'  -f1  `" && 
+echo -e  "  当前 硬盘 文件系统                   ` cat /etc/fstab 2>/dev/null | grep -v ^# | grep -P " / |/home" | awk '{print $3}' `" && 
+echo -e  "  当前 硬盘 挂载方式                   ` cat /etc/fstab 2>/dev/null | grep -v ^# | grep -P " / |/home" | awk '{print $4}' `"
 
 echo -e  "\n  当前系统内所有已安装的内核列表\n"
 cat -n /tmp/system_kernel_list | sed 's/\t/ /g' | sed "s/ linux-/) ${green}linux-/g" | sed "s/     /  ${magenta}(0/g" | sed "s/    /  ${magenta}(/g"
@@ -370,30 +370,37 @@ echo ; }
 # 安装 xanmod
 function _xanmod_install() {
 
-echo -ne "\n  ${bold}输入你要安装的 Xanmod 版本：${normal} " ; read XanmodVer ; echo
+echo -ne "\n  ${bold}输入你要安装的 Xanmod 版本：${normal} " ; read -e XanmodVer ; echo
 
 _online_ubuntu_bbr_firmware
 
 # 安装 Xanmod 内核，Microcode，固件
-cd ; mkdir deball ; cd deball
+cd ; mkdir -p deball ; cd deball
 
 if   [[ $XanmodVer == 4.12 ]]; then
      wget --no-check-certificate -q https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/4.12.14-xanmod15/linux-image-4.12.14-xanmod15_1.170920_amd64.deb
      wget --no-check-certificate -q https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/4.12.14-xanmod15/linux-headers-4.12.14-xanmod15_1.170920_amd64.deb
+     wget --no-check-certificate -q https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/intel-microcode_3.20180312.1_amd64.deb
+     wget --no-check-certificate -q https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/iucode-tool_2.3.1-1_amd64.deb
      kernel_version=4.12.14
 elif [[ $XanmodVer == 4.15 ]]; then
      wget --no-check-certificate -q https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/4.15.13-xanmod12/linux-image-4.15.13-xanmod12_1.180325_amd64.deb
      wget --no-check-certificate -q https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/4.15.13-xanmod12/linux-headers-4.15.13-xanmod12_1.180325_amd64.deb
+     wget --no-check-certificate -q https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/intel-microcode_3.20180312.1_amd64.deb
+     wget --no-check-certificate -q https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/iucode-tool_2.3.1-1_amd64.deb
      kernel_version=4.15.13
-elif [[ $XanmodVer == apt  ]]; then
+elif [[ $XanmodVer == apt12  ]]; then
+     echo 'deb http://deb.xanmod.org releases main' | tee /etc/apt/sources.list.d/xanmod-kernel.list
+     wget -qO- http://deb.xanmod.org/gpg.key | apt-key add -
+     apt-get update && apt-get install -y linux-xanmod-4.12 intel-microcode iucode-tool
+     kernel_version=4.12
+elif [[ $XanmodVer == apt15  ]]; then
      echo 'deb http://deb.xanmod.org releases main' | tee /etc/apt/sources.list.d/xanmod-kernel.list
      wget -qO- http://deb.xanmod.org/gpg.key | apt-key add -
      apt-get update && apt-get install -y linux-xanmod-4.15 intel-microcode iucode-tool
-     kernel_version=4.12.14
+     kernel_version=4.15
 fi
 
-wget --no-check-certificate -q https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/intel-microcode_3.20180312.1_amd64.deb
-wget --no-check-certificate -q https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/iucode-tool_2.3.1-1_amd64.deb
 wget --no-check-certificate -q https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/linux-firmware_1.161_all.deb
 
 # 不隐藏输出
