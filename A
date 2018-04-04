@@ -12,7 +12,7 @@
 # http://xiaofd.win/onekey-ruisu.html
 # https://teddysun.com/489.html
 
-ScriptVersion=1.3.3.Beta
+ScriptVersion=1.3.5.Beta
 ScriptDate=2018.04.04
 
 # 颜色 -----------------------------------------------------------------------------------
@@ -68,6 +68,7 @@ lbit=$( getconf LONG_BIT )
 tcp_c_name=$tcp_control
 [[ $tcp_control == "reno" ]] && tcp_c_name="reno (系统自带算法)"
 [[ $tcp_control == "cubic" ]] && tcp_c_name="cubic (系统自带算法)"
+[[ $tcp_control == "westwood" ]] && tcp_c_name="westwood (Xanmod 默认算法)"
 [[ $tcp_control == "bbr" ]] && tcp_c_name="bbr (原版 BBR)"
 [[ $tcp_control == "bbr_powered" ]] && tcp_c_name="bbr_powered (Vicer 脚本版 魔改 BBR)"
 [[ $tcp_control == "tsunami" ]] && tcp_c_name="tsunami (Yankee 版 魔改 BBR)"
@@ -125,7 +126,7 @@ echo -e  "  ${green}(12) ${jiacu}安装 4.11.12 内核"
 echo -e  "  ${green}(13) ${jiacu}安装 特定的锐速内核"
 echo -e  "  ${green}(21) ${jiacu}卸载 BBR"
 echo -e  "  ${green}(22) ${jiacu}卸载 锐速"
-echo -e  "  ${green}(22) ${jiacu}卸载 多余内核"
+echo -e  "  ${green}(23) ${jiacu}卸载 多余内核"
 echo -e  "  ${green}(99) ${jiacu}返回\n"
 rm -rf /tmp/system_kernel_list ; }
 
@@ -151,7 +152,7 @@ case $response in
         12) # 安装 4.11.12 内核
             _online_ubuntu_bbr_firmware ; _bbr_kernel_4_11_12 ; kernel_version=4.11.12 && _delete_kernel ;;
         13) # 安装 特定的锐速内核
-            _selected_kernel_install ;;
+            _selected_ss_kernel_install ;;
         21) # 卸载 BBR
             _bbr_uninstall ;;
         22) # 卸载 锐速
@@ -162,10 +163,9 @@ case $response in
         31) # 安装 xanmod
             _xanmod_install ;;
     99 |"") # 返回
-            exit 0 ;;
-         *) exit 0 ;;
-esac
-echo -e "\n" ; }
+            echo ; exit 0 ;;
+         *) echo ; exit 0 ;;
+esac ; }
 
 
 
@@ -184,7 +184,7 @@ function _obbr_install() {
 [[ `grep "Advanced options for Ubuntu" /etc/default/grub` ]] && sed -i 's/GRUB_DEFAULT=.*/GRUB_DEFAULT=""/' /etc/default/grub
 
 if [[ $BBRKernel == "${green}是${jiacu}" ]]; then
-    echo -ne "  ${bold}理论上当前内核已支持 ${green}原版 BBR，不安装新内核，直接启用 BBR ...${normal} "
+    echo -ne "\n  ${bold}理论上当前内核已支持 ${green}原版 BBR，不安装新内核，直接启用 BBR ...${normal} "
     bbrname=bbr
     _enable_bbr ; echo
     if [[ ` awk '{print $1}' /proc/sys/net/ipv4/tcp_available_congestion_control ` == bbr ]]; then echo -e "\n  ${bold}BBR 已启用 ...\n${normal}"
@@ -207,12 +207,12 @@ function _ykbbr_install() {
 [[ `grep "Advanced options for Ubuntu" /etc/default/grub` ]] && sed -i 's/GRUB_DEFAULT=.*/GRUB_DEFAULT=0/' /etc/default/grub
 
 if [[ $YKKernel == "${green}是${jiacu}" ]]; then
-    echo -e "  ${bold}理论上当前内核已支持 ${green}Yankee${jiacu} 版魔改 BBR，安装并启用魔改 BBR ...${normal}"
+    echo -e "\n  ${bold}理论上当前内核已支持 ${green}Yankee${jiacu} 版魔改 BBR，安装并启用魔改 BBR ...${normal}"
     _check_headers
     _check_essential
     _bbr_tsunami
     bbrname=tsunami
-    _enable_bbr ; echo
+    _enable_bbr
     if [[ ` awk '{print $1}' /proc/sys/net/ipv4/tcp_available_congestion_control ` == tsunami ]]; then echo -e "\n  ${bold}已开启 ${green}Yankee 版魔改 BBR${jiacu} ...${normal}\n"
     else echo -e "\n  ${bold}${red}错误 ${green}Yankee 版魔改 BBR${jiacu} 开启失败！${normal}\n" ; exit 1 ; fi
 else
@@ -237,12 +237,12 @@ function _nqlbbr_install() {
 [[ `grep "Advanced options for Ubuntu" /etc/default/grub` ]] && sed -i 's/GRUB_DEFAULT=.*/GRUB_DEFAULT=""/' /etc/default/grub
 
 if [[ $NQLKernel == "${green}是${jiacu}" ]]; then
-    echo -ne "  ${bold}理论上当前内核已支持 ${green}南琴浪${jiacu} 版魔改 BBR，安装并启用魔改 BBR ...${normal} "
+    echo -ne "\n  ${bold}理论上当前内核已支持 ${green}南琴浪${jiacu} 版魔改 BBR，安装并启用魔改 BBR ...${normal} "
     _check_headers
     _check_essential
     _bbr_nanqinlang
     bbrname=nanqinlang
-    _enable_bbr ; echo
+    _enable_bbr
     if [[ ` awk '{print $1}' /proc/sys/net/ipv4/tcp_available_congestion_control ` == nanqinlang ]]; then echo -e "\n  ${bold}已开启 ${green}南琴浪${jiacu} 版魔改 BBR ...${normal}\n"
     else echo -e "\n  ${bold}${red}错误 ${green}南琴浪 版魔改 BBR${jiacu} 开启失败！${normal}\n" ; exit 1 ; fi
 else
@@ -264,7 +264,7 @@ fi ; }
 # 安装 锐速
 function _ss_install() {
 if [[ $SSKernel == "${green}是${jiacu}" ]]; then
-    echo -e "  ${bold}理论上当前内核已支持 ${green}锐速${jiacu}，直接安装 ... ${normal} "
+    echo -e "\n  ${bold}理论上当前内核已支持 ${green}锐速${jiacu}，直接安装 ... ${normal} "
     _serverspeeder_direct_install
 elif [[ $SSKernel == "${red}否${jiacu}" ]] && [[ $DISTRO == ubuntu ]]; then
     _ask_continue2
@@ -297,7 +297,7 @@ fi ; }
 
 # 卸载 锐速
 function _ss_uninstall() {
-echo -ne "  ${bold}${red}警告 ${jiacu}即将开始卸载 ${green}锐速${jiacu}，敲 回车 继续，否则退出${normal} " ; read input
+echo -ne "\n  ${bold}${red}警告 ${jiacu}即将开始卸载 ${green}锐速${jiacu}，敲 回车 继续，否则退出${normal} " ; read input
 case $input in
     "" ) echo ;;
     *  ) echo ; _read_response ;;
@@ -309,7 +309,7 @@ echo -e "  ${bold}${red}已卸载 锐速，但安装的内核仍保留${normal}\
 
 # 卸载 BBR
 function _bbr_uninstall() {
-echo -ne "  ${bold}${red}警告 ${jiacu}即将开始卸载 ${green}BBR${jiacu}，敲 回车 继续，否则退出${normal} " ; read input
+echo -ne "\n  ${bold}${red}警告 ${jiacu}即将开始卸载 ${green}BBR${jiacu}，敲 回车 继续，否则退出${normal} " ; read input
 case $input in
     "" ) echo ;;
     *  ) echo ; _read_response ;;
@@ -331,7 +331,19 @@ echo ; }
 
 
 
-
+# 安装 特定锐速内核（BBR）
+function __selected_ss_kernel_install
+if   [[ $DISTRO == ubuntu ]]; then
+     echo -e "  ${bold}安装 ${green}4.4.0-47${jiacu} 内核 ...${normal}"
+     _ubuntu_serverspeeder_kernel_440
+     kernel_version=4.4.0-47
+elif [[ $DISTRO == debian ]]; then
+     echo -e "  ${bold}安装 ${green}3.16.0-4${jiacu} 内核 ...${normal}"
+     _debian_serverspeeder_kernel_316
+     kernel_version=3.16.0-4
+fi
+_delete_kernel
+echo ; }
 
 
 
@@ -382,7 +394,7 @@ EOF
 # CPU 高性能模式
 sed -i '$i\echo performance \| tee \/sys\/devices\/system\/cpu\/cpu*\/cpufreq\/scaling_governor \> \/dev\/null'  /etc/rc.local
 
-echo "\n  ${bold}完成，即将重启 ...${normal} \n"
+echo -e "\n  ${bold}完成，即将重启 ...${normal} \n"
 
 reboot ; }
 
@@ -801,7 +813,7 @@ systemctl start rc-local ; }
 
 
 # 询问是否继续（重启版）
-function _ask_continue2() { echo -ne "  ${bold}输入 ${bailvse}回车${jiacu} 继续，完成后会直接重启；按 ${baihongse}Ctrl+C${jiacu} 退出${normal} " ; read response ; echo ; }
+function _ask_continue2() { echo -ne "\n  ${bold}输入 ${bailvse}回车${jiacu} 继续，完成后会直接重启；按 ${baihongse}Ctrl+C${jiacu} 退出${normal} " ; read response ; echo ; }
 
 
 
