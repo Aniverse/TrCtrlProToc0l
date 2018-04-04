@@ -12,7 +12,7 @@
 # http://xiaofd.win/onekey-ruisu.html
 # https://teddysun.com/489.html
 
-ScriptVersion=1.3.9.Alpha.2
+ScriptVersion=1.3.9.Alpha.3
 ScriptDate=2018.04.04
 
 # 颜色 -----------------------------------------------------------------------------------
@@ -150,7 +150,7 @@ rm -f /tmp/system_kernel_list ; }
 
 # action
 function _read_response() {
-echo -ne "  ${yellow}你想做什么？(默认返回) ${normal} " ; read -e response
+echo -ne "  ${yellow}你想做什么？(默认返回) ${normal}${baiqingse}" ; read -e response ; echo -n "${normal}"
 case $response in
     1 | 01) # 安装 原版 BBR
             _obbr_install ;;
