@@ -12,7 +12,7 @@
 # http://xiaofd.win/onekey-ruisu.html
 # https://teddysun.com/489.html
 
-ScriptVersion=1.3.1.Beta
+ScriptVersion=1.3.2.Beta
 ScriptDate=2018.04.04
 
 # 颜色 -----------------------------------------------------------------------------------
@@ -113,6 +113,7 @@ echo -e  "  当前 锐速 是否已启用                 $SSrunning"
 
 echo -e  "\n  当前系统内所有已安装的内核列表\n"
 cat -n /tmp/system_kernel_list | sed 's/\t/ /g' | sed "s/ linux-/) ${green}linux-/g" | sed "s/     /  ${magenta}(0/g" | sed "s/    /  ${magenta}(/g"
+echo -e  "\n  ${jiacu}当前脚本版本：$ScriptVersion\n"
 echo -e  "\n  ${yellow}${bold}使用本脚本前请先阅读本脚本 GitHub 上的 README；作者水平菜，不保证脚本不会翻车${jiacu}\n"
 
 echo -e  "  ${green}(01) ${jiacu}安装 原版 BBR"
