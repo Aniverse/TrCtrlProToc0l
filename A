@@ -12,7 +12,7 @@
 # http://xiaofd.win/onekey-ruisu.html
 # https://teddysun.com/489.html
 
-ScriptVersion=1.3.0.Beta
+ScriptVersion=1.3.1.Beta
 ScriptDate=2018.04.04
 
 # 颜色 -----------------------------------------------------------------------------------
@@ -124,6 +124,7 @@ echo -e  "  ${green}(12) ${jiacu}安装 4.11.12 内核"
 echo -e  "  ${green}(13) ${jiacu}安装 特定的锐速内核"
 echo -e  "  ${green}(21) ${jiacu}卸载 BBR"
 echo -e  "  ${green}(22) ${jiacu}卸载 锐速"
+echo -e  "  ${green}(22) ${jiacu}卸载 多余内核"
 echo -e  "  ${green}(99) ${jiacu}返回\n"
 rm -rf /tmp/system_kernel_list ; }
 
@@ -147,26 +148,27 @@ case $response in
         11) # 安装 最新内核
             _selected_kernel_install ;;
         12) # 安装 4.11.12 内核
-            _selected_kernel_install ;;
+            _online_ubuntu_bbr_firmware ; _bbr_kernel_4_11_12 ; kernel_version=4.11.12 && _delete_kernel ;;
         13) # 安装 特定的锐速内核
             _selected_kernel_install ;;
         21) # 卸载 BBR
             _bbr_uninstall ;;
         22) # 卸载 锐速
             _ss_uninstall ;;
-        22) # 卸载 多余内核
+        23) # 卸载 多余内核
             echo -ne "\n  ${bold}请输入你要 ${red}保留${jiacu} 的内核版本，其他版本的内核将会被删除：${normal} " ; read -e kernel_version
             _delete_kernel ;;
         31) # 安装 xanmod
             _xanmod_install ;;
     99 |"") # 返回
-            echo ; exit 0 ;;
-         *) echo ; exit 0 ;;
-esac ; }
+            exit 0 ;;
+         *) exit 0 ;;
+esac
+echo ; }
 
 
 
-_delete_kernel
+
 
 
 ###################################################################################################################################################################
@@ -265,7 +267,7 @@ if [[ $SSKernel == "${green}是${jiacu}" ]]; then
     _serverspeeder_direct_install
 elif [[ $SSKernel == "${red}否${jiacu}" ]] && [[ $DISTRO == ubuntu ]]; then
     _ask_continue2
-    echo -ne "  ${bold}当前内核不支持 锐速，安装 ${green}3.16.0-43${jiacu} 内核 ... ${normal} "
+    echo -ne "  ${bold}当前内核不支持 锐速，安装 ${green}3.16.0-43${jiacu} 内核 ... ${normal} \n"
     export kernelver=3.16.0-43-generic
     _ubuntu_serverspeeder_kernel_repo
     _ubuntu_serverspeeder_updategrub
@@ -322,7 +324,7 @@ function _selected_kernel_install() {
 _get_version
 _install_required
 kernel_version=$required_version
-_delete_kernel 
+_delete_kernel
 echo ; }
 
 
@@ -517,12 +519,13 @@ rm  -rf [123].deb ; echo ; }
 function _ubuntu_serverspeeder_kernel_repo() {
 sed -i '/deb http:\/\/security.ubuntu.com\/ubuntu trusty-security main/'d /etc/apt/sources.list
 echo "deb http://security.ubuntu.com/ubuntu trusty-security main" >> /etc/apt/sources.list
-echo -ne "\n${bold}添加源，更新 ...  ${normal}"
+echo -ne "\n  ${bold}添加源，更新 ...  ${normal}"
 apt-get update > /dev/null 2>&1 & echo "${green}${bold}完成${normal}"
-echo -ne "\n${bold}安装内核 ...  ${normal}"
-DEBIAN_FRONTEND=noninteractive apt-get -y install linux-image-extra-$kernelver linux-image-$kernelver linux-headers-$kernelver > /dev/null 2>&1 && echo "${green}${bold}完成${normal}" || { echo "${bold}${red}失败${normal}" ; exit 1 ; }
+echo -ne "\n  ${bold}安装内核 ...  ${normal}"
+DEBIAN_FRONTEND=noninteractive apt-get -y install linux-image-extra-$kernelver linux-image-$kernelver linux-headers-$kernelver > /dev/null 2>&1 && echo "${green}${bold}完成${normal}"
+[[ ! ` dpkg -l | grep linux-image-$kernelver ` ]] && { echo "${bold}${red}失败${normal}" ; exit 1 ; }
 sed -i '/deb http:\/\/security.ubuntu.com\/ubuntu trusty-security main/'d /etc/apt/sources.list
-echo -ne "\n${bold}删除源，更新 ...  ${normal}"
+echo -ne "\n  ${bold}删除源，更新 ...  ${normal}"
 apt-get update > /dev/null 2>&1 && echo "${green}${bold}完成${normal}" ; }
 
 
@@ -797,7 +800,7 @@ systemctl start rc-local ; }
 
 
 # 询问是否继续（重启版）
-function _ask_continue2() { echo -ne "\n  ${bold}输入 ${bailvse}回车${jiacu} 继续，完成后会直接重启；按 ${baihongse}Ctrl+C${jiacu} 退出${normal} " ; read response ; echo ; }
+function _ask_continue2() { echo -ne "  ${bold}输入 ${bailvse}回车${jiacu} 继续，完成后会直接重启；按 ${baihongse}Ctrl+C${jiacu} 退出${normal} " ; read response ; echo ; }
 
 
 
