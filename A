@@ -12,7 +12,7 @@
 # http://xiaofd.win/onekey-ruisu.html
 # https://teddysun.com/489.html
 
-ScriptVersion=1.3.7.RC
+ScriptVersion=1.3.8.Beta
 ScriptDate=2018.04.04
 
 # 颜色 -----------------------------------------------------------------------------------
@@ -30,10 +30,8 @@ shanshuo=$(tput blink); wuguangbiao=$(tput civis); guangbiao=$(tput cnorm)
 
 #  -----------------------------------------------------------------------------------
 
-SysSupport=0 ; DeBUG=0
-[[ $1 == -d ]] && DeBUG=1
-
-[[ ! $DeBUG == 1 ]] && Outputs="> /dev/null 2>&1"
+SysSupport=0 ; DeBUG=0 ; Outputs="/dev/null"
+[[ $1 == -d ]] && DeBUG=1 && { Outputs="/root/TCP.log" ; rm -rf $Outputs ; }
 
 KernelBit=` getconf LONG_BIT `
 [[ $KernelBit == 32 ]] && KernelBitVer=i386 ; [[ $KernelBit == 64 ]] && KernelBitVer=amd64
@@ -315,7 +313,7 @@ case $input in
     "" ) echo ;;
     *  ) echo ; _read_response ;;
 esac
-[[ `grep "Advanced options for Ubuntu" /etc/default/grub` ]] && sed -i 's/GRUB_DEFAULT=.*/GRUB_DEFAULT=""/' /etc/default/grub && update-grub $Outputs
+[[ `grep "Advanced options for Ubuntu" /etc/default/grub` ]] && sed -i 's/GRUB_DEFAULT=.*/GRUB_DEFAULT=""/' /etc/default/grub && update-grub >> $Outputs 2>&1
 wget --no-check-certificate -qO /tmp/appex.sh "https://raw.githubusercontent.com/0oVicero0/serverSpeeder_Install/master/appex.sh" && echo | bash /tmp/appex.sh 'uninstall'
 echo -e "  ${bold}${red}已卸载 锐速，但安装的内核仍保留${normal}\n" ; }
 
@@ -518,7 +516,7 @@ echo "exit 0" >> /etc/rc.local ; }
 function _debian_serverspeeder_kernel_312() {
 wget --no-check-certificate -qO 1.deb https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Linux%20Kernel/ServerSpeeder/linux-headers-3.12-1.deb
 wget --no-check-certificate -qO 2.deb https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Linux%20Kernel/ServerSpeeder/linux-image-3.12-1.deb
-dpkg -i [12].deb $Outputs || { echo -e "\n  ${bold}${red}错误${jiacu} 安装 内核 失败！${normal}" ; exit 1 ; }
+dpkg -i [12].deb >> $Outputs 2>&1 || { echo -e "\n  ${bold}${red}错误${jiacu} 安装 内核 失败！${normal}" ; exit 1 ; }
 rm  -rf [12].deb ; echo ; }
 
 
@@ -526,7 +524,7 @@ rm  -rf [12].deb ; echo ; }
 # Debian 安装 3.16.0-4 内核（For ServerSpeeder）
 function _debian_serverspeeder_kernel_316() {
 wget --no-check-certificate -qO 1.deb https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Linux%20Kernel/ServerSpeeder/linux-image-3.16.0-4.deb
-dpkg -i 1.deb $Outputs || { echo -e "\n  ${bold}${red}错误${jiacu} 安装 内核 失败！${normal}" ; exit 1 ; }
+dpkg -i 1.deb >> $Outputs 2>&1 || { echo -e "\n  ${bold}${red}错误${jiacu} 安装 内核 失败！${normal}" ; exit 1 ; }
 rm  -rf 1.deb ; echo ; }
 
 
@@ -536,7 +534,7 @@ function _ubuntu_serverspeeder_kernel_440() {
 wget --no-check-certificate -qO 1.deb https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Linux%20Kernel/ServerSpeeder/linux-image-4.4.0-47.deb
 wget --no-check-certificate -qO 2.deb https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Linux%20Kernel/ServerSpeeder/linux-headers-4.4.0-47-all.deb
 wget --no-check-certificate -qO 3.deb https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Linux%20Kernel/ServerSpeeder/linux-headers-4.4.0-47.deb
-dpkg -i [123].deb $Outputs || { echo -e "\n  ${bold}${red}错误${jiacu} 安装 内核 失败！${normal}" ; exit 1 ; }
+dpkg -i [123].deb >> $Outputs 2>&1 || { echo -e "\n  ${bold}${red}错误${jiacu} 安装 内核 失败！${normal}" ; exit 1 ; }
 rm  -rf [123].deb ; echo ; }
 
 
@@ -546,13 +544,13 @@ function _ubuntu_serverspeeder_kernel_repo() {
 sed -i '/deb http:\/\/security.ubuntu.com\/ubuntu trusty-security main/'d /etc/apt/sources.list
 echo "deb http://security.ubuntu.com/ubuntu trusty-security main" >> /etc/apt/sources.list
 echo -ne "\n  ${bold}添加源，更新 ...  ${normal}"
-apt-get update $Outputs & echo "${green}${bold}完成${normal}"
+apt-get update >> $Outputs 2>&1 & echo "${green}${bold}完成${normal}"
 echo -ne "\n  ${bold}安装内核 ...  ${normal}"
-DEBIAN_FRONTEND=noninteractive apt-get -y install linux-image-extra-$kernelver linux-image-$kernelver linux-headers-$kernelver $Outputs && echo "${green}${bold}完成${normal}"
+DEBIAN_FRONTEND=noninteractive apt-get -y install linux-image-extra-$kernelver linux-image-$kernelver linux-headers-$kernelver >> $Outputs 2>&1 && echo "${green}${bold}完成${normal}"
 [[ ! ` dpkg -l | grep linux-image-$kernelver ` ]] && { echo "${bold}${red}失败${normal}" ; exit 1 ; }
 sed -i '/deb http:\/\/security.ubuntu.com\/ubuntu trusty-security main/'d /etc/apt/sources.list
 echo -ne "\n  ${bold}删除源，更新 ...  ${normal}"
-apt-get update $Outputs && echo "${green}${bold}完成${normal}" ; }
+apt-get update >> $Outputs 2>&1 && echo "${green}${bold}完成${normal}" ; }
 
 
 
@@ -561,7 +559,7 @@ function _ubuntu_serverspeeder_updategrub() {
 sed -i 's/GRUB_DEFAULT=.*/GRUB_DEFAULT="Advanced options for Ubuntu>Ubuntu, with Linux kernelver"/' /etc/default/grub
 sed -i "s/kernelver/$kernelver/" /etc/default/grub
 echo -ne "\n  ${bold}更新引导 ...  "
-update-grub $Outputs && echo "${green}${bold}完成${normal}" ; }
+update-grub >> $Outputs 2>&1 && echo "${green}${bold}完成${normal}" ; }
 
 
 
@@ -602,10 +600,10 @@ echo -ne "\n  ${bold}安装 4.11.12 内核及其头文件 ... ${normal} "
 wget --no-check-certificate -qO 1.deb https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Linux%20Kernel/BBR/linux-headers-4.11.12-all.deb
 wget --no-check-certificate -qO 2.deb https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Linux%20Kernel/BBR/linux-headers-4.11.12-amd64.deb
 wget --no-check-certificate -qO 3.deb https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Linux%20Kernel/BBR/linux-image-4.11.12-generic-amd64.deb
-dpkg -i [123].deb $Outputs || { echo -e "\n  ${bold}${red}错误${jiacu} 安装 内核 失败！${normal}" ; exit 1 ; }
+dpkg -i [123].deb >> $Outputs 2>&1 || { echo -e "\n  ${bold}${red}错误${jiacu} 安装 内核 失败！${normal}" ; exit 1 ; }
 rm -rf [123].deb ; echo
 echo -ne "\n  ${bold}更新引导 ...  "
-update-grub $Outputs && echo "${green}${bold}完成${normal}" ; }
+update-grub >> $Outputs 2>&1 && echo "${green}${bold}完成${normal}" ; }
 
 
 
@@ -615,24 +613,24 @@ function _check_essential() {
 if [[ $CODENAME == stretch ]]; then
     [[ ! `dpkg -l | grep libssl1.0.0` ]] && { echo -ne "\n  {bold}安装 libssl1.0.0 ...${normal} "
     echo -e "\ndeb http://ftp.hk.debian.org/debian jessie main\c" >> /etc/apt/sources.list
-    apt-get update $Outputs
-    apt-get install -y libssl1.0.0 $Outputs
+    apt-get update >> $Outputs 2>&1
+    apt-get install -y libssl1.0.0 >> $Outputs 2>&1
     sed  -i '/deb http:\/\/ftp\.hk\.debian\.org\/debian jessie main/d' /etc/apt/sources.list
-    apt-get update $Outputs ; echo
+    apt-get update >> $Outputs 2>&1 ; echo
     [[ ! `dpkg -l | grep libssl1.0.0` ]] && { echo -e "\n  ${red}错误${bold} 安装 libssl1.0.0  失败！${normal}" ; exit 1 ; } ; }
 else
-    [[ ! `dpkg -l | grep libssl1.0.0` ]] && { echo -ne "\n  ${bold}安装 libssl1.0.0 ...${normal} "  ; DEBIAN_FRONTEND=noninteractive apt-get install -y libssl1.0.0 $Outputs ; echo
+    [[ ! `dpkg -l | grep libssl1.0.0` ]] && { echo -ne "\n  ${bold}安装 libssl1.0.0 ...${normal} "  ; DEBIAN_FRONTEND=noninteractive apt-get install -y libssl1.0.0 >> $Outputs 2>&1 ; echo
     [[ ! `dpkg -l | grep libssl1.0.0` ]] && { echo -e  "\n$  ${red}错误${bold} 安装 libssl1.0.0  失败！${normal}" ; exit 1 ; } ; }
 fi
 
-which make $Outputs ; [ $? -ne '0' ] && { echo -ne "\n  ${bold}安装 make ...${normal} " ; DEBIAN_FRONTEND=noninteractive apt-get install -y make $Outputs ; echo
-which make $Outputs ; [ $? -ne '0' ] && { echo -e  "\n  ${red}错误${bold} 安装 make 失败！${normal}" ; exit 1 ; } ; }
+which make >> $Outputs 2>&1 ; [ $? -ne '0' ] && { echo -ne "\n  ${bold}安装 make ...${normal} " ; DEBIAN_FRONTEND=noninteractive apt-get install -y make >> $Outputs 2>&1 ; echo
+which make >> $Outputs 2>&1 ; [ $? -ne '0' ] && { echo -e  "\n  ${red}错误${bold} 安装 make 失败！${normal}" ; exit 1 ; } ; }
 
-which awk  $Outputs ; [ $? -ne '0' ] && { echo -ne "\n  ${bold}安装 awk ...${normal} "  ; DEBIAN_FRONTEND=noninteractive apt-get install -y gawk $Outputs ; echo
-which awk  $Outputs ; [ $? -ne '0' ] && { echo -e  "\n  ${red}错误${bold} 安装 awk 失败！${normal}"  ; exit 1 ; } ; }
+which awk  >> $Outputs 2>&1 ; [ $? -ne '0' ] && { echo -ne "\n  ${bold}安装 awk ...${normal} "  ; DEBIAN_FRONTEND=noninteractive apt-get install -y gawk >> $Outputs 2>&1 ; echo
+which awk  >> $Outputs 2>&1 ; [ $? -ne '0' ] && { echo -e  "\n  ${red}错误${bold} 安装 awk 失败！${normal}"  ; exit 1 ; } ; }
 
-which gcc  $Outputs ; [ $? -ne '0' ] && { echo -ne "\n  ${bold}安装 gcc ...${normal} "  ; DEBIAN_FRONTEND=noninteractive apt-get install -y gcc  $Outputs ; echo
-which gcc  $Outputs ; [ $? -ne '0' ] && { echo -e  "\n  ${red}错误${bold} 安装 gcc 失败！${normal}"  ; exit 1 ; } ; }
+which gcc  >> $Outputs 2>&1 ; [ $? -ne '0' ] && { echo -ne "\n  ${bold}安装 gcc ...${normal} "  ; DEBIAN_FRONTEND=noninteractive apt-get install -y gcc  >> $Outputs 2>&1 ; echo
+which gcc  >> $Outputs 2>&1 ; [ $? -ne '0' ] && { echo -e  "\n  ${red}错误${bold} 安装 gcc 失败！${normal}"  ; exit 1 ; } ; }
 
 gcc_ok=0 ; gcc_ver=` gcc --version | grep -Eo '[0-9]+\.[0-9]+\.[0-9]+' | head -n1 `
 gcc_ver_1=` echo $gcc_ver | awk -F. '{print $1}' ` ; gcc_ver_2=` echo $gcc_ver | awk -F. '{print $2}' `
@@ -640,7 +638,7 @@ gcc_ver_1=` echo $gcc_ver | awk -F. '{print $1}' ` ; gcc_ver_2=` echo $gcc_ver |
 [[ $gcc_ver_1 == 4 ]] && [[ -n $gcc_ver_2 ]] && [[ $gcc_ver_2 -ge 9 ]] && gcc_ok=1
 [[ $gcc_ok == 0 ]] && { echo -e "\n  ${red}错误${bold} gcc 版本低于 4.9！${normal}" ; exit 1 ; }
 
-[[ ! `dpkg -l | grep build-essential` ]] && { echo -ne "\n  ${bold}安装 build-essential ...${normal} "  ; DEBIAN_FRONTEND=noninteractive apt-get install -y build-essential $Outputs ; echo
+[[ ! `dpkg -l | grep build-essential` ]] && { echo -ne "\n  ${bold}安装 build-essential ...${normal} "  ; DEBIAN_FRONTEND=noninteractive apt-get install -y build-essential >> $Outputs 2>&1 ; echo
 [[ ! `dpkg -l | grep build-essential` ]] && { echo -e  "\n  ${red}错误${bold} 安装 build-essential  失败！${normal}" ; exit 1 ; } ; } ; }
 
 
@@ -660,10 +658,10 @@ else wget --no-check-certificate -q https://raw.githubusercontent.com/nanqinlang
 # make && make install
 
 echo "obj-m := tcp_nanqinlang.o" > Makefile
-make -C /lib/modules/$(uname -r)/build M=`pwd` modules CC=`which gcc` $Outputs
-cp -rf tcp_nanqinlang.ko /lib/modules/$(uname -r)/kernel/net/ipv4 $Outputs
-insmod /lib/modules/$(uname -r)/kernel/net/ipv4/tcp_nanqinlang.ko $Outputs
-depmod -a $Outputs
+make -C /lib/modules/$(uname -r)/build M=`pwd` modules CC=`which gcc` >> $Outputs 2>&1
+cp -rf tcp_nanqinlang.ko /lib/modules/$(uname -r)/kernel/net/ipv4 >> $Outputs 2>&1
+insmod /lib/modules/$(uname -r)/kernel/net/ipv4/tcp_nanqinlang.ko >> $Outputs 2>&1
+depmod -a >> $Outputs 2>&1
 
 rm -rf tcp_nanqinlang.c Makefile ; }
 
@@ -673,11 +671,11 @@ rm -rf tcp_nanqinlang.c Makefile ; }
 function _bbr_tsunami() {
 wget --no-check-certificate -qO tcp_tsunami.c https://github.com/Aniverse/BitTorrentClientCollection/raw/master/TCP%20Congestion%20Control/tcp_tsunami.c
 echo "obj-m:=tcp_tsunami.o" > Makefile
-make -C /lib/modules/$(uname -r)/build M=`pwd` modules CC=`which gcc` $Outputs
-insmod tcp_tsunami.ko $Outputs
-cp -rf ./tcp_tsunami.ko /lib/modules/$(uname -r)/kernel/net/ipv4 $Outputs
-depmod -a $Outputs
-modprobe tcp_tsunami $Outputs
+make -C /lib/modules/$(uname -r)/build M=`pwd` modules CC=`which gcc` >> $Outputs 2>&1
+insmod tcp_tsunami.ko >> $Outputs 2>&1
+cp -rf ./tcp_tsunami.ko /lib/modules/$(uname -r)/kernel/net/ipv4 >> $Outputs 2>&1
+depmod -a >> $Outputs 2>&1
+modprobe tcp_tsunami >> $Outputs 2>&1
 rm -rf tcp_tsunami.c Makefile ; }
 
 
@@ -688,7 +686,7 @@ sed -i '/net.core.default_qdisc.*/d' /etc/sysctl.conf
 sed -i '/net.ipv4.tcp_congestion_control.*/d' /etc/sysctl.conf
 echo "net.core.default_qdisc = fq" >> /etc/sysctl.conf
 echo "net.ipv4.tcp_congestion_control = $bbrname" >> /etc/sysctl.conf
-sysctl -p $Outputs ; }
+sysctl -p >> $Outputs 2>&1 ; }
 
 
 
@@ -698,7 +696,7 @@ sed -i '/net.core.default_qdisc.*/d' /etc/sysctl.conf
 sed -i '/net.ipv4.tcp_congestion_control.*/d' /etc/sysctl.conf
 echo "net.ipv4.tcp_congestion_control = cubic" >> /etc/sysctl.conf
 [[ ! $bbrname == bbr ]] && rm /lib/modules/`uname -r`/kernel/net/ipv4/tcp_$bbrname.ko
-sysctl -p $Outputs ; }
+sysctl -p >> $Outputs 2>&1 ; }
 
 
 
@@ -746,7 +744,7 @@ image_url="http://kernel.ubuntu.com/~kernel-ppa/mainline/v${required_version}/${
 
 echo -ne "\n  ${bold}安装 ${green}$required_version${jiacu} 内核 ... ${normal}"
 wget -qO kernel.deb $image_url || { echo -e "\n  ${red}错误${jiacu} 内核 下载失败！${normal}\n" ; exit 1 ; }
-dpkg -i kernel.deb $Outputs || { echo -e "\n  ${red}错误${jiacu} 内核 安装失败！${normal}\n" ; exit 1 ; }
+dpkg -i kernel.deb >> $Outputs 2>&1 || { echo -e "\n  ${red}错误${jiacu} 内核 安装失败！${normal}\n" ; exit 1 ; }
 
 rm kernel.deb ; }
 
@@ -761,11 +759,11 @@ headers_bit_url="http://kernel.ubuntu.com/~kernel-ppa/mainline/v${required_versi
 
 echo -ne "\n  ${bold}安装 ${green}$required_version${jiacu} headers_all ... ${normal}"
 wget -qO headers1.deb $headers_all_url || { echo -e "\n  ${red}错误${jiacu} headers_all 下载失败！${normal}\n" ; exit 1 ; }
-dpkg -i headers1.deb $Outputs  || { echo -e "\n  ${red}错误${jiacu} headers_all 安装失败！${normal}\n" ; exit 1 ; }
+dpkg -i headers1.deb >> $Outputs 2>&1  || { echo -e "\n  ${red}错误${jiacu} headers_all 安装失败！${normal}\n" ; exit 1 ; }
 
 echo -ne "\n  ${bold}安装 ${green}$required_version${jiacu} headers ... ${normal}"
 wget -qO headers2.deb $headers_bit_url || { echo -e "\n  ${red}错误${jiacu} headers 下载失败！${normal}\n"     ; exit 1 ; }
-dpkg -i headers2.deb $Outputs  || { echo -e "\n  ${red}错误${jiacu} headers_all 安装失败！${normal}\n" ; exit 1 ; }
+dpkg -i headers2.deb >> $Outputs 2>&1  || { echo -e "\n  ${red}错误${jiacu} headers_all 安装失败！${normal}\n" ; exit 1 ; }
 rm headers1.deb headers2.deb ; }
 
 
@@ -793,12 +791,12 @@ if [ $kernel_total > 1 ]; then
         kernel_tobe_del=` dpkg -l | grep -E linux-[image,headers] | awk '{print $2}' | grep -v "${kernel_version}" | head -${integer} `
         echo -ne "Removing ${kernel_tobe_del} ... "
         echo `debconf-get-selections ${deb_del} | grep removing-running-kernel | grep $running_kernel | sed s/true/false/` | debconf-set-selections
-        DEBIAN_FRONTEND=noninteractive apt-get -y purge $kernel_tobe_del $Outputs && echo "$(tput setaf 2)DONE$(tput sgr0)" || echo "$(tput setaf 1)FAILED$(tput sgr0)"
+        DEBIAN_FRONTEND=noninteractive apt-get -y purge $kernel_tobe_del >> $Outputs 2>&1 && echo "$(tput setaf 2)DONE$(tput sgr0)" || echo "$(tput setaf 1)FAILED$(tput sgr0)"
     done
 fi
 
 echo -ne "\n  ${bold}更新引导 ...  "
-update-grub $Outputs && echo "${green}完成${normal}" ; }
+update-grub >> $Outputs 2>&1 && echo "${green}完成${normal}" ; }
 
 
 
