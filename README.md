@@ -50,12 +50,14 @@ bash <(curl -s https://raw.githubusercontent.com/Aniverse/TrCtrlProToc0l/master/
 
 ## To Do List
 
-- **允许自定义内核版本**  
-目前对于 BBR 都指定了 4.11.12  
-
 ## Known Issues
 
 - **某些情况下多余内核可能会移除失败**  
+
+- **某些情况下 Ubuntu 安装锐速会失败**  
+再跑一次就行  
+
+- **无法删除 PVE 内核**  
 
 ## Some references
 
