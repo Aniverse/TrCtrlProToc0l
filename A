@@ -12,8 +12,8 @@
 # http://xiaofd.win/onekey-ruisu.html
 # https://teddysun.com/489.html
 
-ScriptVersion=1.4.0.Alpha.1
-ScriptDate=2018.04.04
+ScriptVersion=1.4.2
+ScriptDate=2018.04.25
 
 # 颜色 -----------------------------------------------------------------------------------
 
@@ -93,9 +93,14 @@ MyKernel=$(wget --no-check-certificate -qO- "$URLKernel" |grep "$KNA/" |grep "/x
 function version_ge(){ test "$(echo "$@" | tr " " "\n" | sort -rV | head -n 1)" == "$1" ; }
 
 kernel_vvv=$(uname -r | cut -d- -f1)
-if version_ge ${kernel_vvv} 4.9  ; then BBRKernel="${green}是${jiacu}" ; else BBRKernel="${red}否${jiacu}" ; fi
-if version_ge ${kernel_vvv} 4.10 && ! version_ge ${kernel_vvv} 4.16 ; then YKKernel="${green}是${jiacu}" ; else YKKernel="${red}否${jiacu}" ; fi
-if version_ge ${kernel_vvv} 4.9 && ! version_ge ${kernel_vvv} 4.17 ; then NQLKernel="${green}是${jiacu}" ; else NQLKernel="${red}否${jiacu}" ; fi
+if version_ge $kernel_vvv 4.9  ; then BBRKernel="${green}是${jiacu}" ; else BBRKernel="${red}否${jiacu}" ; fi
+if version_ge $kernel_vvv 4.10 && ! version_ge $kernel_vvv 4.16 ; then YKKernel="${green}是${jiacu}"  ; else YKKernel="${red}否${jiacu}" ; fi
+if version_ge $kernel_vvv 4.9  && ! version_ge $kernel_vvv 4.17 ; then NQLKernel="${green}是${jiacu}" ; else NQLKernel="${red}否${jiacu}" ; fi
+ver_4_13=`dpkg -l | grep linux-image | awk '{print $2}' | awk -F '-' '{print $3}' | grep "4.13"`
+ver_4_14=`dpkg -l | grep linux-image | awk '{print $2}' | awk -F '-' '{print $3}' | grep "4.14"`
+ver_4_15=`dpkg -l | grep linux-image | awk '{print $2}' | awk -F '-' '{print $3}' | grep "4.15"`
+ver_4_16=`dpkg -l | grep linux-image | awk '{print $2}' | awk -F '-' '{print $3}' | grep "4.16"`
+ver_4_17=`dpkg -l | grep linux-image | awk '{print $2}' | awk -F '-' '{print $3}' | grep "4.17"`
 
 # 检查 锐速 与 BBR 是否已启用
 [[ ` ps aux | grep appex | grep -v grep ` ]] && SSrunning="${green}是${jiacu}" || SSrunning="${red}否${jiacu}"
@@ -444,6 +449,7 @@ cat > /etc/autoinstall/nqlbbr.sh <<EOF
 ver_4_13=\`dpkg -l | grep linux-image | awk '{print \$2}' | awk -F '-' '{print \$3}' | grep "4.13"\`
 ver_4_14=\`dpkg -l | grep linux-image | awk '{print \$2}' | awk -F '-' '{print \$3}' | grep "4.14"\`
 ver_4_15=\`dpkg -l | grep linux-image | awk '{print \$2}' | awk -F '-' '{print \$3}' | grep "4.15"\`
+ver_4_16=\`dpkg -l | grep linux-image | awk '{print \$2}' | awk -F '-' '{print \$3}' | grep "4.16"\`
 if   [[ ! -z "\${ver_4_13}" ]]; then wget --no-check-certificate -qO tcp_nanqinlang.c https://raw.githubusercontent.com/nanqinlang-tcp/tcp_nanqinlang/master/General/Debian/source/kernel-v4.13/tcp_nanqinlang.c
 elif [[ ! -z "\${ver_4_14}" ]]; then wget --no-check-certificate -qO tcp_nanqinlang.c https://raw.githubusercontent.com/nanqinlang-tcp/tcp_nanqinlang/master/General/Debian/source/kernel-v4.14/tcp_nanqinlang.c
 elif [[ ! -z "\${ver_4_15}" ]]; then wget --no-check-certificate -qO tcp_nanqinlang.c https://raw.githubusercontent.com/nanqinlang-tcp/tcp_nanqinlang/master/General/Debian/source/kernel-v4.15/tcp_nanqinlang.c
@@ -664,14 +670,11 @@ gcc_ver_1=` echo $gcc_ver | awk -F. '{print $1}' ` ; gcc_ver_2=` echo $gcc_ver |
 
 # 南琴浪版魔改 BBR 编译安装算法
 function _bbr_nanqinlang(){
-ver_4_13=`dpkg -l | grep linux-image | awk '{print $2}' | awk -F '-' '{print $3}' | grep "4.13"`
-ver_4_14=`dpkg -l | grep linux-image | awk '{print $2}' | awk -F '-' '{print $3}' | grep "4.14"`
-ver_4_15=`dpkg -l | grep linux-image | awk '{print $2}' | awk -F '-' '{print $3}' | grep "4.15"`
-if   [[ ! -z "${ver_4_13}" ]]; then wget --no-check-certificate -q https://raw.githubusercontent.com/nanqinlang-tcp/tcp_nanqinlang/master/General/Debian/source/kernel-v4.13/tcp_nanqinlang.c
-elif [[ ! -z "${ver_4_14}" ]]; then wget --no-check-certificate -q https://raw.githubusercontent.com/nanqinlang-tcp/tcp_nanqinlang/master/General/Debian/source/kernel-v4.14/tcp_nanqinlang.c
-elif [[ ! -z "${ver_4_15}" ]]; then wget --no-check-certificate -q https://raw.githubusercontent.com/nanqinlang-tcp/tcp_nanqinlang/master/General/Debian/source/kernel-v4.15/tcp_nanqinlang.c
-elif [[ ! -z "${ver_4_16}" ]]; then wget --no-check-certificate -q https://github.com/nanqinlang-tcp/tcp_nanqinlang/raw/master/General/Debian/source/kernel-v4.16/tcp_nanqinlang.c
-else wget --no-check-certificate -q https://raw.githubusercontent.com/nanqinlang-tcp/tcp_nanqinlang/master/General/Debian/source/kernel-v4.12andbelow/tcp_nanqinlang.c ; fi
+if   [[ ! -z "${ver_4_13}" ]]; then wget --no-check-certificate -qO tcp_nanqinlang.c https://github.com/Aniverse/BitTorrentClientCollection/raw/master/TCP%20Congestion%20Control/BBR%204.13/tcp_nanqinlang.c
+elif [[ ! -z "${ver_4_14}" ]]; then wget --no-check-certificate -qO tcp_nanqinlang.c https://github.com/Aniverse/BitTorrentClientCollection/raw/master/TCP%20Congestion%20Control/BBR%204.14/tcp_nanqinlang.c
+elif [[ ! -z "${ver_4_15}" ]]; then wget --no-check-certificate -qO tcp_nanqinlang.c https://github.com/Aniverse/BitTorrentClientCollection/raw/master/TCP%20Congestion%20Control/BBR%204.15/tcp_nanqinlang.c
+elif [[ ! -z "${ver_4_16}" ]]; then wget --no-check-certificate -qO tcp_nanqinlang.c https://github.com/Aniverse/BitTorrentClientCollection/raw/master/TCP%20Congestion%20Control/BBR%204.16/tcp_nanqinlang.c
+else wget --no-check-certificate -qO tcp_nanqinlang.c https://github.com/Aniverse/BitTorrentClientCollection/raw/master/TCP%20Congestion%20Control/BBR%204.12%20and%20below/tcp_nanqinlang.c ; fi
 
 # wget --no-check-certificate -qO Makefile https://raw.githubusercontent.com/nanqinlang-tcp/tcp_nanqinlang/master/Makefile/Makefile-Debian9
 # sed -i "s/\/usr\/bin\/gcc-6/\`which gcc\`/" Makefile
@@ -689,7 +692,12 @@ rm -rf tcp_nanqinlang.c Makefile ; }
 
 # 安装 Yankee 版 魔改 BBR
 function _bbr_tsunami() {
-wget --no-check-certificate -qO tcp_tsunami.c https://github.com/Aniverse/BitTorrentClientCollection/raw/master/TCP%20Congestion%20Control/tcp_tsunami.c
+if   [[ ! -z "${ver_4_13}" ]]; then wget --no-check-certificate -qO tcp_tsunami.c https://github.com/Aniverse/BitTorrentClientCollection/raw/master/TCP%20Congestion%20Control/BBR%204.13/tcp_tsunami.c
+elif [[ ! -z "${ver_4_14}" ]]; then wget --no-check-certificate -qO tcp_tsunami.c https://github.com/Aniverse/BitTorrentClientCollection/raw/master/TCP%20Congestion%20Control/BBR%204.14/tcp_tsunami.c
+elif [[ ! -z "${ver_4_15}" ]]; then wget --no-check-certificate -qO tcp_tsunami.c https://github.com/Aniverse/BitTorrentClientCollection/raw/master/TCP%20Congestion%20Control/BBR%204.15/tcp_tsunami.c
+# elif [[ ! -z "${ver_4_16}" ]]; then wget --no-check-certificate -qO tcp_tsunami.c https://github.com/Aniverse/BitTorrentClientCollection/raw/master/TCP%20Congestion%20Control/BBR%204.16/tcp_tsunami.c
+else wget --no-check-certificate -qO tcp_tsunami.c https://github.com/Aniverse/BitTorrentClientCollection/raw/master/TCP%20Congestion%20Control/BBR%204.12%20and%20below/tcp_tsunami.c ; fi
+
 echo "obj-m:=tcp_tsunami.o" > Makefile
 make -C /lib/modules/$(uname -r)/build M=`pwd` modules CC=`which gcc` >> $Outputs 2>&1
 insmod tcp_tsunami.ko >> $Outputs 2>&1
