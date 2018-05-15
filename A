@@ -12,7 +12,7 @@
 # http://xiaofd.win/onekey-ruisu.html
 # https://teddysun.com/489.html
 
-ScriptVersion=1.4.7
+ScriptVersion=1.4.8
 ScriptDate=2018.05.15
 
 # 颜色 -----------------------------------------------------------------------------------
@@ -30,8 +30,9 @@ shanshuo=$(tput blink); wuguangbiao=$(tput civis); guangbiao=$(tput cnorm)
 
 #  -----------------------------------------------------------------------------------
 
+# Outputs="/dev/null"
 export DEBIAN_FRONTEND=noninteractive
-SysSupport=0 ; DeBUG=0 ; Outputs="/dev/null"
+SysSupport=0 ; DeBUG=0 ; Outputs="/log/tcp.$(date "+%m.%d.%H.%M.%S").log"
 [[ $1 == -d ]] && DeBUG=1
 
 KernelBit=` getconf LONG_BIT `
@@ -58,12 +59,14 @@ mkdir -p /log
 # 菜单
 function _menu() { clear ; echo
 
-[[ $DeBUG == 1 ]] && { Outputs="/log/tcp.$(date "+%m.%d.%H.%M.%S").log" ; }
+# [[ $DeBUG == 1 ]] && { Outputs="/log/tcp.$(date "+%m.%d.%H.%M.%S").log" ; }
+
+[[ $CODENAME =~ (bionic|stretch) ]] && _enable_rclocal
 
 # 操作系统、内核等参数检测
 [ -f /etc/redhat-release ] && KNA=$(awk '{print $1}' /etc/redhat-release)
-[ -f /etc/os-release ] && KNA=$(awk -F'[= "]' '/PRETTY_NAME/{print $3}' /etc/os-release)
-[ -f /etc/lsb-release ] && KNA=$(awk -F'[="]+' '/DISTRIB_ID/{print $2}' /etc/lsb-release)
+[ -f /etc/os-release     ] && KNA=$(awk -F'[= "]' '/PRETTY_NAME/{print $3}' /etc/os-release)
+[ -f /etc/lsb-release    ] && KNA=$(awk -F'[="]+' '/DISTRIB_ID/{print $2}' /etc/lsb-release)
 tcp_control=` awk '{print $1}' /proc/sys/net/ipv4/tcp_available_congestion_control `
 tcp_control_all=` cat /proc/sys/net/ipv4/tcp_available_congestion_control `
 running_kernel=` uname -r `
@@ -251,7 +254,6 @@ else
     _check_essential
     _bbr_kernel_4_11_12
     kernel_version=4.11.12 && _delete_kernel
-    [[ $CODENAME == stretch ]] && _enable_rclocal
     _bbr_tsunami_autoinstall_after_reboot
     bbrname=tsunami
     _enable_bbr
@@ -281,7 +283,6 @@ else
     _check_essential
     _bbr_kernel_4_11_12
     kernel_version=4.11.12 && _delete_kernel
-    [[ $CODENAME == stretch ]] && _enable_rclocal
     _bbr_nanqinlang_autoinstall_after_reboot
     bbrname=nanqinlang
     _enable_bbr
@@ -317,7 +318,6 @@ elif [[ $SSKernel == "${red}否${jiacu}" ]] && [[ $CODENAME == stretch ]]; then
     kernel_version=3.16.0-4
     _debian_serverspeeder_kernel_316
     _delete_kernel
-    _enable_rclocal
     _serverspeeder_autoinstall_after_reboot
     [[ ! $DeBUG == 1 ]] && echo -ne "\n  ${bold}即将重启系统，重启后会自动安装 ${green}锐速${jiacu} ... ${normal}\n" && reboot
 fi ; }
@@ -842,7 +842,7 @@ rm headers1.deb headers2.deb ; }
 
 # 删除其他内核，并更新引导
 function _delete_kernel() {
-echo -e "\n  ${bold}卸载多余内核及其头文件 ... ${normal}\n"
+echo -e "\n  ${bold}卸载多余内核及其头文件 ... ${normal}\n" | tee -a $Outputs
 kernel_total=` dpkg -l | grep -E linux-[image,headers] | awk '{print $2}' | grep -v "${kernel_version}" | wc -l `
 
 for ddd in debconf-set-selections debconf-get-selections ; do
@@ -862,7 +862,7 @@ update-grub >> $Outputs 2>&1 && echo "${green}完成${normal}" | tee -a $Outputs
 
 
 
-# Debian 9 启用 /etc/rc.local
+# 启用 /etc/rc.local
 function _enable_rclocal() {
 cat <<EOF >/etc/rc.local
 #!/bin/sh -e
