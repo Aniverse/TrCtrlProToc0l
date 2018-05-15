@@ -12,7 +12,7 @@
 # http://xiaofd.win/onekey-ruisu.html
 # https://teddysun.com/489.html
 
-ScriptVersion=1.5.3
+ScriptVersion=1.5.4
 ScriptDate=2018.05.15
 
 # 颜色 -----------------------------------------------------------------------------------
@@ -170,7 +170,9 @@ rm -f /tmp/system_kernel_list ; }
 
 # action
 function _read_response() {
-echo -ne "  ${yellow}你想做什么？(默认返回) ${normal}" ; read -e response ; echo -n "${normal}"
+# echo -ne "  ${yellow}你想做什么？(默认返回) ${normal}" ; read -e response ; echo -n "${normal}"
+read -ep "  ${yellow}你想做什么？(默认返回) ${normal}" response ; echo -n "${normal}"
+
 case $response in
     1 | 01) # 安装 原版 BBR
             _obbr_install ;;
@@ -807,23 +809,21 @@ digit_ver_modules=`dpkg -l | grep linux-modules | awk '{print $2}' | awk -F '-' 
 [[ $DeBUG == 1 ]] && echo "${required_version}"
 
 if [[ -z $digit_ver_modules ]]; then _install_required_modules
-else echo -e "\n  ${bold}${green}$required_version${jiacu} 模组已安装 ...${normal}\n" | tee -a $Outputs ; fi
+else echo -e "\n  ${bold}${green}$required_version${jiacu} 模组已安装 ...${normal}" | tee -a $Outputs ; fi
 
 if [[ -z $digit_ver_image ]]; then _install_required_kernel
-else echo -e "\n  ${bold}${green}$required_version${jiacu} 内核已安装 ...${normal}\n" | tee -a $Outputs ; fi
+else echo -e "\n  ${bold}${green}$required_version${jiacu} 内核已安装 ...${normal}" | tee -a $Outputs ; fi
 
 if [[ -z $digit_ver_headers ]]; then _install_required_headers
-else echo -e "\n  ${bold}${green}$required_version${jiacu} 头文件已安装 ...${normal}\n" | tee -a $Outputs ; fi ; }
+else echo -e "\n  ${bold}${green}$required_version${jiacu} 头文件已安装 ...${normal}" | tee -a $Outputs ; fi ; }
 
 
 
 # 安装自选版本的内核
 function _install_required_kernel() {
 [[ $DeBUG == 1 ]] && echo "${required_version}"
-image_name=`wget -qO- http://kernel.ubuntu.com/~kernel-ppa/mainline/v${required_version}/ | grep linux-image | grep generic | grep -v unsigned | awk -F'\">' '/amd64.deb/{print $2}' | cut -d'<' -f1 | head -1`
+image_name=`  wget -qO- http://kernel.ubuntu.com/~kernel-ppa/mainline/v${required_version}/ | grep linux-image | grep generic | awk -F'\">' '/amd64.deb/{print $2}' | cut -d'<' -f1 | head -1  `
 image_url="http://kernel.ubuntu.com/~kernel-ppa/mainline/v${required_version}/${image_name}"
-
-
 
 echo -ne "\n  ${bold}安装 ${green}$required_version${jiacu} 内核 ... ${normal}"
 wget -qO kernel.deb $image_url      || { echo -e "\n  ${red}错误${jiacu} 内核 下载失败！${normal}\n" | tee -a $Outputs ; exit 1 ; }
