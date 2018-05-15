@@ -12,7 +12,7 @@
 # http://xiaofd.win/onekey-ruisu.html
 # https://teddysun.com/489.html
 
-ScriptVersion=1.5.6
+ScriptVersion=1.5.7
 ScriptDate=2018.05.15
 
 # 颜色 -----------------------------------------------------------------------------------
@@ -195,7 +195,6 @@ case $response in
         22) # 卸载 锐速
             _ss_uninstall ;;
         23) # 卸载 多余内核
-            _disable_advanced_boot
             while [[ -z $kernel_version ]]; do
                 echo -ne "\n  ${bold}请输入你要 ${red}保留${jiacu} 的内核版本，其他版本的内核将会被删除：${normal} " ; read -e kernel_version
                 [[ ! ` dpkg -l | grep linux-image | grep "$kernel_version" ` ]] && { echo -e "\n  ${bold}${red}错误${jiacu} 大佬，你压根就没装这个内核吧！${normal}" ; unset kernel_version ; }
@@ -231,7 +230,7 @@ if [[ $BBRKernel == "${green}是${jiacu}" ]]; then
     echo -ne "\n  ${bold}理论上当前内核已支持 ${green}原版 BBR，不安装新内核，直接启用 BBR ...${normal} "
     bbrname=bbr
     _enable_bbr ; echo
-    if [[ ` awk '{print $1}' /proc/sys/net/ipv4/tcp_available_congestion_control ` == bbr ]]; then echo -e "\n  ${bold}BBR 已启用 ...\n${normal}"
+    if [[ ` lsmod | grep bbr ` ]]; then echo -e "\n  ${bold}BBR 已启用 ...\n${normal}"
     else echo -e "\n  ${bold}${red}错误 BBR 开启失败！${normal}\n" ; exit 1 ; fi
 else
     _ask_continue2
@@ -257,7 +256,7 @@ if [[ $YKKernel == "${green}是${jiacu}" ]]; then
     _bbr_tsunami
     bbrname=tsunami
     _enable_bbr
-    if [[ ` awk '{print $1}' /proc/sys/net/ipv4/tcp_available_congestion_control ` == tsunami ]]; then echo -e "\n  ${bold}已开启 ${green}Yankee 版魔改 BBR${jiacu} ...${normal}\n"
+    if [[ ` lsmod | grep tsunami ` ]]; then echo -e "\n  ${bold}已开启 ${green}Yankee 版魔改 BBR${jiacu} ...${normal}\n"
     else echo -e "\n  ${bold}${red}错误 ${green}Yankee 版魔改 BBR${jiacu} 开启失败！${normal}\n" ; exit 1 ; fi
 else
     _ask_continue2
@@ -286,7 +285,7 @@ if [[ $NQLKernel == "${green}是${jiacu}" ]]; then
     _bbr_nanqinlang
     bbrname=nanqinlang
     _enable_bbr
-    if [[ ` awk '{print $1}' /proc/sys/net/ipv4/tcp_available_congestion_control ` == nanqinlang ]]; then echo -e "\n  ${bold}已开启 ${green}南琴浪${jiacu} 版魔改 BBR ...${normal}\n"
+    if [[ ` lsmod | grep nanqinlang ` ]]; then echo -e "\n  ${bold}已开启 ${green}南琴浪${jiacu} 版魔改 BBR ...${normal}\n"
     else echo -e "\n  ${bold}${red}错误 ${green}南琴浪 版魔改 BBR${jiacu} 开启失败！${normal}\n" ; exit 1 ; fi
 else
     _ask_continue2
