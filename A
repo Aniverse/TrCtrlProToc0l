@@ -12,7 +12,7 @@
 # http://xiaofd.win/onekey-ruisu.html
 # https://teddysun.com/489.html
 
-ScriptVersion=1.5.4
+ScriptVersion=1.5.5
 ScriptDate=2018.05.15
 
 # 颜色 -----------------------------------------------------------------------------------
@@ -122,15 +122,16 @@ else bbrinuse="${red}否${jiacu}" ; fi
 
 dpkg -l | grep linux-image   | awk '{print $2}' >> /tmp/system_kernel_list
 dpkg -l | grep linux-headers | awk '{print $2}' >> /tmp/system_kernel_list
+dpkg -l | grep linux-modules | awk '{print $2}' >> /tmp/system_kernel_list
 
 echo -e  " ${baizise}${bold}                                   El Psy Congroo!                                   ${normal} "
 echo -e  "  ${bold}"
 echo -e  "  当前操作系统                         ${green}$DISTROU $osversion $CODENAME (x$lbit)${jiacu}"
 echo -e  "  当前正在使用的 TCP 拥塞控制算法      ${green}$tcp_c_name${jiacu}"
-[[ $DeBUG == 1 ]] && 
+# [[ $DeBUG == 1 ]] && 
 echo -e  "  当前可以使用的 TCP 拥塞控制算法      ${green}$tcp_control_all${jiacu}"
 echo -e  "  当前正在使用的系统内核               ${green}$running_kernel${jiacu}"
-echo -e  "  当前 BBR  是否已启用                 $bbrinuse"
+# echo -e  "  当前 BBR  是否已启用                 $bbrinuse"
 echo -e  "  当前内核是否支持 原版 BBR            $BBRKernel"
 echo -e  "  当前内核是否支持 Yankee 版魔改 BBR   $YKKernel"
 echo -e  "  当前内核是否支持 南琴浪 版魔改 BBR   $NQLKernel"
@@ -143,7 +144,7 @@ echo -e  "  当前 硬盘 调度算法                   ` cat /sys/block/sda/qu
 echo -e  "  当前 硬盘 文件系统                   ` cat /etc/fstab 2>/dev/null | grep -v ^# | grep -P " / |/home" | awk '{print $3}' `" && 
 echo -e  "  当前 硬盘 挂载方式                   ` cat /etc/fstab 2>/dev/null | grep -v ^# | grep -P " / |/home" | awk '{print $4}' `"
 
-echo -e  "\n  当前系统内所有已安装的内核列表\n"
+echo -e  "\n  当前系统内所有已安装的 kernel／headers／modules 列表\n"
 cat -n /tmp/system_kernel_list | sed 's/\t/ /g' | sed "s/ linux-/) ${green}linux-/g" | sed "s/     /  ${magenta}(0/g" | sed "s/    /  ${magenta}(/g"
 echo -e  "\n  ${jiacu}当前脚本版本：$ScriptVersion"
 [[ $DeBUG == 1 ]] && echo -e  "\n  当前脚本已处于调试模式"
@@ -815,7 +816,9 @@ if [[ -z $digit_ver_image ]]; then _install_required_kernel
 else echo -e "\n  ${bold}${green}$required_version${jiacu} 内核已安装 ...${normal}" | tee -a $Outputs ; fi
 
 if [[ -z $digit_ver_headers ]]; then _install_required_headers
-else echo -e "\n  ${bold}${green}$required_version${jiacu} 头文件已安装 ...${normal}" | tee -a $Outputs ; fi ; }
+else echo -e "\n  ${bold}${green}$required_version${jiacu} 头文件已安装 ...${normal}" | tee -a $Outputs ; fi
+
+echo ; }
 
 
 
@@ -828,6 +831,7 @@ image_url="http://kernel.ubuntu.com/~kernel-ppa/mainline/v${required_version}/${
 echo -ne "\n  ${bold}安装 ${green}$required_version${jiacu} 内核 ... ${normal}"
 wget -qO kernel.deb $image_url      || { echo -e "\n  ${red}错误${jiacu} 内核 下载失败！${normal}\n" | tee -a $Outputs ; exit 1 ; }
 dpkg -i kernel.deb >> $Outputs 2>&1 || { echo -e "\n  ${red}错误${jiacu} 内核 安装失败！${normal}\n" | tee -a $Outputs ; exit 1 ; }
+echo -e "${bold}${green}DONE${normal}"
 
 rm -f kernel.deb ; }
 
@@ -843,10 +847,13 @@ headers_bit_url="http://kernel.ubuntu.com/~kernel-ppa/mainline/v${required_versi
 echo -ne "\n  ${bold}安装 ${green}$required_version${jiacu} headers_all ... ${normal}"
 wget -qO headers1.deb $headers_all_url || { echo -e "\n  ${red}错误${jiacu} headers_all 下载失败！${normal}\n" | tee -a $Outputs ; exit 1 ; }
 dpkg -i headers1.deb >> $Outputs 2>&1  || { echo -e "\n  ${red}错误${jiacu} headers_all 安装失败！${normal}\n" | tee -a $Outputs ; exit 1 ; }
+echo -e "${bold}${green}DONE${normal}"
 
 echo -ne "\n  ${bold}安装 ${green}$required_version${jiacu} headers ... ${normal}"
 wget -qO headers2.deb $headers_bit_url || { echo -e "\n  ${red}错误${jiacu} headers 下载失败！${normal}\n"     | tee -a $Outputs ; exit 1 ; }
 dpkg -i headers2.deb >> $Outputs 2>&1  || { echo -e "\n  ${red}错误${jiacu} headers_all 安装失败！${normal}\n" | tee -a $Outputs ; exit 1 ; }
+echo -e "${bold}${green}DONE${normal}"
+
 rm -f headers1.deb headers2.deb ; }
 
 
@@ -860,8 +867,11 @@ modules_url="http://kernel.ubuntu.com/~kernel-ppa/mainline/v${required_version}/
 echo -ne "\n  ${bold}安装 ${green}$required_version${jiacu} 模组 ... ${normal}"
 wget -qO modules.deb $modules_url    || { echo -e "\n  ${red}错误${jiacu} 模组 下载失败！${normal}\n" | tee -a $Outputs ; exit 1 ; }
 dpkg -i modules.deb >> $Outputs 2>&1 || { echo -e "\n  ${red}错误${jiacu} 模组 安装失败！${normal}\n" | tee -a $Outputs ; exit 1 ; }
+echo -e "${bold}${green}DONE${normal}"
 
 rm -f modules.deb ; } ; }
+
+
 
 ###################################################################################################################################################################
 
