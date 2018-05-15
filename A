@@ -12,7 +12,7 @@
 # http://xiaofd.win/onekey-ruisu.html
 # https://teddysun.com/489.html
 
-ScriptVersion=1.5.8
+ScriptVersion=1.5.9
 ScriptDate=2018.05.15
 
 # 颜色 -----------------------------------------------------------------------------------
@@ -162,6 +162,7 @@ echo -e  "  ${green}(13) ${jiacu}安装 特定的锐速内核"
 echo -e  "  ${green}(21) ${jiacu}卸载 BBR"
 echo -e  "  ${green}(22) ${jiacu}卸载 锐速"
 echo -e  "  ${green}(23) ${jiacu}卸载 多余内核"
+echo -e  "  ${green}(90) ${jiacu}重启"
 echo -e  "  ${green}(99) ${jiacu}返回\n"
 rm -f /tmp/system_kernel_list ; }
 
@@ -202,6 +203,8 @@ case $response in
             _delete_kernel ;;
         31) # 安装 xanmod
             _xanmod_install ;;
+        90) # 重启
+            reboot ;;
         98) # 启用调试模式
             DeBUG=1 ; _menu ; _read_response ;;
     ""| 99) # 返回
@@ -234,7 +237,7 @@ if [[ $BBRKernel == "${green}是${jiacu}" ]]; then
     else echo -e "\n  ${bold}${red}错误 BBR 开启失败！${normal}\n" ; exit 1 ; fi
 else
     _ask_continue2
-    echo -e "  ${bold}当前内核不支持 BBR，需要安装 ${green}4.11.12${jiacu} 内核以启用 BBR ...${normal} \n"
+    echo -e "  ${bold}当前内核不支持 BBR，先安装 ${green}4.11.12${jiacu} 内核以启用 BBR ...${normal} "
     _online_ubuntu_bbr_firmware
     _bbr_kernel_4_11_12
     bbrname=bbr
@@ -250,7 +253,7 @@ function _ykbbr_install() {
 [[ `grep "Advanced options for Ubuntu" /etc/default/grub` ]] && sed -i 's/GRUB_DEFAULT=.*/GRUB_DEFAULT=0/' /etc/default/grub
 
 if [[ $YKKernel == "${green}是${jiacu}" ]]; then
-    echo -e "\n  ${bold}理论上当前内核已支持 ${green}Yankee${jiacu} 版魔改 BBR，安装并启用魔改 BBR ...${normal}\n"
+    echo -e "\n  ${bold}理论上当前内核已支持 ${green}Yankee${jiacu} 版魔改 BBR，安装并启用魔改 BBR ...${normal}"
     _check_headers
     _check_essential
     _bbr_tsunami
@@ -260,7 +263,7 @@ if [[ $YKKernel == "${green}是${jiacu}" ]]; then
     else echo -e "\n  ${bold}${red}错误 ${green}Yankee 版魔改 BBR${jiacu} 开启失败！${normal}\n" ; exit 1 ; fi
 else
     _ask_continue2
-    echo -e "  ${bold}当前内核不支持 ${green}Yankee${jiacu} 版魔改 BBR，需要安装 ${green}4.11.12${jiacu} 内核 ...${normal}"
+    echo -e "  ${bold}当前内核不支持 ${green}Yankee${jiacu} 版魔改 BBR，先安装 ${green}4.11.12${jiacu} 内核 ...${normal} "
     _online_ubuntu_bbr_firmware
     _check_essential
     _bbr_kernel_4_11_12
@@ -279,7 +282,7 @@ function _nqlbbr_install() {
 [[ `grep "Advanced options for Ubuntu" /etc/default/grub` ]] && sed -i 's/GRUB_DEFAULT=.*/GRUB_DEFAULT=""/' /etc/default/grub
 
 if [[ $NQLKernel == "${green}是${jiacu}" ]]; then
-    echo -ne "\n  ${bold}理论上当前内核已支持 ${green}南琴浪${jiacu} 版魔改 BBR，安装并启用魔改 BBR ...${normal} \n"
+    echo -ne "\n  ${bold}理论上当前内核已支持 ${green}南琴浪${jiacu} 版魔改 BBR，安装并启用魔改 BBR ...${normal}"
     _check_headers
     _check_essential
     _bbr_nanqinlang
@@ -289,7 +292,7 @@ if [[ $NQLKernel == "${green}是${jiacu}" ]]; then
     else echo -e "\n  ${bold}${red}错误 ${green}南琴浪 版魔改 BBR${jiacu} 开启失败！${normal}\n" ; exit 1 ; fi
 else
     _ask_continue2
-    echo -e "  ${bold}当前内核不支持 ${green}南琴浪${jiacu} 版魔改 BBR，需要安装 ${green}4.11.12${jiacu} 内核 ...${normal} "
+    echo -e "  ${bold}当前内核不支持 ${green}南琴浪${jiacu} 版魔改 BBR，先安装 ${green}4.11.12${jiacu} 内核 ...${normal} "
     _online_ubuntu_bbr_firmware
     _check_essential
     _bbr_kernel_4_11_12
@@ -653,7 +656,7 @@ function _online_ubuntu_bbr_firmware() {
 mkdir -p /lib/firmware/bnx2
 if [[ ! -f /lib/firmware/bnx2/fw.lock ]]; then
     touch /lib/firmware/bnx2/fw.lock
-    echo -e "  ${bold}下载可能缺少的固件 ... ${normal}" | tee -a $Outputs
+    echo -e "\n  ${bold}下载可能缺少的固件 ... ${normal}" | tee -a $Outputs
     wget -qO /lib/firmware/bnx2/bnx2-mips-06-6.2.3.fw https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Linux%20Firmware/bnx2-mips-06-6.2.3.fw
     wget -qO /lib/firmware/bnx2/bnx2-mips-09-6.2.1b.fw https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Linux%20Firmware/bnx2-mips-09-6.2.1b.fw
     wget -qO /lib/firmware/bnx2/bnx2-rv2p-09ax-6.0.17.fw https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Linux%20Firmware/bnx2-rv2p-09ax-6.0.17.fw
@@ -785,7 +788,7 @@ required_version=$(  uname -r | cut  -d- -f1  )
 [[ ` echo $required_version | grep -E "[2345].[0-9]+.0" ` ]] && required_version=$( uname -r | grep -Eo "[2345].[0-9]+" )
 headers_exits=`  dpkg -l | grep linux-headers | awk '{print $2}' | awk -F '-' '{print $3}' | grep $required_version | wc -l  `
 if [[ $headers_exits == 0 ]]; then
-    echo -e "  ${red}错误${jiacu} 没有安装与内核对应的头文件，先尝试安装内核头文件 ...${normal} " | tee -a $Outputs
+    echo -e "\n  ${red}警告${jiacu} 没有安装与内核对应的头文件，先尝试安装内核头文件 ...${normal} " | tee -a $Outputs
     _install_required_headers
 fi ; }
 
