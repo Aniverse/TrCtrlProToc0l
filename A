@@ -12,7 +12,7 @@
 # http://xiaofd.win/onekey-ruisu.html
 # https://teddysun.com/489.html
 
-ScriptVersion=1.4.8
+ScriptVersion=1.4.9
 ScriptDate=2018.05.15
 
 # 颜色 -----------------------------------------------------------------------------------
@@ -32,7 +32,8 @@ shanshuo=$(tput blink); wuguangbiao=$(tput civis); guangbiao=$(tput cnorm)
 
 # Outputs="/dev/null"
 export DEBIAN_FRONTEND=noninteractive
-SysSupport=0 ; DeBUG=0 ; Outputs="/log/tcp.$(date "+%m.%d.%H.%M.%S").log"
+SETUPDATE=$(date "+%Y.%m.%d.%H:%M:%S")
+SysSupport=0 ; DeBUG=0 ; Outputs="/log/tcp.$SETUPDATE.log"
 [[ $1 == -d ]] && DeBUG=1
 
 KernelBit=` getconf LONG_BIT `
@@ -59,9 +60,14 @@ mkdir -p /log
 # 菜单
 function _menu() { clear ; echo
 
-# [[ $DeBUG == 1 ]] && { Outputs="/log/tcp.$(date "+%m.%d.%H.%M.%S").log" ; }
+# [[ $DeBUG == 1 ]] && { Outputs"/log/tcp.$SETUPDATE.log" ; }
 
+# 启用 rc.local
 [[ $CODENAME =~ (bionic|stretch) ]] && _enable_rclocal
+
+# 确保 debconf-get-selections 存在
+for ddd in debconf-set-selections debconf-get-selections ; do
+[[ ! `command -v $ddd` ]] && wget --no-check-certificate -qO /usr/bin/$ddd https://github.com/Aniverse/inexistence/raw/master/00.Installation/script/$ddd && chmod +x /usr/bin/$ddd ; done
 
 # 操作系统、内核等参数检测
 [ -f /etc/redhat-release ] && KNA=$(awk '{print $1}' /etc/redhat-release)
@@ -844,9 +850,6 @@ rm headers1.deb headers2.deb ; }
 function _delete_kernel() {
 echo -e "\n  ${bold}卸载多余内核及其头文件 ... ${normal}\n" | tee -a $Outputs
 kernel_total=` dpkg -l | grep -E linux-[image,headers] | awk '{print $2}' | grep -v "${kernel_version}" | wc -l `
-
-for ddd in debconf-set-selections debconf-get-selections ; do
-[[ ! `command -v $ddd` ]] && wget --no-check-certificate -qO /usr/bin/$ddd https://github.com/Aniverse/inexistence/raw/master/00.Installation/script/$ddd && chmod +x /usr/bin/$ddd ; done
 
 if [ $kernel_total > 1 ]; then
     for (( integer = 1 ; integer <= ${kernel_total} ; integer++ )) ; do
