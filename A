@@ -12,7 +12,7 @@
 # http://xiaofd.win/onekey-ruisu.html
 # https://teddysun.com/489.html
 
-ScriptVersion=1.4.3
+ScriptVersion=1.4.4
 ScriptDate=2018.05.15
 
 # 颜色 -----------------------------------------------------------------------------------
@@ -31,7 +31,7 @@ shanshuo=$(tput blink); wuguangbiao=$(tput civis); guangbiao=$(tput cnorm)
 #  -----------------------------------------------------------------------------------
 
 SysSupport=0 ; DeBUG=0 ; Outputs="/dev/null"
-[[ $1 == -d ]] && DeBUG=1
+[[ $1 == -d ]] && { DeBUG=1 ; Outputs="/log/tcp.$(date "+%m.%d.%H.%M.%S").log" ; }
 
 KernelBit=` getconf LONG_BIT `
 [[ $KernelBit == 32 ]] && KernelBitVer=i386 ; [[ $KernelBit == 64 ]] && KernelBitVer=amd64
@@ -52,6 +52,7 @@ CODENAME=`  cat /etc/os-release | grep VERSION= | tr '[A-Z]' '[a-z]' | sed 's/\"
 [[ -z "$(dpkg -l |grep 'grub-')" ]] && echo -e "\n${red}错误${jiacu} 未发现 grub！${normal}" && exit 1
 [[ ! $DeBUG == 1 ]] &&
 [[ ! $SysSupport == 1 ]] && echo -e "\n${red}错误${jiacu} 不支持 Debian 8/9、Ubuntu 16.04/18.04 以外的系统！${normal}" && exit 1
+mkdir -p /log
 
 # 菜单
 function _menu() { clear ; echo
