@@ -12,7 +12,7 @@
 # http://xiaofd.win/onekey-ruisu.html
 # https://teddysun.com/489.html
 
-ScriptVersion=1.4.5
+ScriptVersion=1.4.6
 ScriptDate=2018.05.15
 
 # 颜色 -----------------------------------------------------------------------------------
@@ -251,7 +251,7 @@ else
     _check_essential
     _bbr_kernel_4_11_12
     kernel_version=4.11.12 && _delete_kernel
-    [[ $CODENAME == stretch ]] && _stretch_enable_rclocal
+    [[ $CODENAME == stretch ]] && _enable_rclocal
     _bbr_tsunami_autoinstall_after_reboot
     bbrname=tsunami
     _enable_bbr
@@ -281,7 +281,7 @@ else
     _check_essential
     _bbr_kernel_4_11_12
     kernel_version=4.11.12 && _delete_kernel
-    [[ $CODENAME == stretch ]] && _stretch_enable_rclocal
+    [[ $CODENAME == stretch ]] && _enable_rclocal
     _bbr_nanqinlang_autoinstall_after_reboot
     bbrname=nanqinlang
     _enable_bbr
@@ -299,7 +299,7 @@ elif [[ $SSKernel == "${red}否${jiacu}" ]] && [[ $DISTRO == ubuntu ]]; then
     _ask_continue2
     echo -ne "  ${bold}当前内核不支持 锐速，安装 ${green}3.16.0-43${jiacu} 内核 ... ${normal} \n"
     export kernelver=3.16.0-43-generic
-    _ubuntu_serverspeeder_kernel_repo
+    _ubuntu_serverspeeder_kernel_3.16.0-43
     _ubuntu_serverspeeder_updategrub
     _serverspeeder_autoinstall_after_reboot
     [[ ! $DeBUG == 1 ]] && echo -ne "\n  ${bold}即将重启系统，重启后会自动安装 ${green}锐速${jiacu} ... ${normal}" && reboot
@@ -317,7 +317,7 @@ elif [[ $SSKernel == "${red}否${jiacu}" ]] && [[ $CODENAME == stretch ]]; then
     kernel_version=3.16.0-4
     _debian_serverspeeder_kernel_316
     _delete_kernel
-    _stretch_enable_rclocal
+    _enable_rclocal
     _serverspeeder_autoinstall_after_reboot
     [[ ! $DeBUG == 1 ]] && echo -ne "\n  ${bold}即将重启系统，重启后会自动安装 ${green}锐速${jiacu} ... ${normal}\n" && reboot
 fi ; }
@@ -362,7 +362,7 @@ echo ; }
 function _selected_ss_kernel_install() {
 if   [[ $DISTRO == ubuntu ]]; then
      echo -e "\n  ${bold}安装 ${green}4.4.0-47${jiacu} 内核 ...${normal}"
-     _ubuntu_serverspeeder_kernel_440
+     _ubuntu_serverspeeder_kernel_4.4.0-47
 elif [[ $DISTRO == debian ]]; then
      echo -e "\n  ${bold}安装 ${green}3.16.0-4${jiacu} 内核 ...${normal}"
      _debian_serverspeeder_kernel_316
@@ -547,7 +547,9 @@ echo "exit 0" >> /etc/rc.local ; }
 function _debian_serverspeeder_kernel_312() {
 wget --no-check-certificate -qO 1.deb https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Linux%20Kernel/ServerSpeeder/linux-headers-3.12-1.deb
 wget --no-check-certificate -qO 2.deb https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Linux%20Kernel/ServerSpeeder/linux-image-3.12-1.deb
-dpkg -i [12].deb >> $Outputs 2>&1 || { echo -e "\n  ${bold}${red}错误${jiacu} 安装 内核 失败！${normal}" ; exit 1 ; }
+echo ` debconf-get-selections linux-image-3.12-1-amd64 | grep -C5 "keep the local version currently installed" | grep keep_current | sed "s/select/note/g"` | debconf-set-selections
+echo ` debconf-get-selections linux-headers-3.12-1-common | grep -C5 "keep the local version currently installed" | grep keep_current | sed "s/select/note/g"` | debconf-set-selections
+{ dpkg -i [12].deb >> $Outputs 2>&1 ; } || { { echo -e "\n  ${bold}${red}错误${jiacu} 安装 内核 失败！${normal}" 2>&1 | tee -a $Outputs 2>&1 ; } ; exit 1 ; }
 rm  -rf [12].deb ; echo ; }
 
 
@@ -555,17 +557,34 @@ rm  -rf [12].deb ; echo ; }
 # Debian 安装 3.16.0-4 内核（For ServerSpeeder）
 function _debian_serverspeeder_kernel_316() {
 wget --no-check-certificate -qO 1.deb https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Linux%20Kernel/ServerSpeeder/linux-image-3.16.0-4.deb
-dpkg -i 1.deb >> $Outputs 2>&1 || { echo -e "\n  ${bold}${red}错误${jiacu} 安装 内核 失败！${normal}" ; exit 1 ; }
+echo ` debconf-get-selections linux-image-3.16.0-4-amd64 | grep -C5 "keep the local version currently installed" | grep keep_current | sed "s/select/note/g"` | debconf-set-selections
+{ dpkg -i 1.deb >> $Outputs 2>&1 ; } || { { echo -e "\n  ${bold}${red}错误${jiacu} 安装 内核 失败！${normal}" 2>&1 | tee -a $Outputs 2>&1 ; } ; exit 1 ; }
 rm  -rf 1.deb ; }
 
 
 
 # Ubuntu 安装 4.4.0-47 内核（For ServerSpeeder）
-function _ubuntu_serverspeeder_kernel_440() {
+function _ubuntu_serverspeeder_kernel_4.4.0-47() {
 wget --no-check-certificate -qO 1.deb https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Linux%20Kernel/ServerSpeeder/linux-image-4.4.0-47.deb
 wget --no-check-certificate -qO 2.deb https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Linux%20Kernel/ServerSpeeder/linux-headers-4.4.0-47-all.deb
 wget --no-check-certificate -qO 3.deb https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Linux%20Kernel/ServerSpeeder/linux-headers-4.4.0-47.deb
-dpkg -i [123].deb >> $Outputs 2>&1 || { echo -e "\n  ${bold}${red}错误${jiacu} 安装 内核 失败！${normal}" ; exit 1 ; }
+echo ` debconf-get-selections linux-image-4.4.0-47-generic | grep -C5 "keep the local version currently installed" | grep keep_current | sed "s/select/note/g"` | debconf-set-selections
+echo ` debconf-get-selections linux-headers-4.4.0-47 | grep -C5 "keep the local version currently installed" | grep keep_current | sed "s/select/note/g"` | debconf-set-selections
+echo ` debconf-get-selections linux-headers-4.4.0-47-generic | grep -C5 "keep the local version currently installed" | grep keep_current | sed "s/select/note/g"` | debconf-set-selections
+{ dpkg -i [123].deb >> $Outputs 2>&1 ; } || { { echo -e "\n  ${bold}${red}错误${jiacu} 安装 内核 失败！${normal}" 2>&1 | tee -a $Outputs 2>&1 ; } ; exit 1 ; }
+rm  -rf [123].deb ; }
+
+
+
+# Ubuntu 安装 3.16.0-43 内核（For ServerSpeeder）
+function _ubuntu_serverspeeder_kernel_3.16.0-43() {
+wget --no-check-certificate -qO 1.deb https://github.com/Aniverse/SSKernel/raw/master/Ubuntu/linux-image-3.16.0-43-generic_3.16.0-43.58~14.04.1_amd64.deb
+wget --no-check-certificate -qO 2.deb https://github.com/Aniverse/SSKernel/raw/master/Ubuntu/image-extra/linux-image-extra-3.16.0-43-generic_3.16.0-43.58~14.04.1_amd64.deb
+wget --no-check-certificate -qO 3.deb https://github.com/Aniverse/SSKernel/raw/master/Ubuntu/headers/linux-headers-3.16.0-43-generic_3.16.0-43.58~14.04.1_amd64.deb
+echo ` debconf-get-selections linux-image-3.16.0-43-generic | grep -C5 "keep the local version currently installed" | grep keep_current | sed "s/select/note/g"` | debconf-set-selections
+echo ` debconf-get-selections linux-image-extra-3.16.0-43-generic | grep -C5 "keep the local version currently installed" | grep keep_current | sed "s/select/note/g"` | debconf-set-selections
+echo ` debconf-get-selections linux-headers-3.16.0-43-generic | grep -C5 "keep the local version currently installed" | grep keep_current | sed "s/select/note/g"` | debconf-set-selections
+{ dpkg -i [123].deb >> $Outputs 2>&1 ; } || { { echo -e "\n  ${bold}${red}错误${jiacu} 安装 内核 失败！${normal}" 2>&1 | tee -a $Outputs 2>&1 ; } ; exit 1 ; }
 rm  -rf [123].deb ; }
 
 
@@ -575,13 +594,13 @@ function _ubuntu_serverspeeder_kernel_repo() {
 sed -i '/deb http:\/\/security.ubuntu.com\/ubuntu trusty-security main/'d /etc/apt/sources.list
 echo "deb http://security.ubuntu.com/ubuntu trusty-security main" >> /etc/apt/sources.list
 echo -ne "\n  ${bold}添加源，更新 ...  ${normal}"
-apt-get update >> $Outputs 2>&1 & echo "${green}${bold}完成${normal}"
-echo -ne "\n  ${bold}安装内核 ...  ${normal}"
-DEBIAN_FRONTEND=noninteractive apt-get -y install linux-image-extra-$kernelver linux-image-$kernelver linux-headers-$kernelver >> $Outputs 2>&1 && echo "${green}${bold}完成${normal}"
-[[ ! ` dpkg -l | grep linux-image-$kernelver ` ]] && { echo "${bold}${red}失败${normal}" ; exit 1 ; }
+{ apt-get update >> $Outputs 2>&1 ; } && { echo "${green}${bold}完成${normal}" 2>&1 | tee -a $Outputs ; }
+echo -ne "\n  ${bold}安装内核 ...  ${normal}" 2>&1 | tee -a $Outputs 2>&1
+apt-get -y install linux-image-extra-$kernelver linux-image-$kernelver linux-headers-$kernelver >> $Outputs 2>&1 && { echo "${green}${bold}完成${normal}" 2>&1 | tee -a $Outputs 2>&1 ; }
+[[ ! ` dpkg -l | grep linux-image-$kernelver ` ]] && { { echo "${bold}${red}失败${normal}" 2>&1 | tee -a $Outputs 2>&1 ; } ; exit 1 ; }
 sed -i '/deb http:\/\/security.ubuntu.com\/ubuntu trusty-security main/'d /etc/apt/sources.list
-echo -ne "\n  ${bold}删除源，更新 ...  ${normal}"
-apt-get update >> $Outputs 2>&1 && echo "${green}${bold}完成${normal}" ; }
+echo -ne "\n  ${bold}删除源，更新 ...  ${normal}" 2>&1 | tee -a $Outputs 2>&1
+{ apt-get update >> $Outputs 2>&1 ; } && { echo "${green}${bold}完成${normal}" 2>&1 | tee -a $Outputs ; } ; }
 
 
 
@@ -589,8 +608,8 @@ apt-get update >> $Outputs 2>&1 && echo "${green}${bold}完成${normal}" ; }
 function _ubuntu_serverspeeder_updategrub() {
 sed -i 's/GRUB_DEFAULT=.*/GRUB_DEFAULT="Advanced options for Ubuntu>Ubuntu, with Linux kernelver"/' /etc/default/grub
 sed -i "s/kernelver/$kernelver/" /etc/default/grub
-echo -ne "\n  ${bold}更新引导 ...  "
-update-grub >> $Outputs 2>&1 && echo "${green}${bold}完成${normal}" ; }
+echo -ne "\n  ${bold}更新引导 ...  " 2>&1 | tee -a $Outputs 2>&1
+{ update-grub >> $Outputs 2>&1 ; } && { echo "${green}${bold}完成${normal}" 2>&1 | tee -a $Outputs ; } ; }
 
 
 
@@ -615,7 +634,7 @@ function _online_ubuntu_bbr_firmware() {
 mkdir -p /lib/firmware/bnx2
 if [[ ! -f /lib/firmware/bnx2/fw.lock ]]; then
     touch /lib/firmware/bnx2/fw.lock
-    echo -e "  ${bold}下载可能缺少的固件 ... ${normal}"
+    echo -e "  ${bold}下载可能缺少的固件 ... ${normal}" | tee -a $Outputs
     wget -qO /lib/firmware/bnx2/bnx2-mips-06-6.2.3.fw https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Linux%20Firmware/bnx2-mips-06-6.2.3.fw
     wget -qO /lib/firmware/bnx2/bnx2-mips-09-6.2.1b.fw https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Linux%20Firmware/bnx2-mips-09-6.2.1b.fw
     wget -qO /lib/firmware/bnx2/bnx2-rv2p-09ax-6.0.17.fw https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Linux%20Firmware/bnx2-rv2p-09ax-6.0.17.fw
@@ -633,8 +652,8 @@ wget --no-check-certificate -qO 2.deb https://github.com/Aniverse/BitTorrentClie
 wget --no-check-certificate -qO 3.deb https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Linux%20Kernel/BBR/linux-image-4.11.12-generic-amd64.deb
 dpkg -i [123].deb >> $Outputs 2>&1 || { echo -e "\n  ${bold}${red}错误${jiacu} 安装 内核 失败！${normal}" ; exit 1 ; }
 rm -rf [123].deb ; echo
-echo -ne "\n  ${bold}更新引导 ...  "
-update-grub >> $Outputs 2>&1 && echo "${green}${bold}完成${normal}" ; }
+echo -ne "\n  ${bold}更新引导 ...  " | tee -a $Outputs
+update-grub >> $Outputs 2>&1 && { echo "${green}${bold}完成${normal}" | tee -a $Outputs ; } ; }
 
 
 
@@ -644,11 +663,11 @@ update-grub >> $Outputs 2>&1 && echo "${green}${bold}完成${normal}" ; }
 # 检查安装魔改版 BBR 所需的必要软件
 function _check_essential() {
 
-[[ ! `dpkg -l | grep libelf-dev` ]] && { echo -ne "\n  ${bold}安装 libelf-dev ...${normal} "  ; DEBIAN_FRONTEND=noninteractive apt-get install -y libelf1 libelf-dev >> $Outputs 2>&1 ; echo
+[[ ! `dpkg -l | grep libelf-dev` ]] && { echo -ne "\n  ${bold}安装 libelf-dev ...${normal} " | tee -a $Outputs ; apt-get install -y libelf1 libelf-dev >> $Outputs 2>&1 ; echo
 [[ ! `dpkg -l | grep libelf-dev` ]] && { echo -e  "\n$  ${red}错误${bold} 安装 libelf-dev 失败！${normal}" ; exit 1 ; } ; }
 
 if [[ $CODENAME == stretch ]]; then
-    [[ ! `dpkg -l | grep libssl1.0.0` ]] && { echo -ne "\n  {bold}安装 libssl1.0.0 ...${normal} "
+    [[ ! `dpkg -l | grep libssl1.0.0` ]] && { echo -ne "\n  {bold}安装 libssl1.0.0 ...${normal} " 2>&1 | tee -a $Outputs 2>&1
     echo -e "\ndeb http://ftp.hk.debian.org/debian jessie main\c" >> /etc/apt/sources.list
     apt-get update >> $Outputs 2>&1
     apt-get install -y libssl1.0.0 >> $Outputs 2>&1
@@ -656,26 +675,26 @@ if [[ $CODENAME == stretch ]]; then
     apt-get update >> $Outputs 2>&1 ; echo
     [[ ! `dpkg -l | grep libssl1.0.0` ]] && { echo -e "\n  ${red}错误${bold} 安装 libssl1.0.0 失败！${normal}" ; exit 1 ; } ; }
 else
-    [[ ! `dpkg -l | grep libssl1.0.0` ]] && { echo -ne "\n  ${bold}安装 libssl1.0.0 ...${normal} "  ; DEBIAN_FRONTEND=noninteractive apt-get install -y libssl1.0.0 >> $Outputs 2>&1 ; echo
+    [[ ! `dpkg -l | grep libssl1.0.0` ]] && { echo -ne "\n  ${bold}安装 libssl1.0.0 ...${normal} " | tee -a $Outputs ; apt-get install -y libssl1.0.0 >> $Outputs 2>&1 ; echo
     [[ ! `dpkg -l | grep libssl1.0.0` ]] && { echo -e  "\n$  ${red}错误${bold} 安装 libssl1.0.0 失败！${normal}" ; exit 1 ; } ; }
 fi
 
-which make >> $Outputs 2>&1 ; [ $? -ne '0' ] && { echo -ne "\n  ${bold}安装 make ...${normal} " ; DEBIAN_FRONTEND=noninteractive apt-get install -y make >> $Outputs 2>&1 ; echo
+which make >> $Outputs 2>&1 ; [ $? -ne '0' ] && { echo -ne "\n  ${bold}安装 make ...${normal} "    | tee -a $Outputs  ; apt-get install -y make >> $Outputs 2>&1 ; echo
 which make >> $Outputs 2>&1 ; [ $? -ne '0' ] && { echo -e  "\n  ${red}错误${bold} 安装 make 失败！${normal}" ; exit 1 ; } ; }
 
-which awk  >> $Outputs 2>&1 ; [ $? -ne '0' ] && { echo -ne "\n  ${bold}安装 awk ...${normal} "  ; DEBIAN_FRONTEND=noninteractive apt-get install -y gawk >> $Outputs 2>&1 ; echo
+which awk  >> $Outputs 2>&1 ; [ $? -ne '0' ] && { echo -ne "\n  ${bold}安装 awk ...${normal} "     | tee -a $Outputs  ; apt-get install -y gawk >> $Outputs 2>&1 ; echo
 which awk  >> $Outputs 2>&1 ; [ $? -ne '0' ] && { echo -e  "\n  ${red}错误${bold} 安装 awk 失败！${normal}"  ; exit 1 ; } ; }
 
-which gcc  >> $Outputs 2>&1 ; [ $? -ne '0' ] && { echo -ne "\n  ${bold}安装 gcc ...${normal} "  ; DEBIAN_FRONTEND=noninteractive apt-get install -y gcc  >> $Outputs 2>&1 ; echo
+which gcc  >> $Outputs 2>&1 ; [ $? -ne '0' ] && { echo -ne "\n  ${bold}安装 gcc ...${normal} "     | tee -a $Outputs  ; apt-get install -y gcc  >> $Outputs 2>&1 ; echo
 which gcc  >> $Outputs 2>&1 ; [ $? -ne '0' ] && { echo -e  "\n  ${red}错误${bold} 安装 gcc 失败！${normal}"  ; exit 1 ; } ; }
 
 gcc_ok=0 ; gcc_ver=` gcc --version | grep -Eo '[0-9]+\.[0-9]+\.[0-9]+' | head -n1 `
 gcc_ver_1=` echo $gcc_ver | awk -F. '{print $1}' ` ; gcc_ver_2=` echo $gcc_ver | awk -F. '{print $2}' `
 [[ -n $gcc_ver_1 ]] && [[ $gcc_ver_1 -gt 4 ]] && gcc_ok=1
 [[ $gcc_ver_1 == 4 ]] && [[ -n $gcc_ver_2 ]] && [[ $gcc_ver_2 -ge 9 ]] && gcc_ok=1
-[[ $gcc_ok == 0 ]] && { echo -e "\n  ${red}错误${bold} gcc 版本低于 4.9！${normal}" ; exit 1 ; }
+[[ $gcc_ok == 0 ]] && { echo -e "\n  ${red}错误${bold} gcc 版本低于 4.9！${normal}" | tee -a $Outputs 2>&1; exit 1 ; }
 
-[[ ! `dpkg -l | grep build-essential` ]] && { echo -ne "\n  ${bold}安装 build-essential ...${normal} "  ; DEBIAN_FRONTEND=noninteractive apt-get install -y build-essential >> $Outputs 2>&1 ; echo
+[[ ! `dpkg -l | grep build-essential` ]] && { echo -ne "\n  ${bold}安装 build-essential ...${normal} "  ; apt-get install -y build-essential >> $Outputs 2>&1 ; echo
 [[ ! `dpkg -l | grep build-essential` ]] && { echo -e  "\n  ${red}错误${bold} 安装 build-essential  失败！${normal}" ; exit 1 ; } ; } ; }
 
 
@@ -832,7 +851,7 @@ if [ $kernel_total > 1 ]; then
         kernel_tobe_del=` dpkg -l | grep -E linux-[image,headers] | awk '{print $2}' | grep -v "${kernel_version}" | head -${integer} `
         echo -ne "Removing ${kernel_tobe_del} ... "
         echo `debconf-get-selections ${deb_del} | grep removing-running-kernel | grep $running_kernel | sed s/true/false/` | debconf-set-selections
-        DEBIAN_FRONTEND=noninteractive apt-get -y purge $kernel_tobe_del >> $Outputs 2>&1 && echo "$(tput setaf 2)DONE$(tput sgr0)" || echo "$(tput setaf 1)FAILED$(tput sgr0)"
+        apt-get -y purge $kernel_tobe_del >> $Outputs 2>&1 && echo "$(tput setaf 2)DONE$(tput sgr0)" || echo "$(tput setaf 1)FAILED$(tput sgr0)"
     done
 fi
 
@@ -842,7 +861,7 @@ update-grub >> $Outputs 2>&1 && echo "${green}完成${normal}" ; }
 
 
 # Debian 9 启用 /etc/rc.local
-function _stretch_enable_rclocal() {
+function _enable_rclocal() {
 cat <<EOF >/etc/rc.local
 #!/bin/sh -e
 #
