@@ -12,7 +12,7 @@
 # http://xiaofd.win/onekey-ruisu.html
 # https://teddysun.com/489.html
 
-ScriptVersion=1.5.2
+ScriptVersion=1.5.3
 ScriptDate=2018.05.15
 
 # 颜色 -----------------------------------------------------------------------------------
@@ -803,7 +803,11 @@ echo -ne "\n  ${yellow}输入你想要的内核版本号 （敲回车则使用�
 function _install_required() {
 digit_ver_image=`dpkg -l | grep linux-image | awk '{print $2}' | awk -F '-' '{print $3}' | grep "${required_version}"`
 digit_ver_headers=`dpkg -l | grep linux-headers | awk '{print $2}' | awk -F '-' '{print $3}' | grep "${required_version}"`
+digit_ver_modules=`dpkg -l | grep linux-modules | awk '{print $2}' | awk -F '-' '{print $3}' | grep "${required_version}"`
 [[ $DeBUG == 1 ]] && echo "${required_version}"
+
+if [[ -z $digit_ver_modules ]]; then _install_required_modules
+else echo -e "\n  ${bold}${green}$required_version${jiacu} 模组已安装 ...${normal}\n" | tee -a $Outputs ; fi
 
 if [[ -z $digit_ver_image ]]; then _install_required_kernel
 else echo -e "\n  ${bold}${green}$required_version${jiacu} 内核已安装 ...${normal}\n" | tee -a $Outputs ; fi
@@ -816,14 +820,16 @@ else echo -e "\n  ${bold}${green}$required_version${jiacu} 头文件已安装 ..
 # 安装自选版本的内核
 function _install_required_kernel() {
 [[ $DeBUG == 1 ]] && echo "${required_version}"
-image_name=`wget -qO- http://kernel.ubuntu.com/~kernel-ppa/mainline/v${required_version}/ | grep "linux-image" | grep "generic" | awk -F'\">' '/amd64.deb/{print $2}' | cut -d'<' -f1 | head -1`
+image_name=`wget -qO- http://kernel.ubuntu.com/~kernel-ppa/mainline/v${required_version}/ | grep linux-image | grep generic | grep -v unsigned | awk -F'\">' '/amd64.deb/{print $2}' | cut -d'<' -f1 | head -1`
 image_url="http://kernel.ubuntu.com/~kernel-ppa/mainline/v${required_version}/${image_name}"
 
+
+
 echo -ne "\n  ${bold}安装 ${green}$required_version${jiacu} 内核 ... ${normal}"
-wget -qO kernel.deb $image_url || { echo -e "\n  ${red}错误${jiacu} 内核 下载失败！${normal}\n" | tee -a $Outputs ; exit 1 ; }
+wget -qO kernel.deb $image_url      || { echo -e "\n  ${red}错误${jiacu} 内核 下载失败！${normal}\n" | tee -a $Outputs ; exit 1 ; }
 dpkg -i kernel.deb >> $Outputs 2>&1 || { echo -e "\n  ${red}错误${jiacu} 内核 安装失败！${normal}\n" | tee -a $Outputs ; exit 1 ; }
 
-rm kernel.deb ; }
+rm -f kernel.deb ; }
 
 
 
@@ -845,8 +851,17 @@ rm -f headers1.deb headers2.deb ; }
 
 
 
+# 安装自选版本的模组（？）
+function _install_required_modules() {
+modules_name=`wget -qO- http://kernel.ubuntu.com/~kernel-ppa/mainline/v${required_version}/ | grep linux-modules | awk -F'\">' '/amd64.deb/{print $2}' | cut -d'<' -f1 | head -1`
+[[ $modules_name ]] && {
+modules_url="http://kernel.ubuntu.com/~kernel-ppa/mainline/v${required_version}/${modules_name}"
 
+echo -ne "\n  ${bold}安装 ${green}$required_version${jiacu} 模组 ... ${normal}"
+wget -qO modules.deb $modules_url    || { echo -e "\n  ${red}错误${jiacu} 模组 下载失败！${normal}\n" | tee -a $Outputs ; exit 1 ; }
+dpkg -i modules.deb >> $Outputs 2>&1 || { echo -e "\n  ${red}错误${jiacu} 模组 安装失败！${normal}\n" | tee -a $Outputs ; exit 1 ; }
 
+rm -f modules.deb ; } ; }
 
 ###################################################################################################################################################################
 
