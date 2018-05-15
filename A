@@ -12,7 +12,7 @@
 # http://xiaofd.win/onekey-ruisu.html
 # https://teddysun.com/489.html
 
-ScriptVersion=1.4.4
+ScriptVersion=1.4.5
 ScriptDate=2018.05.15
 
 # 颜色 -----------------------------------------------------------------------------------
@@ -30,8 +30,9 @@ shanshuo=$(tput blink); wuguangbiao=$(tput civis); guangbiao=$(tput cnorm)
 
 #  -----------------------------------------------------------------------------------
 
+export DEBIAN_FRONTEND=noninteractive
 SysSupport=0 ; DeBUG=0 ; Outputs="/dev/null"
-[[ $1 == -d ]] && { DeBUG=1 ; Outputs="/log/tcp.$(date "+%m.%d.%H.%M.%S").log" ; }
+[[ $1 == -d ]] && DeBUG=1
 
 KernelBit=` getconf LONG_BIT `
 [[ $KernelBit == 32 ]] && KernelBitVer=i386 ; [[ $KernelBit == 64 ]] && KernelBitVer=amd64
@@ -57,7 +58,7 @@ mkdir -p /log
 # 菜单
 function _menu() { clear ; echo
 
-[[ $DeBUG == 1 ]] && { Outputs="/root/TCP.log" ; rm -rf $Outputs ; }
+[[ $DeBUG == 1 ]] && { Outputs="/log/tcp.$(date "+%m.%d.%H.%M.%S").log" ; }
 
 # 操作系统、内核等参数检测
 [ -f /etc/redhat-release ] && KNA=$(awk '{print $1}' /etc/redhat-release)
@@ -408,7 +409,7 @@ fi
 wget --no-check-certificate -q https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/linux-firmware_1.161_all.deb
 
 # 不隐藏输出
-DEBIAN_FRONTEND=noninteractive dpkg -i *.deb
+dpkg -i *.deb
 cd ; rm -rf deball
 
 # 启用 mq
@@ -546,7 +547,7 @@ echo "exit 0" >> /etc/rc.local ; }
 function _debian_serverspeeder_kernel_312() {
 wget --no-check-certificate -qO 1.deb https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Linux%20Kernel/ServerSpeeder/linux-headers-3.12-1.deb
 wget --no-check-certificate -qO 2.deb https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Linux%20Kernel/ServerSpeeder/linux-image-3.12-1.deb
-DEBIAN_FRONTEND=noninteractive dpkg -i [12].deb >> $Outputs 2>&1 || { echo -e "\n  ${bold}${red}错误${jiacu} 安装 内核 失败！${normal}" ; exit 1 ; }
+dpkg -i [12].deb >> $Outputs 2>&1 || { echo -e "\n  ${bold}${red}错误${jiacu} 安装 内核 失败！${normal}" ; exit 1 ; }
 rm  -rf [12].deb ; echo ; }
 
 
@@ -554,7 +555,7 @@ rm  -rf [12].deb ; echo ; }
 # Debian 安装 3.16.0-4 内核（For ServerSpeeder）
 function _debian_serverspeeder_kernel_316() {
 wget --no-check-certificate -qO 1.deb https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Linux%20Kernel/ServerSpeeder/linux-image-3.16.0-4.deb
-DEBIAN_FRONTEND=noninteractive dpkg -i 1.deb >> $Outputs 2>&1 || { echo -e "\n  ${bold}${red}错误${jiacu} 安装 内核 失败！${normal}" ; exit 1 ; }
+dpkg -i 1.deb >> $Outputs 2>&1 || { echo -e "\n  ${bold}${red}错误${jiacu} 安装 内核 失败！${normal}" ; exit 1 ; }
 rm  -rf 1.deb ; }
 
 
@@ -564,7 +565,7 @@ function _ubuntu_serverspeeder_kernel_440() {
 wget --no-check-certificate -qO 1.deb https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Linux%20Kernel/ServerSpeeder/linux-image-4.4.0-47.deb
 wget --no-check-certificate -qO 2.deb https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Linux%20Kernel/ServerSpeeder/linux-headers-4.4.0-47-all.deb
 wget --no-check-certificate -qO 3.deb https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Linux%20Kernel/ServerSpeeder/linux-headers-4.4.0-47.deb
-DEBIAN_FRONTEND=noninteractive dpkg -i [123].deb >> $Outputs 2>&1 || { echo -e "\n  ${bold}${red}错误${jiacu} 安装 内核 失败！${normal}" ; exit 1 ; }
+dpkg -i [123].deb >> $Outputs 2>&1 || { echo -e "\n  ${bold}${red}错误${jiacu} 安装 内核 失败！${normal}" ; exit 1 ; }
 rm  -rf [123].deb ; }
 
 
@@ -630,7 +631,7 @@ echo -ne "\n  ${bold}安装 4.11.12 内核及其头文件 ... ${normal} "
 wget --no-check-certificate -qO 1.deb https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Linux%20Kernel/BBR/linux-headers-4.11.12-all.deb
 wget --no-check-certificate -qO 2.deb https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Linux%20Kernel/BBR/linux-headers-4.11.12-amd64.deb
 wget --no-check-certificate -qO 3.deb https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Linux%20Kernel/BBR/linux-image-4.11.12-generic-amd64.deb
-DEBIAN_FRONTEND=noninteractive dpkg -i [123].deb >> $Outputs 2>&1 || { echo -e "\n  ${bold}${red}错误${jiacu} 安装 内核 失败！${normal}" ; exit 1 ; }
+dpkg -i [123].deb >> $Outputs 2>&1 || { echo -e "\n  ${bold}${red}错误${jiacu} 安装 内核 失败！${normal}" ; exit 1 ; }
 rm -rf [123].deb ; echo
 echo -ne "\n  ${bold}更新引导 ...  "
 update-grub >> $Outputs 2>&1 && echo "${green}${bold}完成${normal}" ; }
@@ -784,7 +785,7 @@ image_url="http://kernel.ubuntu.com/~kernel-ppa/mainline/v${required_version}/${
 
 echo -ne "\n  ${bold}安装 ${green}$required_version${jiacu} 内核 ... ${normal}"
 wget -qO kernel.deb $image_url || { echo -e "\n  ${red}错误${jiacu} 内核 下载失败！${normal}\n" ; exit 1 ; }
-DEBIAN_FRONTEND=noninteractive dpkg -i kernel.deb >> $Outputs 2>&1 || { echo -e "\n  ${red}错误${jiacu} 内核 安装失败！${normal}\n" ; exit 1 ; }
+dpkg -i kernel.deb >> $Outputs 2>&1 || { echo -e "\n  ${red}错误${jiacu} 内核 安装失败！${normal}\n" ; exit 1 ; }
 
 rm kernel.deb ; }
 
@@ -799,11 +800,11 @@ headers_bit_url="http://kernel.ubuntu.com/~kernel-ppa/mainline/v${required_versi
 
 echo -ne "\n  ${bold}安装 ${green}$required_version${jiacu} headers_all ... ${normal}"
 wget -qO headers1.deb $headers_all_url || { echo -e "\n  ${red}错误${jiacu} headers_all 下载失败！${normal}\n" ; exit 1 ; }
-DEBIAN_FRONTEND=noninteractive dpkg -i headers1.deb >> $Outputs 2>&1  || { echo -e "\n  ${red}错误${jiacu} headers_all 安装失败！${normal}\n" ; exit 1 ; }
+dpkg -i headers1.deb >> $Outputs 2>&1  || { echo -e "\n  ${red}错误${jiacu} headers_all 安装失败！${normal}\n" ; exit 1 ; }
 
 echo -ne "\n  ${bold}安装 ${green}$required_version${jiacu} headers ... ${normal}"
 wget -qO headers2.deb $headers_bit_url || { echo -e "\n  ${red}错误${jiacu} headers 下载失败！${normal}\n"     ; exit 1 ; }
-DEBIAN_FRONTEND=noninteractive dpkg -i headers2.deb >> $Outputs 2>&1  || { echo -e "\n  ${red}错误${jiacu} headers_all 安装失败！${normal}\n" ; exit 1 ; }
+dpkg -i headers2.deb >> $Outputs 2>&1  || { echo -e "\n  ${red}错误${jiacu} headers_all 安装失败！${normal}\n" ; exit 1 ; }
 rm headers1.deb headers2.deb ; }
 
 
