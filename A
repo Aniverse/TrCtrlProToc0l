@@ -12,7 +12,7 @@
 # http://xiaofd.win/onekey-ruisu.html
 # https://teddysun.com/489.html
 
-ScriptVersion=1.5.0
+ScriptVersion=1.5.1
 ScriptDate=2018.05.15
 
 # 颜色 -----------------------------------------------------------------------------------
@@ -314,7 +314,7 @@ elif [[ $SSKernel == "${red}否${jiacu}" ]] && [[ $CODENAME == xenial ]]; then
 elif [[ $SSKernel == "${red}否${jiacu}" ]] && [[ $CODENAME == bionic ]]; then
     _ask_continue2
     echo -ne "  ${bold}当前内核不支持 锐速，安装 ${green}4.4.0-47${jiacu} 内核 ... ${normal} \n"
-    export kernelver=4.4.0-47
+    export kernelver=4.4.0-47-generic
     _ubuntu_serverspeeder_kernel_4.4.0-47
     _ubuntu_serverspeeder_updategrub
     _serverspeeder_autoinstall_after_reboot
@@ -630,7 +630,7 @@ echo -ne "\n  ${bold}更新引导 ...  " | tee -a $Outputs
 
 # 内核匹配的情况下安装锐速
 function _serverspeeder_direct_install() { wget --no-check-certificate -qO /tmp/appex.sh "https://raw.githubusercontent.com/0oVicero0/serverSpeeder_Install/master/appex.sh" && echo | bash /tmp/appex.sh 'install'
-[[ ` ps aux | grep appex | grep -v grep ` ]] && echo -e "\n${bold}${green}锐速已在运行 ...${normal}\n" || echo -e "\n${bold}${green}锐速尚未在运行，可能安装失败！${normal}\n" ; }
+[[ ` ps aux | grep appex | grep -v grep ` ]] && echo -e "\n${bold}${green}锐速已在运行 ...${normal}\n" || echo -e "\n${bold}${red}锐速尚未在运行，可能安装失败！${normal}\n" ; }
 
 
 
@@ -816,7 +816,7 @@ else echo -e "\n  ${bold}${green}$required_version${jiacu} 头文件已安装 ..
 # 安装自选版本的内核
 function _install_required_kernel() {
 [[ $DeBUG == 1 ]] && echo "${required_version}"
-image_name=`wget -qO- http://kernel.ubuntu.com/~kernel-ppa/mainline/v${required_version}/ | grep "linux-image" | grep "lowlatency" | awk -F'\">' '/amd64.deb/{print $2}' | cut -d'<' -f1 | head -1`
+image_name=`wget -qO- http://kernel.ubuntu.com/~kernel-ppa/mainline/v${required_version}/ | grep "linux-image" | grep "generic" | awk -F'\">' '/amd64.deb/{print $2}' | cut -d'<' -f1 | head -1`
 image_url="http://kernel.ubuntu.com/~kernel-ppa/mainline/v${required_version}/${image_name}"
 
 echo -ne "\n  ${bold}安装 ${green}$required_version${jiacu} 内核 ... ${normal}"
