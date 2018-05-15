@@ -12,7 +12,7 @@
 # http://xiaofd.win/onekey-ruisu.html
 # https://teddysun.com/489.html
 
-ScriptVersion=1.5.1
+ScriptVersion=1.5.2
 ScriptDate=2018.05.15
 
 # 颜色 -----------------------------------------------------------------------------------
@@ -191,6 +191,7 @@ case $response in
         22) # 卸载 锐速
             _ss_uninstall ;;
         23) # 卸载 多余内核
+            _disable_advanced_boot
             while [[ -z $kernel_version ]]; do
                 echo -ne "\n  ${bold}请输入你要 ${red}保留${jiacu} 的内核版本，其他版本的内核将会被删除：${normal} " ; read -e kernel_version
                 [[ ! ` dpkg -l | grep linux-image | grep "$kernel_version" ` ]] && { echo -e "\n  ${bold}${red}错误${jiacu} 大佬，你压根就没装这个内核吧！${normal}" ; unset kernel_version ; }
@@ -623,8 +624,8 @@ echo -ne "\n  ${bold}删除源，更新 ...  ${normal}" | tee -a $Outputs
 function _ubuntu_serverspeeder_updategrub() {
 sed -i 's/GRUB_DEFAULT=.*/GRUB_DEFAULT="Advanced options for Ubuntu>Ubuntu, with Linux kernelver"/' /etc/default/grub
 sed -i "s/kernelver/$kernelver/" /etc/default/grub
-echo -ne "\n  ${bold}更新引导 ...  " | tee -a $Outputs
-{ update-grub >> $Outputs 2>&1 ; } && { echo "${green}${bold}完成${normal}" | tee -a $Outputs ; } ; }
+_update_grub ; }
+
 
 
 
@@ -661,14 +662,13 @@ fi ; }
 
 # 安装 4.11.12 的内核（For BBR）
 function _bbr_kernel_4_11_12() {
-echo -ne "\n  ${bold}安装 4.11.12 内核及其头文件 ... ${normal} "
+echo -ne "\n  ${bold}安装 4.11.12 内核及其头文件 ... ${normal} " | tee -a $Outputs
 wget --no-check-certificate -qO 1.deb https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Linux%20Kernel/BBR/linux-headers-4.11.12-all.deb
 wget --no-check-certificate -qO 2.deb https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Linux%20Kernel/BBR/linux-headers-4.11.12-amd64.deb
 wget --no-check-certificate -qO 3.deb https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Linux%20Kernel/BBR/linux-image-4.11.12-generic-amd64.deb
 dpkg -i [123].deb >> $Outputs 2>&1 || { echo -e "\n  ${bold}${red}错误${jiacu} 安装 内核 失败！${normal}" ; exit 1 ; }
 rm -rf [123].deb ; echo
-echo -ne "\n  ${bold}更新引导 ...  " | tee -a $Outputs
-update-grub >> $Outputs 2>&1 && { echo "${green}${bold}完成${normal}" | tee -a $Outputs ; } ; }
+_update_grub ; }
 
 
 
@@ -841,7 +841,7 @@ dpkg -i headers1.deb >> $Outputs 2>&1  || { echo -e "\n  ${red}错误${jiacu} he
 echo -ne "\n  ${bold}安装 ${green}$required_version${jiacu} headers ... ${normal}"
 wget -qO headers2.deb $headers_bit_url || { echo -e "\n  ${red}错误${jiacu} headers 下载失败！${normal}\n"     | tee -a $Outputs ; exit 1 ; }
 dpkg -i headers2.deb >> $Outputs 2>&1  || { echo -e "\n  ${red}错误${jiacu} headers_all 安装失败！${normal}\n" | tee -a $Outputs ; exit 1 ; }
-rm headers1.deb headers2.deb ; }
+rm -f headers1.deb headers2.deb ; }
 
 
 
@@ -852,10 +852,18 @@ rm headers1.deb headers2.deb ; }
 
 
 
+# 禁用启动选项
+function _disable_advanced_boot() { sed -i 's/GRUB_DEFAULT=.*/GRUB_DEFAULT=""/' /etc/default/grub ; }
+
+# 更新引导
+function _update_grub() { echo -ne "\n  ${bold}更新引导 ...  ${normal}" | tee -a $Outputs
+{ update-grub >> $Outputs 2>&1 ; } && { echo "${green}${bold}完成${normal}" | tee -a $Outputs ; } ; }
+
+# 目前自带更新引导的三个 function：ubuntu 启动选项、删除其他内核、安装 4.11.12 内核
 
 
 
-# 删除其他内核，并更新引导
+# 删除其他内核
 function _delete_kernel() {
 echo -e "\n  ${bold}卸载多余内核及其头文件 ... ${normal}\n" | tee -a $Outputs
 kernel_total=` dpkg -l | grep -E linux-[image,headers] | awk '{print $2}' | grep -v "${kernel_version}" | wc -l `
@@ -869,8 +877,7 @@ if [ $kernel_total > 1 ]; then
     done
 fi
 
-echo -ne "\n  ${bold}更新引导 ...  " | tee -a $Outputs
-update-grub >> $Outputs 2>&1 && echo "${green}完成${normal}" | tee -a $Outputs ; }
+_update_grub ; }
 
 
 
