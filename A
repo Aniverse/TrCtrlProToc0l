@@ -12,7 +12,7 @@
 # http://xiaofd.win/onekey-ruisu.html
 # https://teddysun.com/489.html
 
-ScriptVersion=1.6.9
+ScriptVersion=1.7.0
 ScriptDate=2018.05.17
 
 # 颜色 -----------------------------------------------------------------------------------
@@ -642,6 +642,7 @@ rm  -rf [123].deb ; }
 
 # Ubuntu 安装 3.16.0-43 内核（For ServerSpeeder）
 function _ubuntu_serverspeeder_kernel_3.16.0-43() {
+apt-get -y install module-init-tools >> $Outputs 2>&1
 wget --no-check-certificate -qO 1.deb https://github.com/Aniverse/SSKernel/raw/master/Ubuntu/linux-image-3.16.0-43-generic_3.16.0-43.58~14.04.1_amd64.deb
 wget --no-check-certificate -qO 2.deb https://github.com/Aniverse/SSKernel/raw/master/Ubuntu/image-extra/linux-image-extra-3.16.0-43-generic_3.16.0-43.58~14.04.1_amd64.deb
 wget --no-check-certificate -qO 3.deb https://github.com/Aniverse/SSKernel/raw/master/Ubuntu/headers/linux-headers-3.16.0-43-generic_3.16.0-43.58~14.04.1_amd64.deb
@@ -948,8 +949,8 @@ kernel_total=` dpkg -l | grep -E linux-[image,headers] | awk '{print $2}' | grep
 
 if [ $kernel_total > 1 ]; then
     for (( integer = 1 ; integer <= ${kernel_total} ; integer++ )) ; do
-      # kernel_tobe_del=` dpkg -l | grep -E linux-[image,headers] | awk '{print $2}' | grep -v "${kernel_version}" | head -${integer} `
-        kernel_tobe_del=` dpkg -l | grep -E linux-[image,headers] | awk '{print $2}' | grep -v "${kernel_version}" | head -n1 `
+      # kernel_tobe_del=` dpkg -l | grep -E linux-[image,headers] | grep -v binutils | awk '{print $2}' | grep -v "${kernel_version}" | head -${integer} `
+        kernel_tobe_del=` dpkg -l | grep -E linux-[image,headers] | grep -v binutils | awk '{print $2}' | grep -v "${kernel_version}" | sed -n '${integer}p' `
         echo -ne "  卸载 ${kernel_tobe_del} ... " | tee -a $Outputs
         echo `debconf-get-selections ${deb_del} | grep removing-running-kernel | grep $running_kernel | sed s/true/false/` | debconf-set-selections
         apt-get -y purge $kernel_tobe_del >> $Outputs 2>&1 && { echo "${green}完成${normal}" | tee -a $Outputs ; } || { echo "${red}失败${normal}" | tee -a $Outputs ; }
