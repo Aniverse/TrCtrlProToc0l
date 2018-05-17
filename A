@@ -12,7 +12,7 @@
 # http://xiaofd.win/onekey-ruisu.html
 # https://teddysun.com/489.html
 
-ScriptVersion=1.6.7
+ScriptVersion=1.6.8
 ScriptDate=2018.05.17
 
 # 颜色 -----------------------------------------------------------------------------------
@@ -144,7 +144,7 @@ function version_ge(){ test "$(echo "$@" | tr " " "\n" | sort -rV | head -n 1)" 
 kernel_vvv=$(uname -r | cut -d- -f1)
 if version_ge $kernel_vvv 4.9  ; then BBRKernel="${green}是${jiacu}" ; else BBRKernel="${red}否${jiacu}" ; fi
 if version_ge $kernel_vvv 4.10 && ! version_ge $kernel_vvv 4.16 ; then YKKernel="${green}是${jiacu}"  ; else YKKernel="${red}否${jiacu}" ; fi
-if version_ge $kernel_vvv 4.9.3  && ! version_ge $kernel_vvv 4.17 ; then NQLKernel="${green}是${jiacu}" ; else NQLKernel="${red}否${jiacu}" ; fi
+if version_ge $kernel_vvv 4.9.3  && ! version_ge $kernel_vvv 4.16 ; then NQLKernel="${green}是${jiacu}" ; else NQLKernel="${red}否${jiacu}" ; fi
 ver_4_13=`dpkg -l | grep linux-image | awk '{print $2}' | awk -F '-' '{print $3}' | grep "4.13"`
 ver_4_14=`dpkg -l | grep linux-image | awk '{print $2}' | awk -F '-' '{print $3}' | grep "4.14"`
 ver_4_15=`dpkg -l | grep linux-image | awk '{print $2}' | awk -F '-' '{print $3}' | grep "4.15"`
@@ -765,7 +765,7 @@ gcc_ver_1=` echo $gcc_ver | awk -F. '{print $1}' ` ; gcc_ver_2=` echo $gcc_ver |
 
 # 南琴浪版魔改 BBR 编译安装算法
 function _bbr_nanqinlang(){
-echo -ne "\n  ￥{bold}编译魔改 BBR 算法 ...${normal} " | tee -a $Outputs
+echo -ne "\n  ${bold}编译魔改 BBR 算法 ...${normal} " | tee -a $Outputs
 if   [[ ! -z "${ver_4_13}" ]]; then wget --no-check-certificate -qO tcp_nanqinlang.c https://github.com/Aniverse/BitTorrentClientCollection/raw/master/TCP%20Congestion%20Control/BBR%204.13/tcp_nanqinlang.c
 elif [[ ! -z "${ver_4_14}" ]]; then wget --no-check-certificate -qO tcp_nanqinlang.c https://github.com/Aniverse/BitTorrentClientCollection/raw/master/TCP%20Congestion%20Control/BBR%204.14/tcp_nanqinlang.c
 elif [[ ! -z "${ver_4_15}" ]]; then wget --no-check-certificate -qO tcp_nanqinlang.c https://github.com/Aniverse/BitTorrentClientCollection/raw/master/TCP%20Congestion%20Control/BBR%204.15/tcp_nanqinlang.c
@@ -948,10 +948,11 @@ kernel_total=` dpkg -l | grep -E linux-[image,headers] | awk '{print $2}' | grep
 
 if [ $kernel_total > 1 ]; then
     for (( integer = 1 ; integer <= ${kernel_total} ; integer++ )) ; do
-        kernel_tobe_del=` dpkg -l | grep -E linux-[image,headers] | awk '{print $2}' | grep -v "${kernel_version}" | head -${integer} `
-        echo -ne "Removing ${kernel_tobe_del} ... " | tee -a $Outputs
+      # kernel_tobe_del=` dpkg -l | grep -E linux-[image,headers] | awk '{print $2}' | grep -v "${kernel_version}" | head -${integer} `
+        kernel_tobe_del=` dpkg -l | grep -E linux-[image,headers] | awk '{print $2}' | grep -v "${kernel_version}" | head -n1 `
+        echo -ne "  卸载 ${kernel_tobe_del} ... " | tee -a $Outputs
         echo `debconf-get-selections ${deb_del} | grep removing-running-kernel | grep $running_kernel | sed s/true/false/` | debconf-set-selections
-        apt-get -y purge $kernel_tobe_del >> $Outputs 2>&1 && { echo "$(tput setaf 2)DONE$(tput sgr0)" | tee -a $Outputs ; } || { echo "$(tput setaf 1)FAILED$(tput sgr0)" | tee -a $Outputs ; }
+        apt-get -y purge $kernel_tobe_del >> $Outputs 2>&1 && { echo "${green}完成${normal}" | tee -a $Outputs ; } || { echo "${red}失败${normal}" | tee -a $Outputs ; }
     done
 fi
 
