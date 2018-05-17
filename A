@@ -12,7 +12,7 @@
 # http://xiaofd.win/onekey-ruisu.html
 # https://teddysun.com/489.html
 
-ScriptVersion=1.6.8
+ScriptVersion=1.6.9
 ScriptDate=2018.05.17
 
 # 颜色 -----------------------------------------------------------------------------------
@@ -894,7 +894,7 @@ rm -f kernel.deb ; }
 function _install_required_headers() {
 headers_all_name=`  wget -qO- http://kernel.ubuntu.com/~kernel-ppa/mainline/v${required_version}/ | grep "linux-headers" | awk -F'\">' '/all.deb/{print $2}' | cut -d'<' -f1 | head -1  `
 headers_all_url="http://kernel.ubuntu.com/~kernel-ppa/mainline/v${required_version}/${headers_all_name}"
-headers_bit_name=`  wget -qO- http://kernel.ubuntu.com/~kernel-ppa/mainline/v${required_version}/ | grep "linux-headers" | grep "lowlatency" | awk -F'\">' '/amd64.deb/{print $2}' | cut -d'<' -f1 | head -1  `
+headers_bit_name=`  wget -qO- http://kernel.ubuntu.com/~kernel-ppa/mainline/v${required_version}/ | grep "linux-headers" | grep "all" | awk -F'\">' '/amd64.deb/{print $2}' | cut -d'<' -f1 | head -1  `
 headers_bit_url="http://kernel.ubuntu.com/~kernel-ppa/mainline/v${required_version}/${headers_bit_name}"
 
 echo -ne "\n  ${bold}安装 ${green}$required_version${jiacu} headers_all ... ${normal}"
