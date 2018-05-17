@@ -12,7 +12,7 @@
 # http://xiaofd.win/onekey-ruisu.html
 # https://teddysun.com/489.html
 
-ScriptVersion=1.7.5
+ScriptVersion=1.7.6
 ScriptDate=2018.05.17
 
 # 颜色 -----------------------------------------------------------------------------------
@@ -946,12 +946,12 @@ function _update_grub() { echo -ne "\n  ${bold}更新引导 ...  ${normal}" | te
 function _delete_kernel() {
 echo -e "\n  ${bold}卸载多余内核及其头文件 ... ${normal}\n" | tee -a $Outputs
 dpkg -l | grep -E linux-[image,headers,modules] | grep -v binutils | awk '{print $2}' | grep -v "${kernel_version}" > /log/kernel_tobe_del 2>&1
-kernel_total_num=` cat /tmp/kernel_tobe_del | wc -l `
+kernel_total_num=` cat /log/kernel_tobe_del | wc -l `
 
 if [ $kernel_total_num > 1 ]; then
     for (( integer = 1 ; integer <= ${kernel_total_num} ; integer++ )) ; do
       # kernel_tobe_del=` dpkg -l | grep -E linux-[image,headers,modules] | grep -v binutils | awk '{print $2}' | grep -v "${kernel_version}" | head -${integer} `
-        kernel_tobe_del=` cat /tmp/kernel_tobe_del | sed -n "${integer}p" `
+        kernel_tobe_del=` cat /log/kernel_tobe_del | sed -n "${integer}p" `
         echo -ne "  卸载 ${kernel_tobe_del} ... " | tee -a $Outputs
         echo `debconf-get-selections ${deb_del} | grep removing-running-kernel | grep $running_kernel | sed s/true/false/` | debconf-set-selections
         [[ $DeBUG == 1 ]] && { echo -e "\n  $integer, $kernel_tobe_del" ; }
