@@ -12,7 +12,7 @@
 # http://xiaofd.win/onekey-ruisu.html
 # https://teddysun.com/489.html
 
-ScriptVersion=1.6.1
+ScriptVersion=1.6.2
 ScriptDate=2018.05.15
 
 # 颜色 -----------------------------------------------------------------------------------
@@ -81,11 +81,12 @@ isp=$( echo $result | awk -F '"' '{print $10}' )
 asn=$(wget -qO- https://ipapi.co/asn/)
 
 # 非常蛋疼的设计，有点自欺欺人
-[[ $isp == "choopa.com" ]] && isp="Vultr (choopa.com)"
 [[ $isp == "online.net" ]] && isp="Online.net"
 [[ $isp == "digitalocean.com" ]] && isp="Digital Ocean"
 [[ $isp == "hetzner.de" ]] && isp="Hetzner"
 [[ $isp == "leaseweb.com" ]] && isp="LeaseWeb"
+[[ `hostname -A | grep vultr` ]] && isp="Vultr, Choopa"
+[[ `hostname -A | grep seedhost` ]] && isp="SeedHost, LeaseWeb"
 [[ $asn == AS200052 ]] && isp="Feral Hosting"
 [[ $isp == "" ]] && isp="未检测到 ISP"
 }
