@@ -54,6 +54,12 @@ bash <(curl -s https://raw.githubusercontent.com/Aniverse/TrCtrlProToc0l/master/
 
 ## To Do List
 
+- **检测当前 BBR、魔改 BBR 是否可以直接启用**  
+比如我已经编译完了 Yankee 和 nanqinlang 版魔改 BBR，检测到 `/lib/modules/$(uname -r)/kernel/net/ipv4` 里有对应文件存在的话，就直接启用算法而不是再次编译  
+
+- **4.11.12 内核使用预先编译好的魔改算法文件**  
+这样可以省略编译过程  
+
 ## Known Issues
 
 - **某些情况下编译魔改 BBR 会失败**  
