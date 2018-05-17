@@ -12,7 +12,7 @@
 # http://xiaofd.win/onekey-ruisu.html
 # https://teddysun.com/489.html
 
-ScriptVersion=1.6.5
+ScriptVersion=1.6.6
 ScriptDate=2018.05.17
 
 # 颜色 -----------------------------------------------------------------------------------
@@ -776,12 +776,14 @@ else wget --no-check-certificate -qO tcp_nanqinlang.c https://github.com/Anivers
 # make && make install
 
 echo "obj-m := tcp_nanqinlang.o" > Makefile
+mkdir -p /lib/modules/$(uname -r)/build
 make -C /lib/modules/$(uname -r)/build M=`pwd` modules CC=`which gcc` >> $Outputs 2>&1
 cp -rf tcp_nanqinlang.ko /lib/modules/$(uname -r)/kernel/net/ipv4 >> $Outputs 2>&1
 insmod /lib/modules/$(uname -r)/kernel/net/ipv4/tcp_nanqinlang.ko >> $Outputs 2>&1
 depmod -a >> $Outputs 2>&1
 
-rm -rf tcp_nanqinlang.c Makefile ; }
+rm -rf tcp_nanqinlang.c Makefile
+echo ; }
 
 
 
@@ -795,12 +797,15 @@ elif [[ ! -z "${ver_4_15}" ]]; then wget --no-check-certificate -qO tcp_tsunami.
 else wget --no-check-certificate -qO tcp_tsunami.c https://github.com/Aniverse/BitTorrentClientCollection/raw/master/TCP%20Congestion%20Control/BBR%204.12%20and%20below/tcp_tsunami.c ; fi
 
 echo "obj-m:=tcp_tsunami.o" > Makefile
+mkdir -p /lib/modules/$(uname -r)/build
 make -C /lib/modules/$(uname -r)/build M=`pwd` modules CC=`which gcc` >> $Outputs 2>&1
 insmod tcp_tsunami.ko >> $Outputs 2>&1
 cp -rf ./tcp_tsunami.ko /lib/modules/$(uname -r)/kernel/net/ipv4 >> $Outputs 2>&1
 depmod -a >> $Outputs 2>&1
 modprobe tcp_tsunami >> $Outputs 2>&1
-rm -rf tcp_tsunami.c Makefile ; }
+
+rm -rf tcp_tsunami.c Makefile
+echo ; }
 
 
 
