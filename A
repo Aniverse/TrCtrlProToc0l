@@ -12,7 +12,7 @@
 # http://xiaofd.win/onekey-ruisu.html
 # https://teddysun.com/489.html
 
-ScriptVersion=1.7.4
+ScriptVersion=1.7.5
 ScriptDate=2018.05.17
 
 # 颜色 -----------------------------------------------------------------------------------
@@ -945,7 +945,7 @@ function _update_grub() { echo -ne "\n  ${bold}更新引导 ...  ${normal}" | te
 # 删除其他内核
 function _delete_kernel() {
 echo -e "\n  ${bold}卸载多余内核及其头文件 ... ${normal}\n" | tee -a $Outputs
-dpkg -l | grep -E linux-[image,headers,modules] | grep -v binutils | awk '{print $2}' | grep -v "${kernel_version}" > /tmp/kernel_tobe_del 2>&1
+dpkg -l | grep -E linux-[image,headers,modules] | grep -v binutils | awk '{print $2}' | grep -v "${kernel_version}" > /log/kernel_tobe_del 2>&1
 kernel_total_num=` cat /tmp/kernel_tobe_del | wc -l `
 
 if [ $kernel_total_num > 1 ]; then
