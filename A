@@ -12,7 +12,7 @@
 # http://xiaofd.win/onekey-ruisu.html
 # https://teddysun.com/489.html
 
-ScriptVersion=1.7.1
+ScriptVersion=1.7.2
 ScriptDate=2018.05.17
 
 # 颜色 -----------------------------------------------------------------------------------
@@ -945,16 +945,17 @@ function _update_grub() { echo -ne "\n  ${bold}更新引导 ...  ${normal}" | te
 # 删除其他内核
 function _delete_kernel() {
 echo -e "\n  ${bold}卸载多余内核及其头文件 ... ${normal}\n" | tee -a $Outputs
-kernel_total=` dpkg -l | grep -E linux-[image,headers] | grep -v binutils | awk '{print $2}' | grep -v "${kernel_version}" | wc -l `
+kernel_total=` dpkg -l | grep -E linux-[image,headers] | grep -v binutils | awk '{print $2}' | grep -v "${kernel_version}" `
+kernel_total_num=` echo $kernel_total | wc -l `
 
 if [ $kernel_total > 1 ]; then
-    for (( integer = 1 ; integer <= ${kernel_total} ; integer++ )) ; do
+    for (( integer = 1 ; integer <= ${kernel_total_num} ; integer++ )) ; do
       # kernel_tobe_del=` dpkg -l | grep -E linux-[image,headers] | grep -v binutils | awk '{print $2}' | grep -v "${kernel_version}" | head -${integer} `
-        kernel_tobe_del=` dpkg -l | grep -E linux-[image,headers] | grep -v binutils | awk '{print $2}' | grep -v "${kernel_version}" | sed -n "${integer}p" `
+        kernel_tobe_del=` echo $kernel_total | sed -n "${integer}p" `
         echo -ne "  卸载 ${kernel_tobe_del} ... " | tee -a $Outputs
         echo `debconf-get-selections ${deb_del} | grep removing-running-kernel | grep $running_kernel | sed s/true/false/` | debconf-set-selections
-        [[ $DeBUG == 1 ]] && { echo -e "\n$integer, $kernel_tobe_del" ; }
-        apt-get -y purge $kernel_tobe_del >> $Outputs 2>&1 && { echo "${green}完成${normal}" | tee -a $Outputs ; } || { echo "${red}失败${normal}" | tee -a $Outputs ; }
+        [[ $DeBUG == 1 ]] && { echo -e "\n  $integer, $kernel_tobe_del" ; }
+        apt-get -y purge $kernel_tobe_del >> $Outputs 2>&1 && { echo "${green}${bold}完成${normal}" | tee -a $Outputs ; } || { echo "${red}${bold}失败${normal}" | tee -a $Outputs ; }
     done
 fi
 
