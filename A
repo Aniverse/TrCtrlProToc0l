@@ -12,7 +12,7 @@
 # http://xiaofd.win/onekey-ruisu.html
 # https://teddysun.com/489.html
 
-ScriptVersion=1.6.0
+ScriptVersion=1.6.1
 ScriptDate=2018.05.15
 
 # 颜色 -----------------------------------------------------------------------------------
@@ -78,7 +78,17 @@ country=$( echo $result | awk -F '"' '{print $2}' )
 region=$( echo $result | awk -F '"' '{print $4}' )
 city=$( echo $result | awk -F '"' '{print $6}' )
 isp=$( echo $result | awk -F '"' '{print $10}' )
-asn=$(wget -qO- https://ipapi.co/asn/) ; }
+asn=$(wget -qO- https://ipapi.co/asn/)
+
+# 非常蛋疼的设计，有点自欺欺人
+[[ $isp == "choopa.com" ]] && isp="Vultr (choopa.com)"
+[[ $isp == "online.net" ]] && isp="Online.net"
+[[ $isp == "digitalocean.com" ]] && isp="Digital Ocean"
+[[ $isp == "hetzner.de" ]] && isp="Hetzner"
+[[ $isp == "leaseweb.com" ]] && isp="LeaseWeb"
+[[ $asn == AS200052 ]] && isp="Feral Hosting"
+[[ $isp == "" ]] && isp="未检测到 ISP"
+}
 
 
 
@@ -152,11 +162,10 @@ dpkg -l | grep linux-modules | awk '{print $2}' >> /tmp/system_kernel_list
 
 echo -e  " ${baizise}${bold}                                   El Psy Congroo!                                   ${normal} "
 echo -e  "  ${bold}"
-echo -e  "  ASN ／ISP                            ${green}$asn, $org${jiacu}"
 echo -e  "  IPv4 地址                            ${green}$serveripv4${jiacu}"
 [[ $serveripv6 ]] &&
 echo -e  "  IPv6 地址                            ${green}$serveripv6${jiacu}"
-echo -e  "  ASN ／ISP                            ${green}$asn, $org${jiacu}"
+echo -e  "  ASN ／ISP                            ${green}$asn, $isp${jiacu}"
 echo -e  "  地理位置                             ${green}$city, $region, $country${jiacu}"
 echo -e  "  当前操作系统                         ${green}$DISTROU $osversion $CODENAME (x$lbit)${jiacu}"
 # echo -e  "  当前正在使用的 TCP 拥塞控制算法      ${green}$tcp_c_name${jiacu}"
