@@ -12,7 +12,7 @@
 # http://xiaofd.win/onekey-ruisu.html
 # https://teddysun.com/489.html
 
-ScriptVersion=1.7.9
+ScriptVersion=1.8.0
 ScriptDate=2018.05.17
 
 # 颜色 -----------------------------------------------------------------------------------
@@ -171,8 +171,8 @@ echo -e  "  ${bold}"
 echo -e  "  IPv4 地址                            ${green}$serveripv4${jiacu}"
 [[ $serveripv6 ]] &&
 echo -e  "  IPv6 地址                            ${green}$serveripv6${jiacu}"
-echo -e  "  ASN／ISP                             ${green}$asn, $isp${jiacu}" ; }
-echo -e  "  地理位置                             ${green}$city, $region, $country${jiacu}"
+echo -e  "  ASN／ISP                             ${green}$asn, $isp${jiacu}"
+echo -e  "  地理位置                             ${green}$city, $region, $country${jiacu}" ; }
 echo -e  "  当前操作系统                         ${green}$DISTROU $osversion $CODENAME (x$lbit)${jiacu}"
 echo -e  "  当前正在使用的 TCP 拥塞控制算法      ${green}$tcp_c_name${jiacu}"
 echo -e  "  当前可以使用的 TCP 拥塞控制算法      ${green}$tcp_control_all${jiacu}"
