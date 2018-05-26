@@ -13,7 +13,7 @@
 # http://xiaofd.win/onekey-ruisu.html
 # https://teddysun.com/489.html
 
-ScriptVersion=1.8.5
+ScriptVersion=1.8.6
 ScriptDate=2018.05.26
 
 # 颜色 -----------------------------------------------------------------------------------
@@ -669,13 +669,13 @@ rm  -rf [123].deb ; }
 function _ubuntu_serverspeeder_kernel_repo() {
 sed -i '/deb http:\/\/security.ubuntu.com\/ubuntu trusty-security main/'d /etc/apt/sources.list
 echo "deb http://security.ubuntu.com/ubuntu trusty-security main" >> /etc/apt/sources.list
-echo -ne "\n  ${bold}添加源，更新 ...  ${normal}"
+echo -ne "\n  ${bold}添加源，更新 ...  ${normal}" | tee -a $Outputs ; echo >> $Outputs
 { apt-get update >> $Outputs 2>&1 ; } && { echo "${green}${bold}完成${normal}" | tee -a $Outputs ; }
-echo -ne "\n  ${bold}安装内核 ...  ${normal}" | tee -a $Outputs
+echo -ne "\n  ${bold}安装内核 ...  ${normal}" | tee -a $Outputs     ; echo >> $Outputs
 apt-get -y install linux-image-extra-$kernelver linux-image-$kernelver linux-headers-$kernelver >> $Outputs 2>&1 && { echo "${green}${bold}完成${normal}" | tee -a $Outputs ; }
 [[ ! ` dpkg -l | grep linux-image-$kernelver ` ]] && { echo "${bold}${red}失败${normal}" | tee -a $Outputs ; exit 1 ; }
 sed -i '/deb http:\/\/security.ubuntu.com\/ubuntu trusty-security main/'d /etc/apt/sources.list
-echo -ne "\n  ${bold}删除源，更新 ...  ${normal}" | tee -a $Outputs
+echo -ne "\n  ${bold}删除源，更新 ...  ${normal}" | tee -a $Outputs ; echo >> $Outputs
 { apt-get update >> $Outputs 2>&1 ; } && { echo "${green}${bold}完成${normal}" | tee -a $Outputs ; } ; }
 
 
@@ -710,7 +710,7 @@ function _online_ubuntu_bbr_firmware() {
 mkdir -p /lib/firmware/bnx2
 if [[ ! -f /lib/firmware/bnx2/fw.lock ]]; then
     touch /lib/firmware/bnx2/fw.lock
-    echo -ne "  ${bold}下载可能缺少的固件 ... ${normal}" | tee -a $Outputs
+    echo -ne "  ${bold}下载可能缺少的固件 ... ${normal}" | tee -a $Outputs ; echo >> $Outputs
     wget -qO /lib/firmware/bnx2/bnx2-mips-06-6.2.3.fw https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Linux%20Firmware/bnx2-mips-06-6.2.3.fw
     wget -qO /lib/firmware/bnx2/bnx2-mips-09-6.2.1b.fw https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Linux%20Firmware/bnx2-mips-09-6.2.1b.fw
     wget -qO /lib/firmware/bnx2/bnx2-rv2p-09ax-6.0.17.fw https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Linux%20Firmware/bnx2-rv2p-09ax-6.0.17.fw
@@ -723,7 +723,7 @@ fi ; }
 
 # 安装 4.11.12 的内核（For BBR）
 function _bbr_kernel_4_11_12() {
-echo -ne "\n  ${bold}安装 4.11.12 内核及其头文件 ... ${normal} " | tee -a $Outputs
+echo -ne "\n  ${bold}安装 4.11.12 内核及其头文件 ... ${normal} " | tee -a $Outputs ; echo >> $Outputs
 wget --no-check-certificate -qO 1.deb https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Linux%20Kernel/BBR/linux-headers-4.11.12-all.deb
 wget --no-check-certificate -qO 2.deb https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Linux%20Kernel/BBR/linux-headers-4.11.12-amd64.deb
 wget --no-check-certificate -qO 3.deb https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Linux%20Kernel/BBR/linux-image-4.11.12-generic-amd64.deb
@@ -755,7 +755,7 @@ echo -ne "\n  ${bold}修复可能存在的依赖问题 ...${normal} " | tee -a $
 apt-get install -f -y >> $Outputs 2>&1
 echo | tee -a $Outputs ; }
 
-[[ ! `dpkg -l | grep libelf-dev` ]] && { echo -ne "\n  ${bold}安装 libelf-dev ...${normal} " | tee -a $Outputs ; apt-get install -y libelf1 libelf-dev >> $Outputs 2>&1 ; echo
+[[ ! `dpkg -l | grep libelf-dev` ]] && { echo -ne "\n  ${bold}安装 libelf-dev ...${normal} " | tee -a $Outputs ; apt-get install -y libelf1 libelf-dev >> $Outputs 2>&1 ; echo | tee -a $Outputs
 [[ ! `dpkg -l | grep libelf-dev` ]] && { echo -e  "\n  ${red}错误${bold} 安装 libelf-dev 失败！${normal}" | tee -a $Outputs ; exit 1 ; } ; }
 
 if [[ $CODENAME == stretch ]]; then
@@ -763,7 +763,7 @@ if [[ $CODENAME == stretch ]]; then
     echo -ne "\n  ${bold}安装 libssl1.0.0 ...${normal} " | tee -a $Outputs
     wget --no-check-certificate https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Deb%20Package/Jessie/libssl1.0.0_1.0.1t-1+deb8u7_amd64.deb -O libssl1.0.deb >> $Outputs 2>&1
     dpkg -i libssl1.0.deb >> $Outputs 2>&1
-    rm -f libssl1.0.deb ; echo
+    rm -f libssl1.0.deb ; echo | tee -a $Outputs
   # echo -e "\ndeb http://ftp.hk.debian.org/debian jessie main\c" >> /etc/apt/sources.list
   # apt-get update >> $Outputs 2>&1
   # apt-get install -y libssl1.0.0 >> $Outputs 2>&1
@@ -771,17 +771,17 @@ if [[ $CODENAME == stretch ]]; then
   # apt-get update >> $Outputs 2>&1 ; echo
     [[ ! `dpkg -l | grep libssl1.0.0` ]] && { echo -e "\n  ${red}错误${bold} 安装 libssl1.0.0 失败！${normal}" | tee -a $Outputs ; exit 1 ; } ; }
 else
-    [[ ! `dpkg -l | grep libssl1.0.0` ]] && { echo -ne "\n  ${bold}安装 libssl1.0.0 ...${normal} " | tee -a $Outputs ; apt-get install -y libssl1.0.0 >> $Outputs 2>&1 ; echo
+    [[ ! `dpkg -l | grep libssl1.0.0` ]] && { echo -ne "\n  ${bold}安装 libssl1.0.0 ...${normal} " | tee -a $Outputs ; apt-get install -y libssl1.0.0 >> $Outputs 2>&1 ; echo | tee -a $Outputs
     [[ ! `dpkg -l | grep libssl1.0.0` ]] && { echo -e  "\n$  ${red}错误${bold} 安装 libssl1.0.0 失败！${normal}" | tee -a $Outputs ; exit 1 ; } ; }
 fi
 
-which make >> $Outputs 2>&1 ; [ $? -ne '0' ] && { echo -ne "\n  ${bold}安装 make ...${normal} "    | tee -a $Outputs  ; apt-get install -y make >> $Outputs 2>&1 ; echo
+which make >> $Outputs 2>&1 ; [ $? -ne '0' ] && { echo -ne "\n  ${bold}安装 make ...${normal} "    | tee -a $Outputs  ; apt-get install -y make >> $Outputs 2>&1 ; echo | tee -a $Outputs
 which make >> $Outputs 2>&1 ; [ $? -ne '0' ] && { echo -e  "\n  ${red}错误${bold} 安装 make 失败！${normal}" | tee -a $Outputs ; exit 1 ; } ; }
 
-which awk  >> $Outputs 2>&1 ; [ $? -ne '0' ] && { echo -ne "\n  ${bold}安装 awk ...${normal} "     | tee -a $Outputs  ; apt-get install -y gawk >> $Outputs 2>&1 ; echo
+which awk  >> $Outputs 2>&1 ; [ $? -ne '0' ] && { echo -ne "\n  ${bold}安装 awk ...${normal} "     | tee -a $Outputs  ; apt-get install -y gawk >> $Outputs 2>&1 ; echo | tee -a $Outputs
 which awk  >> $Outputs 2>&1 ; [ $? -ne '0' ] && { echo -e  "\n  ${red}错误${bold} 安装 awk 失败！${normal}" | tee -a $Outputs  ; exit 1 ; } ; }
 
-which gcc  >> $Outputs 2>&1 ; [ $? -ne '0' ] && { echo -ne "\n  ${bold}安装 gcc ...${normal} "     | tee -a $Outputs  ; apt-get install -y gcc  >> $Outputs 2>&1 ; echo
+which gcc  >> $Outputs 2>&1 ; [ $? -ne '0' ] && { echo -ne "\n  ${bold}安装 gcc ...${normal} "     | tee -a $Outputs  ; apt-get install -y gcc  >> $Outputs 2>&1 ; echo | tee -a $Outputs
 which gcc  >> $Outputs 2>&1 ; [ $? -ne '0' ] && { echo -e  "\n  ${red}错误${bold} 安装 gcc 失败！${normal}" | tee -a $Outputs  ; exit 1 ; } ; }
 
 gcc_ok=0 ; gcc_ver=` gcc --version | grep -Eo '[0-9]+\.[0-9]+\.[0-9]+' | head -n1 `
@@ -790,7 +790,7 @@ gcc_ver_1=` echo $gcc_ver | awk -F. '{print $1}' ` ; gcc_ver_2=` echo $gcc_ver |
 [[ $gcc_ver_1 == 4 ]] && [[ -n $gcc_ver_2 ]] && [[ $gcc_ver_2 -ge 9 ]] && gcc_ok=1
 [[ $gcc_ok == 0 ]] && { echo -e "\n  ${red}错误${bold} gcc 版本低于 4.9！${normal}" | tee -a $Outputs ; exit 1 ; }
 
-[[ ! `dpkg -l | grep build-essential` ]] && { echo -ne "\n  ${bold}安装 build-essential ...${normal} " | tee -a $Outputs  ; apt-get install -y build-essential >> $Outputs 2>&1 ; echo
+[[ ! `dpkg -l | grep build-essential` ]] && { echo -ne "\n  ${bold}安装 build-essential ...${normal} " | tee -a $Outputs  ; apt-get install -y build-essential >> $Outputs 2>&1 ; echo | tee -a $Outputs
 [[ ! `dpkg -l | grep build-essential` ]] && { echo -e  "\n  ${red}错误${bold} 安装 build-essential  失败！${normal}" | tee -a $Outputs ; exit 1 ; } ; } ; }
 
 
@@ -798,11 +798,12 @@ gcc_ver_1=` echo $gcc_ver | awk -F. '{print $1}' ` ; gcc_ver_2=` echo $gcc_ver |
 # 南琴浪版魔改 BBR 编译安装算法
 function _bbr_nanqinlang(){
 echo -ne "\n  ${bold}编译魔改 BBR 算法 ...${normal} " | tee -a $Outputs
-if   [[ ! -z "${ver_4_13}" ]]; then wget --no-check-certificate -qO tcp_nanqinlang.c https://github.com/Aniverse/BitTorrentClientCollection/raw/master/TCP%20Congestion%20Control/BBR%204.13/tcp_nanqinlang.c
-elif [[ ! -z "${ver_4_14}" ]]; then wget --no-check-certificate -qO tcp_nanqinlang.c https://github.com/Aniverse/BitTorrentClientCollection/raw/master/TCP%20Congestion%20Control/BBR%204.14/tcp_nanqinlang.c
-elif [[ ! -z "${ver_4_15}" ]]; then wget --no-check-certificate -qO tcp_nanqinlang.c https://github.com/Aniverse/BitTorrentClientCollection/raw/master/TCP%20Congestion%20Control/BBR%204.15/tcp_nanqinlang.c
-elif [[ ! -z "${ver_4_16}" ]]; then wget --no-check-certificate -qO tcp_nanqinlang.c https://github.com/Aniverse/BitTorrentClientCollection/raw/master/TCP%20Congestion%20Control/BBR%204.16/tcp_nanqinlang.c
-else wget --no-check-certificate -qO tcp_nanqinlang.c https://github.com/Aniverse/BitTorrentClientCollection/raw/master/TCP%20Congestion%20Control/BBR%204.12%20and%20below/tcp_nanqinlang.c ; fi
+echo >> $Outputs 2>&1
+if   [[ ! -z "${ver_4_13}" ]]; then wget --no-check-certificate -O tcp_nanqinlang.c https://github.com/Aniverse/BitTorrentClientCollection/raw/master/TCP%20Congestion%20Control/BBR%204.13/tcp_nanqinlang.c >> $Outputs 2>&1
+elif [[ ! -z "${ver_4_14}" ]]; then wget --no-check-certificate -O tcp_nanqinlang.c https://github.com/Aniverse/BitTorrentClientCollection/raw/master/TCP%20Congestion%20Control/BBR%204.14/tcp_nanqinlang.c >> $Outputs 2>&1
+elif [[ ! -z "${ver_4_15}" ]]; then wget --no-check-certificate -O tcp_nanqinlang.c https://github.com/Aniverse/BitTorrentClientCollection/raw/master/TCP%20Congestion%20Control/BBR%204.15/tcp_nanqinlang.c >> $Outputs 2>&1
+elif [[ ! -z "${ver_4_16}" ]]; then wget --no-check-certificate -O tcp_nanqinlang.c https://github.com/Aniverse/BitTorrentClientCollection/raw/master/TCP%20Congestion%20Control/BBR%204.16/tcp_nanqinlang.c >> $Outputs 2>&1
+else                                wget --no-check-certificate -O tcp_nanqinlang.c https://github.com/Aniverse/BitTorrentClientCollection/raw/master/TCP%20Congestion%20Control/BBR%204.12%20and%20below/tcp_nanqinlang.c >> $Outputs 2>&1 ; fi
 
 # wget --no-check-certificate -qO Makefile https://raw.githubusercontent.com/nanqinlang-tcp/tcp_nanqinlang/master/Makefile/Makefile-Debian9
 # sed -i "s/\/usr\/bin\/gcc-6/\`which gcc\`/" Makefile
@@ -823,6 +824,7 @@ echo ; }
 # 安装 Yankee 版 魔改 BBR
 function _bbr_tsunami() {
 echo -ne "\n  ${bold}编译魔改 BBR 算法 ...${normal} " | tee -a $Outputs
+echo >> $Outputs 2>&1
 if   [[ ! -z "${ver_4_13}" ]]; then wget --no-check-certificate -qO tcp_tsunami.c https://github.com/Aniverse/BitTorrentClientCollection/raw/master/TCP%20Congestion%20Control/BBR%204.13/tcp_tsunami.c
 elif [[ ! -z "${ver_4_14}" ]]; then wget --no-check-certificate -qO tcp_tsunami.c https://github.com/Aniverse/BitTorrentClientCollection/raw/master/TCP%20Congestion%20Control/BBR%204.14/tcp_tsunami.c
 elif [[ ! -z "${ver_4_15}" ]]; then wget --no-check-certificate -qO tcp_tsunami.c https://github.com/Aniverse/BitTorrentClientCollection/raw/master/TCP%20Congestion%20Control/BBR%204.15/tcp_tsunami.c
@@ -884,7 +886,7 @@ while [[ -z "${required_version}" ]]; do
     [[ -z "${required_version}" ]] && required_version=`  wget -qO- http://kernel.ubuntu.com/~kernel-ppa/mainline/ | awk -F'\"v' '/v[4-9]./{print $2}' | cut -d/ -f1 | grep -v -  | sort -V | tail -1  `
     [[ -z ` wget -qO- http://kernel.ubuntu.com/~kernel-ppa/mainline/v${required_version}/ ` ]] && { echo -e "\n  ${red}错误${jiacu} 这个内核不存在或无法使用本脚本下载，请重新输入！${normal}" ; unset required_version ; }
 done
-echo -ne "\n  ${yellow}输入你想要的内核版本号 （敲回车则使用最新内核）：$required_version ${normal}" >> $Outputs ; }
+echo -e "\n  ${yellow}输入你想要的内核版本号 （敲回车则使用最新内核）：$required_version ${normal}" >> $Outputs ; }
 
 
 
@@ -895,21 +897,24 @@ function _install_required() {
 
 [[ $apt_install_needed == yes ]] && { 
 echo -ne "\n  ${bold}需要安装相关依赖以安装内核，先更新系统源 ...${normal} " | tee -a $Outputs
+echo >> $Outputs
 apt-get update >> $Outputs 2>&1
 echo | tee -a $Outputs
 echo -ne "\n  ${bold}修复可能存在的依赖问题 ...${normal} " | tee -a $Outputs
+echo >> $Outputs
 apt-get install -f -y >> $Outputs 2>&1
 echo | tee -a $Outputs ; }
 
 if [[ $CODENAME == stretch ]]; then
     [[ ! `dpkg -l | grep libssl1.0.0` ]] && {
     echo -ne "\n  ${bold}安装 libssl1.0.0 ...${normal} " | tee -a $Outputs
+    echo >> $Outputs
     wget --no-check-certificate https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Deb%20Package/Jessie/libssl1.0.0_1.0.1t-1+deb8u7_amd64.deb -O libssl1.0.deb >> $Outputs 2>&1
     dpkg -i libssl1.0.deb >> $Outputs 2>&1
     rm -f libssl1.0.deb ; echo
     [[ ! `dpkg -l | grep libssl1.0.0` ]] && { echo -e "\n  ${red}错误${bold} 安装 libssl1.0.0 失败！${normal}" | tee -a $Outputs ; exit 1 ; } ; }
 else
-    [[ ! `dpkg -l | grep libssl1.0.0` ]] && { echo -ne "\n  ${bold}安装 libssl1.0.0 ...${normal} " | tee -a $Outputs ; apt-get install -y libssl1.0.0 >> $Outputs 2>&1 ; echo
+    [[ ! `dpkg -l | grep libssl1.0.0` ]] && { echo -ne "\n  ${bold}安装 libssl1.0.0 ...${normal} " | tee -a $Outputs ; echo >> $Outputs ; apt-get install -y libssl1.0.0 >> $Outputs 2>&1 ; echo
     [[ ! `dpkg -l | grep libssl1.0.0` ]] && { echo -e  "\n$  ${red}错误${bold} 安装 libssl1.0.0 失败！${normal}" | tee -a $Outputs ; exit 1 ; } ; }
 fi
 
@@ -937,7 +942,8 @@ function _install_required_kernel() {
 image_name=`  wget -qO- http://kernel.ubuntu.com/~kernel-ppa/mainline/v${required_version}/ | grep linux-image | grep generic | awk -F'\">' '/amd64.deb/{print $2}' | cut -d'<' -f1 | head -1  `
 image_url="http://kernel.ubuntu.com/~kernel-ppa/mainline/v${required_version}/${image_name}"
 
-echo -ne "\n  ${bold}安装 ${green}$required_version${jiacu} 内核 ... ${normal}"
+echo -ne "\n  ${bold}安装 ${green}$required_version${jiacu} 内核 ... ${normal}" | tee -a $Outputs
+echo >> $Outputs
 wget -qO kernel.deb $image_url      || { echo -e "\n  ${red}错误${jiacu} 内核 下载失败！${normal}\n" | tee -a $Outputs ; exit 1 ; }
 dpkg -i kernel.deb >> $Outputs 2>&1 || { echo -e "\n  ${red}错误${jiacu} 内核 安装失败！${normal}\n" | tee -a $Outputs ; exit 1 ; }
 echo -e "${bold}${green}DONE${normal}"
@@ -953,12 +959,14 @@ headers_all_url="http://kernel.ubuntu.com/~kernel-ppa/mainline/v${required_versi
 headers_bit_name=`  wget -qO- http://kernel.ubuntu.com/~kernel-ppa/mainline/v${required_version}/ | grep "linux-headers" | awk -F'\">' '/amd64.deb/{print $2}' | cut -d'<' -f1 | head -1  `
 headers_bit_url="http://kernel.ubuntu.com/~kernel-ppa/mainline/v${required_version}/${headers_bit_name}"
 
-echo -ne "\n  ${bold}安装 ${green}$required_version${jiacu} headers_all ... ${normal}"
+echo -ne "\n  ${bold}安装 ${green}$required_version${jiacu} headers_all ... ${normal}" | tee -a $Outputs
+echo >> $Outputs
 wget -qO headers1.deb $headers_all_url || { echo -e "\n  ${red}错误${jiacu} headers_all 下载失败！${normal}\n" | tee -a $Outputs ; exit 1 ; }
 dpkg -i headers1.deb >> $Outputs 2>&1  || { echo -e "\n  ${red}错误${jiacu} headers_all 安装失败！${normal}\n" | tee -a $Outputs ; exit 1 ; }
 echo -e "${bold}${green}DONE${normal}"
 
-echo -ne "\n  ${bold}安装 ${green}$required_version${jiacu} headers ... ${normal}"
+echo -ne "\n  ${bold}安装 ${green}$required_version${jiacu} headers ... ${normal}" | tee -a $Outputs
+echo >> $Outputs
 wget -qO headers2.deb $headers_bit_url || { echo -e "\n  ${red}错误${jiacu} headers 下载失败！${normal}\n"     | tee -a $Outputs ; exit 1 ; }
 dpkg -i headers2.deb >> $Outputs 2>&1  || { echo -e "\n  ${red}错误${jiacu} headers_all 安装失败！${normal}\n" | tee -a $Outputs ; exit 1 ; }
 echo -e "${bold}${green}DONE${normal}"
@@ -973,7 +981,8 @@ modules_name=`wget -qO- http://kernel.ubuntu.com/~kernel-ppa/mainline/v${require
 [[ $modules_name ]] && {
 modules_url="http://kernel.ubuntu.com/~kernel-ppa/mainline/v${required_version}/${modules_name}"
 
-echo -ne "\n  ${bold}安装 ${green}$required_version${jiacu} 模组 ... ${normal}"
+echo -ne "\n  ${bold}安装 ${green}$required_version${jiacu} 模组 ... ${normal}" | tee -a $Outputs
+echo >> $Outputs
 wget -qO modules.deb $modules_url    || { echo -e "\n  ${red}错误${jiacu} 模组 下载失败！${normal}\n" | tee -a $Outputs ; exit 1 ; }
 dpkg -i modules.deb >> $Outputs 2>&1 || { echo -e "\n  ${red}错误${jiacu} 模组 安装失败！${normal}\n" | tee -a $Outputs ; exit 1 ; }
 echo -e "${bold}${green}DONE${normal}"
@@ -990,7 +999,7 @@ rm -f modules.deb ; } ; }
 function _disable_advanced_boot() { sed -i 's/GRUB_DEFAULT=.*/GRUB_DEFAULT=""/' /etc/default/grub ; }
 
 # 更新引导
-function _update_grub() { echo -ne "\n  ${bold}更新引导 ...  ${normal}" | tee -a $Outputs
+function _update_grub() { echo -ne "\n  ${bold}更新引导 ...  ${normal}" | tee -a $Outputs ; echo >> $Outputs
 { update-grub >> $Outputs 2>&1 ; } && { echo "${green}${bold}完成${normal}" | tee -a $Outputs ; } ; }
 
 # 目前自带更新引导的三个 function：ubuntu 启动选项、删除其他内核、安装 4.11.12 内核
@@ -1009,7 +1018,7 @@ if [ $kernel_total_num > 1 ]; then
     for (( integer = 1 ; integer <= ${kernel_total_num} ; integer++ )) ; do
       # kernel_tobe_del=` dpkg -l | grep -E linux-[image,headers,modules] | grep -v binutils | awk '{print $2}' | grep -v "${kernel_version}" | head -${integer} `
         kernel_tobe_del=` cat /log/kernel_tobe_del_list | sed -n "${integer}p" `
-        echo -ne "  卸载 ${kernel_tobe_del} ... " | tee -a $Outputs
+        echo -ne "  卸载 ${kernel_tobe_del} ... " | tee -a $Outputs ; echo >> $Outputs
         echo `debconf-get-selections ${deb_del} | grep removing-running-kernel | grep $running_kernel | sed s/true/false/` | debconf-set-selections
         [[ $DeBUG == 1 ]] && { echo -e "\n  $integer, $kernel_tobe_del" ; }
         apt-get -y purge $kernel_tobe_del >> $Outputs 2>&1 && { echo "${green}${bold}完成${normal}" | tee -a $Outputs ; } || { echo "${red}${bold}失败${normal}" | tee -a $Outputs ; }
