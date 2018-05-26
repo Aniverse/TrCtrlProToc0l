@@ -13,7 +13,7 @@
 # http://xiaofd.win/onekey-ruisu.html
 # https://teddysun.com/489.html
 
-ScriptVersion=1.8.1
+ScriptVersion=1.8.2
 ScriptDate=2018.05.26
 
 # 颜色 -----------------------------------------------------------------------------------
@@ -204,11 +204,16 @@ echo -e  "  ${green}(03) ${jiacu}安装 魔改 BBR (nanqinlang)"
 echo -e  "  ${green}(04) ${jiacu}安装 锐速"
 echo -e  "  ${green}(11) ${jiacu}安装 指定内核"
 echo -e  "  ${green}(12) ${jiacu}安装 4.11.12 内核"
+[[ $DeBUG == 1 ]] &&
 echo -e  "  ${green}(13) ${jiacu}安装 特定的锐速内核"
 echo -e  "  ${green}(21) ${jiacu}卸载 BBR"
 echo -e  "  ${green}(22) ${jiacu}卸载 锐速"
 echo -e  "  ${green}(23) ${jiacu}卸载 多余内核"
+[[ $DeBUG == 1 ]] &&
+echo -e  "  ${green}(31) ${jiacu}安装 Xanmod"
 echo -e  "  ${green}(90) ${jiacu}重启"
+[[ $DeBUG == 1 ]] &&
+echo -e  "  ${green}(98) ${jiacu}调试"
 echo -e  "  ${green}(99) ${jiacu}返回\n"
 rm -f /tmp/system_kernel_list ; }
 
@@ -1005,6 +1010,7 @@ function _ask_continue2() { echo -ne "\n  ${bold}输入 ${bailvse}回车${jiacu}
 
 
 cp -f /etc/default/grub "/etc/default/grub.bak.$(date "+%Y.%m.%d.%H.%M.%S")"
-[[ $DeBUG == 1 ]] && _ip
+# [[ $DeBUG == 1 ]] && _ip
+_ip
 _menu
 _read_response
