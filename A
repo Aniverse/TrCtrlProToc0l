@@ -3,6 +3,7 @@
 # Author: Aniverse
 # https://github.com/Aniverse/TrCtrlProToc0l
 #
+# bash -c "$(wget --no-check-certificate -qO- https://github.com/Aniverse/TrCtrlProToc0l/raw/master/A)"
 #
 # https://github.com/FunctionClub/YankeeBBR
 # https://sometimesnaive.org/article/linux/bash/tcp_nanqinlang
@@ -12,8 +13,8 @@
 # http://xiaofd.win/onekey-ruisu.html
 # https://teddysun.com/489.html
 
-ScriptVersion=1.8.0
-ScriptDate=2018.05.17
+ScriptVersion=1.8.1
+ScriptDate=2018.05.26
 
 # 颜色 -----------------------------------------------------------------------------------
 
@@ -737,11 +738,14 @@ function _check_essential() {
 if [[ $CODENAME == stretch ]]; then
     [[ ! `dpkg -l | grep libssl1.0.0` ]] && {
     echo -ne "\n  ${bold}安装 libssl1.0.0 ...${normal} " | tee -a $Outputs
-    echo -e "\ndeb http://ftp.hk.debian.org/debian jessie main\c" >> /etc/apt/sources.list
-    apt-get update >> $Outputs 2>&1
-    apt-get install -y libssl1.0.0 >> $Outputs 2>&1
-    sed  -i '/deb http:\/\/ftp\.hk\.debian\.org\/debian jessie main/d' /etc/apt/sources.list
-    apt-get update >> $Outputs 2>&1 ; echo
+    wget --no-check-certificate https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Deb%20Package/Jessie/libssl1.0.0_1.0.1t-1+deb8u7_amd64.deb -O libssl1.0.deb >> $Outputs 2>&1
+    dpkg -i libssl1.0.deb >> $Outputs 2>&1
+    rm -f libssl1.0.deb
+  # echo -e "\ndeb http://ftp.hk.debian.org/debian jessie main\c" >> /etc/apt/sources.list
+  # apt-get update >> $Outputs 2>&1
+  # apt-get install -y libssl1.0.0 >> $Outputs 2>&1
+  # sed  -i '/deb http:\/\/ftp\.hk\.debian\.org\/debian jessie main/d' /etc/apt/sources.list
+  # apt-get update >> $Outputs 2>&1 ; echo
     [[ ! `dpkg -l | grep libssl1.0.0` ]] && { echo -e "\n  ${red}错误${bold} 安装 libssl1.0.0 失败！${normal}" | tee -a $Outputs ; exit 1 ; } ; }
 else
     [[ ! `dpkg -l | grep libssl1.0.0` ]] && { echo -ne "\n  ${bold}安装 libssl1.0.0 ...${normal} " | tee -a $Outputs ; apt-get install -y libssl1.0.0 >> $Outputs 2>&1 ; echo
@@ -851,6 +855,7 @@ fi ; }
 # 询问版本（BBR）
 function _get_version() {
 unset required_version
+echo -e "\n  ${red}注意${jiacu} 不推荐使用高版本内核，可能无法成功安装或者无法成功编译魔改版 BBR！${normal}"
 while [[ -z "${required_version}" ]]; do
     echo -ne "\n  ${yellow}输入你想要的内核版本号 （敲回车则使用最新内核）：${normal}" ; read -e required_version
     [[ -z "${required_version}" ]] && required_version=`  wget -qO- http://kernel.ubuntu.com/~kernel-ppa/mainline/ | awk -F'\"v' '/v[4-9]./{print $2}' | cut -d/ -f1 | grep -v -  | sort -V | tail -1  `
