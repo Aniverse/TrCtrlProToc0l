@@ -13,7 +13,7 @@
 # http://xiaofd.win/onekey-ruisu.html
 # https://teddysun.com/489.html
 
-ScriptVersion=1.8.3
+ScriptVersion=1.8.4
 ScriptDate=2018.05.26
 
 # 颜色 -----------------------------------------------------------------------------------
@@ -258,7 +258,7 @@ case $response in
         90) # 重启
             reboot ;;
         98) # 启用调试模式
-            _ip ; DeBUG=1 ; _menu ; _read_response ;;
+            DeBUG=1 ; _menu ; _read_response ;;
     ""| 99) # 返回
             echo ; exit 0 ;;
          *) echo ; exit 0 ;;
@@ -289,7 +289,7 @@ if [[ $BBRKernel == "${green}是${jiacu}" ]]; then
     else echo -e "\n  ${bold}${red}错误 BBR 开启失败！${normal}\n" ; exit 1 ; fi
 else
     _ask_continue2
-    echo -e "  ${bold}当前内核不支持 BBR，先安装 ${green}4.11.12${jiacu} 内核以启用 BBR ...${normal} "
+  # echo -e "  ${bold}当前内核不支持 BBR，先安装 ${green}4.11.12${jiacu} 内核以启用 BBR ...${normal} "
     _online_ubuntu_bbr_firmware
     _bbr_kernel_4_11_12
     bbrname=bbr
@@ -315,7 +315,7 @@ if [[ $YKKernel == "${green}是${jiacu}" ]]; then
     else echo -e "\n  ${bold}${red}错误 ${green}Yankee 版魔改 BBR${jiacu} 开启失败！${normal}\n" ; exit 1 ; fi
 else
     _ask_continue2
-    echo -e "  ${bold}当前内核不支持 ${green}Yankee${jiacu} 版魔改 BBR，先安装 ${green}4.11.12${jiacu} 内核 ...${normal} "
+  # echo -e "  ${bold}当前内核不支持 ${green}Yankee${jiacu} 版魔改 BBR，先安装 ${green}4.11.12${jiacu} 内核 ...${normal} "
     _online_ubuntu_bbr_firmware
     _check_essential
     _bbr_kernel_4_11_12
@@ -344,7 +344,7 @@ if [[ $NQLKernel == "${green}是${jiacu}" ]]; then
     else echo -e "\n  ${bold}${red}错误 ${green}南琴浪 版魔改 BBR${jiacu} 开启失败！${normal}\n" ; exit 1 ; fi
 else
     _ask_continue2
-    echo -e "  ${bold}当前内核不支持 ${green}南琴浪${jiacu} 版魔改 BBR，先安装 ${green}4.11.12${jiacu} 内核 ...${normal} "
+  # echo -e "  ${bold}当前内核不支持 ${green}南琴浪${jiacu} 版魔改 BBR，先安装 ${green}4.11.12${jiacu} 内核 ...${normal} "
     _online_ubuntu_bbr_firmware
     _check_essential
     _bbr_kernel_4_11_12
@@ -749,10 +749,13 @@ apt_install_needed=no
 [[ $apt_install_needed == yes ]] && { 
 echo -ne "\n  ${bold}需要安装相关依赖以编译魔改版 BBR，先更新系统源 ...${normal} " | tee -a $Outputs
 apt-get update >> $Outputs 2>&1
-echo ; }
+echo | tee -a $Outputs
+echo -ne "\n  ${bold}修复可能存在的依赖问题 ...${normal} " | tee -a $Outputs
+apt-get install -f -y >> $Outputs 2>&1
+echo | tee -a $Outputs ; }
 
 [[ ! `dpkg -l | grep libelf-dev` ]] && { echo -ne "\n  ${bold}安装 libelf-dev ...${normal} " | tee -a $Outputs ; apt-get install -y libelf1 libelf-dev >> $Outputs 2>&1 ; echo
-[[ ! `dpkg -l | grep libelf-dev` ]] && { echo -e  "\n$  ${red}错误${bold} 安装 libelf-dev 失败！${normal}" | tee -a $Outputs ; exit 1 ; } ; }
+[[ ! `dpkg -l | grep libelf-dev` ]] && { echo -e  "\n  ${red}错误${bold} 安装 libelf-dev 失败！${normal}" | tee -a $Outputs ; exit 1 ; } ; }
 
 if [[ $CODENAME == stretch ]]; then
     [[ ! `dpkg -l | grep libssl1.0.0` ]] && {
@@ -886,6 +889,29 @@ echo -ne "\n  ${yellow}输入你想要的内核版本号 （敲回车则使用�
 
 # 确定安装内核？
 function _install_required() {
+
+[[ ! `dpkg -l | grep libssl1.0.0` ]] && apt_install_needed=yes
+
+[[ $apt_install_needed == yes ]] && { 
+echo -ne "\n  ${bold}需要安装相关依赖以安装内核，先更新系统源 ...${normal} " | tee -a $Outputs
+apt-get update >> $Outputs 2>&1
+echo | tee -a $Outputs
+echo -ne "\n  ${bold}修复可能存在的依赖问题 ...${normal} " | tee -a $Outputs
+apt-get install -f -y >> $Outputs 2>&1
+echo | tee -a $Outputs ; }
+
+if [[ $CODENAME == stretch ]]; then
+    [[ ! `dpkg -l | grep libssl1.0.0` ]] && {
+    echo -ne "\n  ${bold}安装 libssl1.0.0 ...${normal} " | tee -a $Outputs
+    wget --no-check-certificate https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Deb%20Package/Jessie/libssl1.0.0_1.0.1t-1+deb8u7_amd64.deb -O libssl1.0.deb >> $Outputs 2>&1
+    dpkg -i libssl1.0.deb >> $Outputs 2>&1
+    rm -f libssl1.0.deb ; echo
+    [[ ! `dpkg -l | grep libssl1.0.0` ]] && { echo -e "\n  ${red}错误${bold} 安装 libssl1.0.0 失败！${normal}" | tee -a $Outputs ; exit 1 ; } ; }
+else
+    [[ ! `dpkg -l | grep libssl1.0.0` ]] && { echo -ne "\n  ${bold}安装 libssl1.0.0 ...${normal} " | tee -a $Outputs ; apt-get install -y libssl1.0.0 >> $Outputs 2>&1 ; echo
+    [[ ! `dpkg -l | grep libssl1.0.0` ]] && { echo -e  "\n$  ${red}错误${bold} 安装 libssl1.0.0 失败！${normal}" | tee -a $Outputs ; exit 1 ; } ; }
+fi
+
 digit_ver_image=`dpkg -l | grep linux-image | awk '{print $2}' | awk -F '-' '{print $3}' | grep "${required_version}"`
 digit_ver_headers=`dpkg -l | grep linux-headers | awk '{print $2}' | awk -F '-' '{print $3}' | grep "${required_version}"`
 digit_ver_modules=`dpkg -l | grep linux-modules | awk '{print $2}' | awk -F '-' '{print $3}' | grep "${required_version}"`
