@@ -1,18 +1,12 @@
 # TrCtrlProToc0l
 > WARNING: This script may cause system reboot failure  
 
-This is the choice of Steins;Gate.  
-
 ![01](https://github.com/Aniverse/TrCtrlProToc0l/raw/master/Images/01.png)
 
 ## Usage
 
 ```
 bash -c "$(wget --no-check-certificate -qO- https://github.com/Aniverse/TrCtrlProToc0l/raw/master/A)"
-```
-
-```
-bash <(curl -s https://raw.githubusercontent.com/Aniverse/TrCtrlProToc0l/master/A)
 ```
 
 ## Features
@@ -25,8 +19,8 @@ bash <(curl -s https://raw.githubusercontent.com/Aniverse/TrCtrlProToc0l/master/
 - **Onekey Install, Onekey Switch**  
 本脚本可以安装、卸载 锐速、BBR、Yankee 版魔改 BBR、南琴浪 版魔改 BBR，并支持在以上任意的加速方案中一键切换  
 
-- **Adapt for Linux Kernel 4.13-4.16**  
-尝试针对 4.13-4.16 内核适配魔改版 BBR *（尚处于测试阶段，有时候会失败，求稳的话建议还是使用老版本内核比如 4.11.12）*  
+- **Adapt for Linux Kernel 4.13-4.15**  
+尝试针对 4.13-4.15 内核适配魔改版 BBR *（尚处于测试阶段，有时候会失败，求稳的话建议还是使用老版本内核比如 4.11.12）*  
 针对部分最新的 4.16 内核还需要安装 modules 的情况也做了处理，会先安装 modules  
 
 - **Adapt for Online.net Dedicated Server**  
@@ -50,7 +44,6 @@ bash <(curl -s https://raw.githubusercontent.com/Aniverse/TrCtrlProToc0l/master/
 ![03](https://github.com/Aniverse/TrCtrlProToc0l/raw/master/Images/03.png)
 ![04](https://github.com/Aniverse/TrCtrlProToc0l/raw/master/Images/04.png)
 ![05](https://github.com/Aniverse/TrCtrlProToc0l/raw/master/Images/05.png)
-![06](https://github.com/Aniverse/TrCtrlProToc0l/raw/master/Images/06.png)
 
 ## To Do List
 
@@ -70,6 +63,12 @@ bash <(curl -s https://raw.githubusercontent.com/Aniverse/TrCtrlProToc0l/master/
 
 - **无法删除 PVE 内核**  
 因为这个的包名不太一样……  
+
+- **Debian 无法安装 4.16 内核**  
+似乎无解...  
+
+![Error01](https://github.com/Aniverse/TrCtrlProToc0l/raw/master/Images/Error01.png)
+![Error02](https://github.com/Aniverse/TrCtrlProToc0l/raw/master/Images/Error02.png)
 
 ## Some references
 
