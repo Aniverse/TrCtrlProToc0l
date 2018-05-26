@@ -13,7 +13,7 @@
 # http://xiaofd.win/onekey-ruisu.html
 # https://teddysun.com/489.html
 
-ScriptVersion=1.8.6
+ScriptVersion=1.8.7
 ScriptDate=2018.05.26
 
 # 颜色 -----------------------------------------------------------------------------------
@@ -323,7 +323,7 @@ else
     _bbr_tsunami_autoinstall_after_reboot
     bbrname=tsunami
     _enable_bbr
-    [[ ! $DeBUG == 1 ]] && echo -ne "\n  ${bold}即将重启系统，重启后会自动安装 ${green}Yankee${jiacu} 版魔改 BBR ... ${normal}\n" && reboot
+    [[ ! $DeBUG == 1 ]] && echo -e "\n  ${bold}即将重启系统，重启后会自动安装 ${green}Yankee${jiacu} 版魔改 BBR ... ${normal}\n" && reboot
 fi ; }
 
 
@@ -340,7 +340,7 @@ if [[ $NQLKernel == "${green}是${jiacu}" ]]; then
     _bbr_nanqinlang
     bbrname=nanqinlang
     _enable_bbr
-    if [[ ` lsmod | grep nanqinlang ` ]]; then echo -e "\n  ${bold}已开启 ${green}南琴浪${jiacu} 版魔改 BBR ...${normal}\n"
+    if [[ ` lsmod | grep nanqinlang ` ]]; then echo -e "\n  ${bold}已开启 ${green}南琴浪${jiacu} 版魔改 BBR ...${normal}\n\n"
     else echo -e "\n  ${bold}${red}错误 ${green}南琴浪 版魔改 BBR${jiacu} 开启失败！${normal}\n" ; exit 1 ; fi
 else
     _ask_continue2
@@ -352,7 +352,7 @@ else
     _bbr_nanqinlang_autoinstall_after_reboot
     bbrname=nanqinlang
     _enable_bbr
-    [[ ! $DeBUG == 1 ]] && echo -ne "\n  ${bold}即将重启系统，重启后会自动安装 ${green}南琴浪${jiacu} 版魔改 BBR ... ${normal}\n" && reboot
+    [[ ! $DeBUG == 1 ]] && echo -e "\n  ${bold}即将重启系统，重启后会自动安装 ${green}南琴浪${jiacu} 版魔改 BBR ... ${normal}\n" && reboot
 fi ; }
 
 
@@ -369,7 +369,7 @@ elif [[ $SSKernel == "${red}否${jiacu}" ]] && [[ $CODENAME == xenial ]]; then
     _ubuntu_serverspeeder_kernel_3.16.0-43
     _ubuntu_serverspeeder_updategrub
     _serverspeeder_autoinstall_after_reboot
-    [[ ! $DeBUG == 1 ]] && echo -ne "\n  ${bold}即将重启系统，重启后会自动安装 ${green}锐速${jiacu} ... ${normal}" && reboot
+    [[ ! $DeBUG == 1 ]] && echo -e "\n  ${bold}即将重启系统，重启后会自动安装 ${green}锐速${jiacu} ... ${normal}\n" && reboot
 elif [[ $SSKernel == "${red}否${jiacu}" ]] && [[ $CODENAME == bionic ]]; then
     _ask_continue2
     echo -ne "  ${bold}当前内核不支持 锐速，安装 ${green}4.4.0-47${jiacu} 内核 ... ${normal} \n"
@@ -377,7 +377,7 @@ elif [[ $SSKernel == "${red}否${jiacu}" ]] && [[ $CODENAME == bionic ]]; then
     _ubuntu_serverspeeder_kernel_4.4.0-47
     _ubuntu_serverspeeder_updategrub
     _serverspeeder_autoinstall_after_reboot
-    [[ ! $DeBUG == 1 ]] && echo -ne "\n  ${bold}即将重启系统，重启后会自动安装 ${green}锐速${jiacu} ... ${normal}" && reboot
+    [[ ! $DeBUG == 1 ]] && echo -e "\n  ${bold}即将重启系统，重启后会自动安装 ${green}锐速${jiacu} ... ${normal}\n" && reboot
 elif [[ $SSKernel == "${red}否${jiacu}" ]] && [[ $CODENAME == jessie ]]; then
     _ask_continue2
     echo -ne "  ${bold}当前内核不支持 锐速，安装 ${green}3.12.1${jiacu} 内核 ... ${normal} "
@@ -385,7 +385,7 @@ elif [[ $SSKernel == "${red}否${jiacu}" ]] && [[ $CODENAME == jessie ]]; then
     _debian_serverspeeder_kernel_3.12.1
     _delete_kernel
     _serverspeeder_autoinstall_after_reboot
-    [[ ! $DeBUG == 1 ]] && echo -ne "\n  ${bold}即将重启系统，重启后会自动安装 ${green}锐速${jiacu} ... ${normal}" && reboot
+    [[ ! $DeBUG == 1 ]] && echo -e "\n  ${bold}即将重启系统，重启后会自动安装 ${green}锐速${jiacu} ... ${normal}\n" && reboot
 elif [[ $SSKernel == "${red}否${jiacu}" ]] && [[ $CODENAME == stretch ]]; then
     _ask_continue2
     echo -ne "  ${bold}当前内核不支持 锐速，安装 ${green}3.16.0-4${jiacu} 内核 ... ${normal} "
@@ -393,7 +393,7 @@ elif [[ $SSKernel == "${red}否${jiacu}" ]] && [[ $CODENAME == stretch ]]; then
     _debian_serverspeeder_kernel_3.16.0-4
     _delete_kernel
     _serverspeeder_autoinstall_after_reboot
-    [[ ! $DeBUG == 1 ]] && echo -ne "\n  ${bold}即将重启系统，重启后会自动安装 ${green}锐速${jiacu} ... ${normal}\n" && reboot
+    [[ ! $DeBUG == 1 ]] && echo -e "\n  ${bold}即将重启系统，重启后会自动安装 ${green}锐速${jiacu} ... ${normal}\n" && reboot
 fi ; }
 
 
