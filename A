@@ -4,6 +4,7 @@
 # https://github.com/Aniverse/TrCtrlProToc0l
 #
 # bash -c "$(wget --no-check-certificate -qO- https://github.com/Aniverse/TrCtrlProToc0l/raw/master/A)"
+# bash <(curl -s https://raw.githubusercontent.com/Aniverse/TrCtrlProToc0l/master/A)
 #
 # https://github.com/FunctionClub/YankeeBBR
 # https://sometimesnaive.org/article/linux/bash/tcp_nanqinlang
@@ -13,8 +14,8 @@
 # http://xiaofd.win/onekey-ruisu.html
 # https://teddysun.com/489.html
 
-ScriptVersion=1.8.7
-ScriptDate=2018.05.26
+ScriptVersion=1.8.8
+ScriptDate=2018.06.14
 
 # 颜色 -----------------------------------------------------------------------------------
 
@@ -79,7 +80,7 @@ country=$( echo $result | awk -F '"' '{print $2}' )
 region=$( echo $result | awk -F '"' '{print $4}' )
 city=$( echo $result | awk -F '"' '{print $6}' )
 isp=$( echo $result | awk -F '"' '{print $10}' )
-asn=$(wget -qO- https://ipapi.co/asn/)
+asn=$( wget -qO- https://ipapi.co/asn )
 
 # 非常蛋疼的设计，有点自欺欺人
 [[ $isp == "online.net" ]] && isp="Online.net"
@@ -199,23 +200,24 @@ echo -e  "\n  ${jiacu}当前脚本版本：$ScriptVersion"
 echo -e  "\n  ${yellow}${bold}使用本脚本前请先阅读本脚本 GitHub 上的 README；作者水平菜，不保证脚本不会翻车${jiacu}"
 echo -e  "\n  如果运行时出错退出，可以输入这条命令查看日志：${red}cat $Outputs${jiacu}\n"
 
-echo -e  "  ${green}(01) ${jiacu}安装 原版 BBR"
-echo -e  "  ${green}(02) ${jiacu}安装 魔改 BBR (tsunami)"
-echo -e  "  ${green}(03) ${jiacu}安装 魔改 BBR (nanqinlang)"
-echo -e  "  ${green}(04) ${jiacu}安装 锐速"
-echo -e  "  ${green}(11) ${jiacu}安装 指定内核"
-echo -e  "  ${green}(12) ${jiacu}安装 4.11.12 内核"
+echo -e  "  ${green}(01) ${jiacu}安装 原版 BBR "
+echo -e  "  ${green}(02) ${jiacu}安装 魔改 BBR (tsunami) "
+echo -e  "  ${green}(03) ${jiacu}安装 魔改 BBR (nanqinlang) "
+echo -e  "  ${green}(04) ${jiacu}安装 锐速 "
+echo -e  "  ${green}(11) ${jiacu}安装 指定内核 "
+echo -e  "  ${green}(12) ${jiacu}安装 4.11.12 内核 "
 [[ $DeBUG == 1 ]] &&
-echo -e  "  ${green}(13) ${jiacu}安装 特定的锐速内核"
-echo -e  "  ${green}(21) ${jiacu}卸载 BBR"
-echo -e  "  ${green}(22) ${jiacu}卸载 锐速"
-echo -e  "  ${green}(23) ${jiacu}卸载 多余内核"
+echo -e  "  ${green}(13) ${jiacu}安装 特定的锐速内核 "
+echo -e  "  ${green}(21) ${jiacu}卸载 BBR "
+echo -e  "  ${green}(22) ${jiacu}卸载 锐速 "
+echo -e  "  ${green}(23) ${jiacu}卸载 多余内核 "
 [[ $DeBUG == 1 ]] &&
-echo -e  "  ${green}(31) ${jiacu}安装 Xanmod"
-echo -e  "  ${green}(90) ${jiacu}重启"
+echo -e  "  ${green}(31) ${jiacu}安装 Xanmod "
+echo -e  "  ${green}(90) ${jiacu}重启 "
 [[ $DeBUG == 1 ]] &&
-echo -e  "  ${green}(98) ${jiacu}调试"
-echo -e  "  ${green}(99) ${jiacu}返回\n"
+echo -e  "  ${green}(97) ${jiacu}检查 IP 信息 " &&
+echo -e  "  ${green}(98) ${jiacu}调试 "
+echo -e  "  ${green}(99) ${jiacu}返回 \n"
 rm -f /tmp/system_kernel_list ; }
 
 
@@ -257,6 +259,8 @@ case $response in
             _xanmod_install ;;
         90) # 重启
             reboot ;;
+        97) # 检查 IP 信息
+            _ip ; _menu ; _read_response ;;
         98) # 启用调试模式
             DeBUG=1 ; _menu ; _read_response ;;
     ""| 99) # 返回
@@ -660,7 +664,8 @@ wget --no-check-certificate -qO 3.deb https://github.com/Aniverse/SSKernel/raw/m
 echo ` debconf-get-selections linux-image-3.16.0-43-generic | grep -C5 "keep the local version currently installed" | grep keep_current | sed "s/select/note/g"` | debconf-set-selections
 echo ` debconf-get-selections linux-image-extra-3.16.0-43-generic | grep -C5 "keep the local version currently installed" | grep keep_current | sed "s/select/note/g"` | debconf-set-selections
 echo ` debconf-get-selections linux-headers-3.16.0-43-generic | grep -C5 "keep the local version currently installed" | grep keep_current | sed "s/select/note/g"` | debconf-set-selections
-{ dpkg -i [123].deb >> $Outputs 2>&1 ; } || { echo -e "\n  ${bold}${red}错误${jiacu} 安装 内核 失败！${normal}" | tee -a $Outputs ; exit 1 ; }
+{ dpkg -i [12].deb >> $Outputs 2>&1 ; } || { echo -e "\n  ${bold}${red}错误${jiacu} 安装 内核 失败！${normal}" | tee -a $Outputs ; exit 1 ; }
+# dpkg -i 3.deb >> $Outputs 2>&1 ; apt-get -f -y install
 rm  -rf [123].deb ; }
 
 
@@ -1061,6 +1066,6 @@ function _ask_continue2() { echo -ne "\n  ${bold}输入 ${bailvse}回车${jiacu}
 
 cp -f /etc/default/grub "/etc/default/grub.bak.$(date "+%Y.%m.%d.%H.%M.%S")"
 # [[ $DeBUG == 1 ]] && _ip
-_ip
+# _ip
 _menu
 _read_response
