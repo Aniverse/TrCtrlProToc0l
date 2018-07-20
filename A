@@ -14,8 +14,8 @@
 # http://xiaofd.win/onekey-ruisu.html
 # https://teddysun.com/489.html
 
-ScriptVersion=1.8.8
-ScriptDate=2018.06.14
+ScriptVersion=1.9.0
+ScriptDate=2018.07.20
 
 # 颜色 -----------------------------------------------------------------------------------
 
@@ -157,7 +157,7 @@ ver_4_17=`dpkg -l | grep linux-image | awk '{print $2}' | awk -F '-' '{print $3}
 
 # 检查 锐速 与 BBR 是否已启用
 [[ ` ps aux | grep appex | grep -v grep ` ]] && SSrunning="${green}是${jiacu}" || SSrunning="${red}否${jiacu}"
-export tcp_control=$( awk '{print $1}' /proc/sys/net/ipv4/tcp_available_congestion_control )
+# export tcp_control=$( awk '{print $1}' /proc/sys/net/ipv4/tcp_available_congestion_control )
 # if [[ $tcp_control =~ ("nanqinlang"|"tsunami") ]]; then bbrinuse="${green}是${jiacu}"
 # elif [[ `echo $tcp_control | grep bbr` ]]; then bbrinuse="${green}是${jiacu}"
 # else bbrinuse="${red}否${jiacu}" ; fi
@@ -462,17 +462,21 @@ _online_ubuntu_bbr_firmware
 cd ; mkdir -p deball ; cd deball
 
 if   [[ $XanmodVer == 4.12 ]]; then
-     wget --no-check-certificate -q https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/4.12.14-xanmod15/linux-image-4.12.14-xanmod15_1.170920_amd64.deb
-     wget --no-check-certificate -q https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/4.12.14-xanmod15/linux-headers-4.12.14-xanmod15_1.170920_amd64.deb
-     wget --no-check-certificate -q https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/intel-microcode_3.20180312.1_amd64.deb
-     wget --no-check-certificate -q https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/iucode-tool_2.3.1-1_amd64.deb
+     wget --no-check-certificate -q https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/4.12/linux-image-4.12.14-xanmod15_1.170920_amd64.deb
+     wget --no-check-certificate -q https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/4.12/linux-headers-4.12.14-xanmod15_1.170920_amd64.deb
+#    wget --no-check-certificate -q https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/intel-microcode_3.20180312.1_amd64.deb
+#    wget --no-check-certificate -q https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/iucode-tool_2.3.1-1_amd64.deb
      kernel_version=4.12.14
 elif [[ $XanmodVer == 4.15 ]]; then
-     wget --no-check-certificate -q https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/4.15.13-xanmod12/linux-image-4.15.13-xanmod12_1.180325_amd64.deb
-     wget --no-check-certificate -q https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/4.15.13-xanmod12/linux-headers-4.15.13-xanmod12_1.180325_amd64.deb
-     wget --no-check-certificate -q https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/intel-microcode_3.20180312.1_amd64.deb
-     wget --no-check-certificate -q https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/iucode-tool_2.3.1-1_amd64.deb
+     wget --no-check-certificate -q https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/4.15/linux-image-4.15.13-xanmod12_1.180325_amd64.deb
+     wget --no-check-certificate -q https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/4.15/linux-headers-4.15.13-xanmod12_1.180325_amd64.deb
      kernel_version=4.15.13
+elif [[ $XanmodVer == 4.16 ]]; then
+     wget --no-check-certificate -q https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/4.16/linux-image-4.16.12-xanmod11_2.180526_amd64.deb
+     wget --no-check-certificate -q https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/4.16/linux-headers-4.16.12-xanmod11_2.180526_amd64.deb
+elif [[ $XanmodVer == 4.17 ]]; then
+     wget --no-check-certificate -q https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/4.17/linux-image-4.17.6-xanmod5_2.180712_amd64.deb
+     wget --no-check-certificate -q https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/4.17/linux-headers-4.17.6-xanmod5_2.180712_amd64.deb
 elif [[ $XanmodVer == apt12  ]]; then
      echo 'deb http://deb.xanmod.org releases main' | tee /etc/apt/sources.list.d/xanmod-kernel.list
      wget -qO- http://deb.xanmod.org/gpg.key | apt-key add -
@@ -485,7 +489,7 @@ elif [[ $XanmodVer == apt15  ]]; then
      kernel_version=4.15
 fi
 
-wget --no-check-certificate -q https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/linux-firmware_1.161_all.deb
+# wget --no-check-certificate -q https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/linux-firmware_1.161_all.deb
 
 # 不隐藏输出
 dpkg -i *.deb
@@ -496,10 +500,12 @@ sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT=.*/GRUB_CMDLINE_LINUX_DEFAULT="quiet splash
 
 _delete_kernel
 
-# 启用 mq-deadline
+# 启用 mq-deadline／bfq-mq／kyber
 cat >/etc/udev/rules.d/60-schedulers.rules<<EOF
 ACTION=="add|change", KERNEL=="sd[a-z]", ATTR{queue/rotational}=="1", ATTR{queue/scheduler}="mq-deadline"
 EOF
+
+
 
 # CPU 高性能模式
 sed -i '$i\echo performance \| tee \/sys\/devices\/system\/cpu\/cpu*\/cpufreq\/scaling_governor \> \/dev\/null'  /etc/rc.local
