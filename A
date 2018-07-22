@@ -14,8 +14,8 @@
 # http://xiaofd.win/onekey-ruisu.html
 # https://teddysun.com/489.html
 
-ScriptVersion=1.9.0
-ScriptDate=2018.07.20
+ScriptVersion=1.9.3
+ScriptDate=2018.07.22
 
 # 颜色 -----------------------------------------------------------------------------------
 
@@ -188,10 +188,10 @@ echo -e  "  当前 BBR  是否已启用                 $bbrinuse"
 echo -e  "  当前 锐速 是否已启用                 $SSrunning"
 
 [[ $DeBUG == 1 ]] && echo &&
-echo -e  "  当前 CPU  调度方式                   ` cat /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor 2>/dev/null | head -1  `" && 
-echo -e  "  当前 硬盘 调度算法                   ` cat /sys/block/sda/queue/scheduler 2>/dev/null | cut -d '[' -f2|cut -d ']'  -f1  `" && 
-echo -e  "  当前 硬盘 文件系统                   ` cat /etc/fstab 2>/dev/null | grep -v ^# | grep -P " / |/home" | awk '{print $3}' `" && 
-echo -e  "  当前 硬盘 挂载方式                   ` cat /etc/fstab 2>/dev/null | grep -v ^# | grep -P " / |/home" | awk '{print $4}' `"
+echo -e  "  当前 CPU  调度方式                   $( cat /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor 2>/dev/null | head -1                       )" && 
+echo -e  "  当前 硬盘 调度算法                   $( cat /sys/block/[sv]da/queue/scheduler 2>/dev/null | cut -d '[' -f2|cut -d ']'  -f1                    )" && 
+echo -e  "  当前 硬盘 文件系统                   $( cat /proc/mounts | grep -P "`df -k | sort -rn -k4 | awk '{print $1}' | head -1`\b" | awk '{print $3}' )" && 
+echo -e  "  当前 硬盘 挂载方式                   $( cat /proc/mounts | grep -P "`df -k | sort -rn -k4 | awk '{print $1}' | head -1`\b" | awk '{print $4}' )"
 
 echo -e  "\n  当前系统内所有已安装的 kernel／headers／modules 列表\n"
 cat -n /tmp/system_kernel_list | sed 's/\t/ /g' | sed "s/ linux-/) ${green}linux-/g" | sed "s/     /  ${magenta}(0/g" | sed "s/    /  ${magenta}(/g"
