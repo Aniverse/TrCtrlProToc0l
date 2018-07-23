@@ -14,7 +14,7 @@
 # http://xiaofd.win/onekey-ruisu.html
 # https://teddysun.com/489.html
 
-ScriptVersion=1.9.6
+ScriptVersion=1.9.7
 ScriptDate=2018.07.23
 
 # 颜色 -----------------------------------------------------------------------------------
@@ -507,14 +507,14 @@ fi
 cd ; rm -rf deball
 
 [[ $mqo == 1 ]] && {
-sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT=.*/GRUB_CMDLINE_LINUX_DEFAULT="quiet splash scsi_mod.use_blk_mq=y dm_mod.use_blk_mq=y"/' /etc/default/grub ;
+sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT=.*/GRUB_CMDLINE_LINUX_DEFAULT="quiet splash scsi_mod.use_blk_mq=y dm_mod.use_blk_mq=y"/' /etc/default/grub
 cat >/etc/udev/rules.d/60-schedulers.rules<<EOF
 ACTION=="add|change", KERNEL=="sd[a-z]", ATTR{queue/rotational}=="1", ATTR{queue/scheduler}="mq-deadline"
 EOF
 }
 
 [[ $mqo == 0 ]] && {
-sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT=.*/GRUB_CMDLINE_LINUX_DEFAULT="quiet splash"/' /etc/default/grub ;
+[[ $(grep dm_mod.use_blk_mq=y /etc/default/grub) ]] && sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT=.*/GRUB_CMDLINE_LINUX_DEFAULT="quiet splash"/' /etc/default/grub
 cat >/etc/udev/rules.d/60-schedulers.rules<<EOF
 ACTION=="add|change", KERNEL=="sd[a-z]", ATTR{queue/rotational}=="1", ATTR{queue/scheduler}="deadline"
 EOF
