@@ -14,8 +14,8 @@
 # http://xiaofd.win/onekey-ruisu.html
 # https://teddysun.com/489.html
 
-ScriptVersion=1.9.3
-ScriptDate=2018.07.22
+ScriptVersion=1.9.4
+ScriptDate=2018.07.23
 
 # 颜色 -----------------------------------------------------------------------------------
 
@@ -451,42 +451,53 @@ echo ; }
 
 
 # 安装 xanmod
+function _xanmod_apt_install() {
+echo 'deb http://deb.xanmod.org releases main' | tee /etc/apt/sources.list.d/xanmod-kernel.list
+wget -qO- http://deb.xanmod.org/gpg.key | apt-key add -
+apt-get update && apt-get install -y linux-xanmod-$kernel_version intel-microcode iucode-tool ; }
+
+
+
+
+# 安装 xanmod
 function _xanmod_install() {
 
 # echo -ne "\n  ${bold}输入你要安装的 Xanmod 版本：${normal} " ; read -e XanmodVer ; echo
 echo ; read -ep "  ${bold}输入你要安装的 Xanmod 版本： ${normal}" XanmodVer ; echo -e ""
 
+echo ; read -ep "  ${bold}是否启用 mq ？（1/0）${normal}" mqo ; echo -e ""
+
 _online_ubuntu_bbr_firmware
 
-# 安装 Xanmod 内核，Microcode，固件
+# 安装 Xanmod 内核
 cd ; mkdir -p deball ; cd deball
 
 if   [[ $XanmodVer == 4.12 ]]; then
+     kernel_version=4.12.14
      wget --no-check-certificate -q https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/4.12/linux-image-4.12.14-xanmod15_1.170920_amd64.deb
      wget --no-check-certificate -q https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/4.12/linux-headers-4.12.14-xanmod15_1.170920_amd64.deb
 #    wget --no-check-certificate -q https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/intel-microcode_3.20180312.1_amd64.deb
 #    wget --no-check-certificate -q https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/iucode-tool_2.3.1-1_amd64.deb
-     kernel_version=4.12.14
 elif [[ $XanmodVer == 4.15 ]]; then
+     kernel_version=4.15.13
      wget --no-check-certificate -q https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/4.15/linux-image-4.15.13-xanmod12_1.180325_amd64.deb
      wget --no-check-certificate -q https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/4.15/linux-headers-4.15.13-xanmod12_1.180325_amd64.deb
-     kernel_version=4.15.13
 elif [[ $XanmodVer == 4.16 ]]; then
+     kernel_version=4.16.12
      wget --no-check-certificate -q https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/4.16/linux-image-4.16.12-xanmod11_2.180526_amd64.deb
      wget --no-check-certificate -q https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/4.16/linux-headers-4.16.12-xanmod11_2.180526_amd64.deb
 elif [[ $XanmodVer == 4.17 ]]; then
+     kernel_version=4.17.6
      wget --no-check-certificate -q https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/4.17/linux-image-4.17.6-xanmod5_2.180712_amd64.deb
      wget --no-check-certificate -q https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/4.17/linux-headers-4.17.6-xanmod5_2.180712_amd64.deb
-elif [[ $XanmodVer == apt12  ]]; then
-     echo 'deb http://deb.xanmod.org releases main' | tee /etc/apt/sources.list.d/xanmod-kernel.list
-     wget -qO- http://deb.xanmod.org/gpg.key | apt-key add -
-     apt-get update && apt-get install -y linux-xanmod-4.12 intel-microcode iucode-tool
-     kernel_version=4.12
-elif [[ $XanmodVer == apt15  ]]; then
-     echo 'deb http://deb.xanmod.org releases main' | tee /etc/apt/sources.list.d/xanmod-kernel.list
-     wget -qO- http://deb.xanmod.org/gpg.key | apt-key add -
-     apt-get update && apt-get install -y linux-xanmod-4.15 intel-microcode iucode-tool
-     kernel_version=4.15
+elif [[ $XanmodVer == a12  ]]; then
+     kernel_version=4.12 ; _xanmod_apt_install
+elif [[ $XanmodVer == a15  ]]; then
+     kernel_version=4.15 ; _xanmod_apt_install
+elif [[ $XanmodVer == a16  ]]; then
+     kernel_version=4.16 ; _xanmod_apt_install
+elif [[ $XanmodVer == a17  ]]; then
+     kernel_version=4.17 ; _xanmod_apt_install
 fi
 
 # wget --no-check-certificate -q https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/linux-firmware_1.161_all.deb
@@ -495,25 +506,28 @@ fi
 dpkg -i *.deb
 cd ; rm -rf deball
 
-# 启用 mq
-sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT=.*/GRUB_CMDLINE_LINUX_DEFAULT="quiet splash scsi_mod.use_blk_mq=y dm_mod.use_blk_mq=y"/g' /etc/default/grub
-
-_delete_kernel
-
-# 启用 mq-deadline／bfq-mq／kyber
+[[ $mqo == 1 ]] && {
+sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT=.*/GRUB_CMDLINE_LINUX_DEFAULT="quiet splash scsi_mod.use_blk_mq=y dm_mod.use_blk_mq=y"/' /etc/default/grub ;
 cat >/etc/udev/rules.d/60-schedulers.rules<<EOF
 ACTION=="add|change", KERNEL=="sd[a-z]", ATTR{queue/rotational}=="1", ATTR{queue/scheduler}="mq-deadline"
 EOF
+}
 
+[[ $mqo == 0 ]] && {
+sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT=.*/GRUB_CMDLINE_LINUX_DEFAULT="quiet splash"/' /etc/default/grub ;
+cat >/etc/udev/rules.d/60-schedulers.rules<<EOF
+ACTION=="add|change", KERNEL=="sd[a-z]", ATTR{queue/rotational}=="1", ATTR{queue/scheduler}="deadline"
+EOF
+}
 
-
-# CPU 高性能模式
+# CPU 高性能模式，不过有的系统或者机器下好像没这选项……
 sed -i '$i\echo performance \| tee \/sys\/devices\/system\/cpu\/cpu*\/cpufreq\/scaling_governor \> \/dev\/null'  /etc/rc.local
+
+_delete_kernel
 
 echo -e "\n  ${bold}完成，即将重启 ...${normal} \n"
 
 reboot ; }
-
 
 
 
