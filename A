@@ -14,8 +14,8 @@
 # http://xiaofd.win/onekey-ruisu.html
 # https://teddysun.com/489.html
 
-ScriptVersion=1.9.7
-ScriptDate=2018.07.23
+ScriptVersion=1.9.8
+ScriptDate=2018.09.07
 
 # 颜色 -----------------------------------------------------------------------------------
 
@@ -454,7 +454,9 @@ echo ; }
 function _xanmod_apt_install() {
 echo 'deb http://deb.xanmod.org releases main' | tee /etc/apt/sources.list.d/xanmod-kernel.list
 wget -qO- http://deb.xanmod.org/gpg.key | apt-key add -
-apt-get update && apt-get install -y linux-xanmod-$kernel_version intel-microcode iucode-tool ; }
+apt-get update
+# apt-get install -y linux-xanmod-$kernel_version intel-microcode iucode-tool
+apt install -y linux-xanmod ; }
 
 
 
@@ -465,7 +467,7 @@ function _xanmod_install() {
 # echo -ne "\n  ${bold}输入你要安装的 Xanmod 版本：${normal} " ; read -e XanmodVer ; echo
 echo ; read -ep "  ${bold}输入你要安装的 Xanmod 版本： ${normal}" XanmodVer ; echo -e ""
 
-read -ep "  ${bold}是否启用 mq ？（1/0）${normal}" mqo ; echo -e ""
+# read -ep "  ${bold}是否启用 mq ？（1/0）${normal} " mqo ; echo -e ""
 
 _online_ubuntu_bbr_firmware
 
@@ -476,35 +478,37 @@ if   [[ $XanmodVer == 4.12 ]]; then
      kernel_version=4.12.14
      wget --no-check-certificate -q https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/4.12/linux-image-4.12.14-xanmod15_1.170920_amd64.deb
      wget --no-check-certificate -q https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/4.12/linux-headers-4.12.14-xanmod15_1.170920_amd64.deb
-#    wget --no-check-certificate -q https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/intel-microcode_3.20180312.1_amd64.deb
-#    wget --no-check-certificate -q https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/iucode-tool_2.3.1-1_amd64.deb
-     echo ; apt-get install -y ./*.deb
+   # wget --no-check-certificate -q https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/intel-microcode_3.20180312.1_amd64.deb
+   # wget --no-check-certificate -q https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/iucode-tool_2.3.1-1_amd64.deb
+     echo ; dpkg -i linux-image*.deb ; dpkg -i linux-headers*.deb
+   # echo ; apt-get install -y ./*.deb
 elif [[ $XanmodVer == 4.15 ]]; then
      kernel_version=4.15.13
      wget --no-check-certificate -q https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/4.15/linux-image-4.15.13-xanmod12_1.180325_amd64.deb
      wget --no-check-certificate -q https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/4.15/linux-headers-4.15.13-xanmod12_1.180325_amd64.deb
-     echo ; apt-get install -y ./*.deb
+     echo ; dpkg -i linux-image*.deb ; dpkg -i linux-headers*.deb
+   # echo ; apt-get install -y ./*.deb
 elif [[ $XanmodVer == 4.16 ]]; then
      kernel_version=4.16.12
      wget --no-check-certificate -q https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/4.16/linux-image-4.16.12-xanmod11_2.180526_amd64.deb
      wget --no-check-certificate -q https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/4.16/linux-headers-4.16.12-xanmod11_2.180526_amd64.deb
-     echo ; apt-get install -y ./*.deb
+     echo ; dpkg -i linux-image*.deb ; dpkg -i linux-headers*.deb
+   # echo ; apt-get install -y ./*.deb
 elif [[ $XanmodVer == 4.17 ]]; then
      kernel_version=4.17.6
      wget --no-check-certificate -q https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/4.17/linux-image-4.17.6-xanmod5_2.180712_amd64.deb
      wget --no-check-certificate -q https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/4.17/linux-headers-4.17.6-xanmod5_2.180712_amd64.deb
-     echo ; apt-get install -y ./*.deb
-elif [[ $XanmodVer == a15  ]]; then
-     kernel_version=4.15 ; _xanmod_apt_install
-elif [[ $XanmodVer == a16  ]]; then
-     kernel_version=4.16 ; _xanmod_apt_install
-elif [[ $XanmodVer == a17  ]]; then
-     kernel_version=4.17 ; _xanmod_apt_install
+     echo ; dpkg -i linux-image*.deb ; dpkg -i linux-headers*.deb
+   # echo ; apt-get install -y ./*.deb
+elif [[ $XanmodVer == apt  ]]; then
+     kernel_version=4.18 ; _xanmod_apt_install
 fi
 
 # wget --no-check-certificate -q https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/linux-firmware_1.161_all.deb
 
 cd ; rm -rf deball
+
+mqo=1
 
 [[ $mqo == 1 ]] && {
 sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT=.*/GRUB_CMDLINE_LINUX_DEFAULT="quiet splash scsi_mod.use_blk_mq=y dm_mod.use_blk_mq=y"/' /etc/default/grub
