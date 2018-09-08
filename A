@@ -14,8 +14,8 @@
 # http://xiaofd.win/onekey-ruisu.html
 # https://teddysun.com/489.html
 
-ScriptVersion=1.9.8
-ScriptDate=2018.09.07
+ScriptVersion=1.9.9
+ScriptDate=2018.09.08
 
 # 颜色 -----------------------------------------------------------------------------------
 
@@ -394,7 +394,7 @@ elif [[ $SSKernel == "${red}否${jiacu}" ]] && [[ $CODENAME == stretch ]]; then
     _ask_continue2
     echo -ne "  ${bold}当前内核不支持 锐速，安装 ${green}3.16.0-4${jiacu} 内核 ... ${normal} "
     kernel_version=3.16.0-4
-    _debian_serverspeeder_kernel_3.16.0-4
+    _debian_serverspeeder_kernel_3.16.0-4_apt
     _delete_kernel
     _serverspeeder_autoinstall_after_reboot
     [[ ! $DeBUG == 1 ]] && echo -e "\n  ${bold}即将重启系统，重启后会自动安装 ${green}锐速${jiacu} ... ${normal}\n" && reboot
@@ -443,7 +443,7 @@ if   [[ $DISTRO == ubuntu ]]; then
      _ubuntu_serverspeeder_kernel_4.4.0-47
 elif [[ $DISTRO == debian ]]; then
      echo -e "\n  ${bold}安装 ${green}3.16.0-4${jiacu} 内核 ...${normal}"
-     _debian_serverspeeder_kernel_3.16.0-4
+     _debian_serverspeeder_kernel_3.16.0-4_apt
 fi
 echo ; }
 
@@ -662,6 +662,18 @@ wget --no-check-certificate -qO 1.deb https://github.com/Aniverse/BitTorrentClie
 echo ` debconf-get-selections linux-image-3.16.0-4-amd64 | grep -C5 "keep the local version currently installed" | grep keep_current | sed "s/select/note/g"` | debconf-set-selections
 { dpkg -i 1.deb >> $Outputs 2>&1 ; } || { echo -e "\n  ${bold}${red}错误${jiacu} 安装 内核 失败！${normal}" | tee -a $Outputs ; exit 1 ; }
 rm  -rf 1.deb ; }
+
+
+
+# Debian 安装 3.16.0-4 内核（apt-get install）（For ServerSpeeder）
+function _debian_serverspeeder_kernel_3.16.0-4_apt() {
+cat >>/etc/apt/sources.list<<EOF
+deb http://snapshot.debian.org/archive/debian/20180620T205325Z/ jessie main contrib non-free
+deb-src http://snapshot.debian.org/archive/debian/20180620T205325Z/ jessie main contrib non-free
+EOF
+apt-get update >> $Outputs 2>&1
+apt-get install -y linux-image-3.16.0-4-amd64 >> $Outputs 2>&1
+}
 
 
 
