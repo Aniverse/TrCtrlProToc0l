@@ -14,8 +14,8 @@
 # http://xiaofd.win/onekey-ruisu.html
 # https://teddysun.com/489.html
 
-ScriptVersion=1.9.9
-ScriptDate=2018.09.08
+ScriptVersion=2.0.0
+ScriptDate=2018.09.29
 
 # 颜色 -----------------------------------------------------------------------------------
 
@@ -147,8 +147,8 @@ function version_ge(){ test "$(echo "$@" | tr " " "\n" | sort -rV | head -n 1)" 
 
 kernel_vvv=$(uname -r | cut -d- -f1)
 if version_ge $kernel_vvv 4.9  ; then BBRKernel="${green}是${jiacu}" ; else BBRKernel="${red}否${jiacu}" ; fi
-if version_ge $kernel_vvv 4.10 && ! version_ge $kernel_vvv 4.16 ; then YKKernel="${green}是${jiacu}"  ; else YKKernel="${red}否${jiacu}" ; fi
-if version_ge $kernel_vvv 4.9.3  && ! version_ge $kernel_vvv 4.16 ; then NQLKernel="${green}是${jiacu}" ; else NQLKernel="${red}否${jiacu}" ; fi
+if version_ge $kernel_vvv 4.10 && ! version_ge $kernel_vvv 4.19 ; then YKKernel="${green}是${jiacu}"  ; else YKKernel="${red}否${jiacu}" ; fi
+if version_ge $kernel_vvv 4.9.3  && ! version_ge $kernel_vvv 4.19 ; then NQLKernel="${green}是${jiacu}" ; else NQLKernel="${red}否${jiacu}" ; fi
 ver_4_13=`dpkg -l | grep linux-image | awk '{print $2}' | awk -F '-' '{print $3}' | grep "4.13"`
 ver_4_14=`dpkg -l | grep linux-image | awk '{print $2}' | awk -F '-' '{print $3}' | grep "4.14"`
 ver_4_15=`dpkg -l | grep linux-image | awk '{print $2}' | awk -F '-' '{print $3}' | grep "4.15"`
@@ -559,6 +559,8 @@ if   [[ ! -z "\${ver_4_13}" ]]; then wget --no-check-certificate -qO tcp_nanqinl
 elif [[ ! -z "\${ver_4_14}" ]]; then wget --no-check-certificate -qO tcp_nanqinlang.c https://github.com/Aniverse/BitTorrentClientCollection/raw/master/TCP%20Congestion%20Control/BBR%204.14/tcp_nanqinlang.c
 elif [[ ! -z "\${ver_4_15}" ]]; then wget --no-check-certificate -qO tcp_nanqinlang.c https://github.com/Aniverse/BitTorrentClientCollection/raw/master/TCP%20Congestion%20Control/BBR%204.15/tcp_nanqinlang.c
 elif [[ ! -z "\${ver_4_16}" ]]; then wget --no-check-certificate -qO tcp_nanqinlang.c https://github.com/Aniverse/BitTorrentClientCollection/raw/master/TCP%20Congestion%20Control/BBR%204.16/tcp_nanqinlang.c
+elif [[ ! -z "\${ver_4_17}" ]]; then wget --no-check-certificate -qO tcp_nanqinlang.c https://github.com/Aniverse/BitTorrentClientCollection/raw/master/TCP%20Congestion%20Control/BBR%204.17/tcp_nanqinlang.c
+elif [[ ! -z "\${ver_4_18}" ]]; then wget --no-check-certificate -qO tcp_nanqinlang.c https://github.com/Aniverse/BitTorrentClientCollection/raw/master/TCP%20Congestion%20Control/BBR%204.18/tcp_nanqinlang.c
 else wget --no-check-certificate -qO tcp_nanqinlang.c https://github.com/Aniverse/BitTorrentClientCollection/raw/master/TCP%20Congestion%20Control/BBR%204.12%20and%20below/tcp_nanqinlang.c ; fi
 
 echo "obj-m := tcp_nanqinlang.o" > Makefile
@@ -592,7 +594,9 @@ ver_4_15=\`dpkg -l | grep linux-image | awk '{print \$2}' | awk -F '-' '{print \
 if   [[ ! -z "\${ver_4_13}" ]]; then wget --no-check-certificate -qO tcp_tsunami.c https://github.com/Aniverse/BitTorrentClientCollection/raw/master/TCP%20Congestion%20Control/BBR%204.13/tcp_tsunami.c
 elif [[ ! -z "\${ver_4_14}" ]]; then wget --no-check-certificate -qO tcp_tsunami.c https://github.com/Aniverse/BitTorrentClientCollection/raw/master/TCP%20Congestion%20Control/BBR%204.14/tcp_tsunami.c
 elif [[ ! -z "\${ver_4_15}" ]]; then wget --no-check-certificate -qO tcp_tsunami.c https://github.com/Aniverse/BitTorrentClientCollection/raw/master/TCP%20Congestion%20Control/BBR%204.15/tcp_tsunami.c
-# elif [[ ! -z "\${ver_4_16}" ]]; then wget --no-check-certificate -qO tcp_tsunami.c https://github.com/Aniverse/BitTorrentClientCollection/raw/master/TCP%20Congestion%20Control/BBR%204.16/tcp_tsunami.c
+elif [[ ! -z "\${ver_4_16}" ]]; then wget --no-check-certificate -qO tcp_tsunami.c https://github.com/Aniverse/BitTorrentClientCollection/raw/master/TCP%20Congestion%20Control/BBR%204.16/tcp_tsunami.c
+elif [[ ! -z "\${ver_4_17}" ]]; then wget --no-check-certificate -qO tcp_tsunami.c https://github.com/Aniverse/BitTorrentClientCollection/raw/master/TCP%20Congestion%20Control/BBR%204.17/tcp_tsunami.c
+elif [[ ! -z "\${ver_4_18}" ]]; then wget --no-check-certificate -qO tcp_tsunami.c https://github.com/Aniverse/BitTorrentClientCollection/raw/master/TCP%20Congestion%20Control/BBR%204.18/tcp_tsunami.c
 else wget --no-check-certificate -qO tcp_tsunami.c https://github.com/Aniverse/BitTorrentClientCollection/raw/master/TCP%20Congestion%20Control/BBR%204.12%20and%20below/tcp_tsunami.c ; fi
 
 echo "obj-m:=tcp_tsunami.o" > Makefile
@@ -843,6 +847,8 @@ if   [[ ! -z "${ver_4_13}" ]]; then wget --no-check-certificate -O tcp_nanqinlan
 elif [[ ! -z "${ver_4_14}" ]]; then wget --no-check-certificate -O tcp_nanqinlang.c https://github.com/Aniverse/BitTorrentClientCollection/raw/master/TCP%20Congestion%20Control/BBR%204.14/tcp_nanqinlang.c >> $Outputs 2>&1
 elif [[ ! -z "${ver_4_15}" ]]; then wget --no-check-certificate -O tcp_nanqinlang.c https://github.com/Aniverse/BitTorrentClientCollection/raw/master/TCP%20Congestion%20Control/BBR%204.15/tcp_nanqinlang.c >> $Outputs 2>&1
 elif [[ ! -z "${ver_4_16}" ]]; then wget --no-check-certificate -O tcp_nanqinlang.c https://github.com/Aniverse/BitTorrentClientCollection/raw/master/TCP%20Congestion%20Control/BBR%204.16/tcp_nanqinlang.c >> $Outputs 2>&1
+elif [[ ! -z "${ver_4_17}" ]]; then wget --no-check-certificate -O tcp_nanqinlang.c https://github.com/Aniverse/BitTorrentClientCollection/raw/master/TCP%20Congestion%20Control/BBR%204.17/tcp_nanqinlang.c >> $Outputs 2>&1
+elif [[ ! -z "${ver_4_18}" ]]; then wget --no-check-certificate -O tcp_nanqinlang.c https://github.com/Aniverse/BitTorrentClientCollection/raw/master/TCP%20Congestion%20Control/BBR%204.18/tcp_nanqinlang.c >> $Outputs 2>&1
 else                                wget --no-check-certificate -O tcp_nanqinlang.c https://github.com/Aniverse/BitTorrentClientCollection/raw/master/TCP%20Congestion%20Control/BBR%204.12%20and%20below/tcp_nanqinlang.c >> $Outputs 2>&1 ; fi
 
 # wget --no-check-certificate -qO Makefile https://raw.githubusercontent.com/nanqinlang-tcp/tcp_nanqinlang/master/Makefile/Makefile-Debian9
@@ -868,7 +874,9 @@ echo >> $Outputs 2>&1
 if   [[ ! -z "${ver_4_13}" ]]; then wget --no-check-certificate -qO tcp_tsunami.c https://github.com/Aniverse/BitTorrentClientCollection/raw/master/TCP%20Congestion%20Control/BBR%204.13/tcp_tsunami.c
 elif [[ ! -z "${ver_4_14}" ]]; then wget --no-check-certificate -qO tcp_tsunami.c https://github.com/Aniverse/BitTorrentClientCollection/raw/master/TCP%20Congestion%20Control/BBR%204.14/tcp_tsunami.c
 elif [[ ! -z "${ver_4_15}" ]]; then wget --no-check-certificate -qO tcp_tsunami.c https://github.com/Aniverse/BitTorrentClientCollection/raw/master/TCP%20Congestion%20Control/BBR%204.15/tcp_tsunami.c
-# elif [[ ! -z "${ver_4_16}" ]]; then wget --no-check-certificate -qO tcp_tsunami.c https://github.com/Aniverse/BitTorrentClientCollection/raw/master/TCP%20Congestion%20Control/BBR%204.16/tcp_tsunami.c
+elif [[ ! -z "${ver_4_16}" ]]; then wget --no-check-certificate -qO tcp_tsunami.c https://github.com/Aniverse/BitTorrentClientCollection/raw/master/TCP%20Congestion%20Control/BBR%204.16/tcp_tsunami.c
+elif [[ ! -z "${ver_4_17}" ]]; then wget --no-check-certificate -qO tcp_tsunami.c https://github.com/Aniverse/BitTorrentClientCollection/raw/master/TCP%20Congestion%20Control/BBR%204.17/tcp_tsunami.c
+elif [[ ! -z "${ver_4_18}" ]]; then wget --no-check-certificate -qO tcp_tsunami.c https://github.com/Aniverse/BitTorrentClientCollection/raw/master/TCP%20Congestion%20Control/BBR%204.18/tcp_tsunami.c
 else wget --no-check-certificate -qO tcp_tsunami.c https://github.com/Aniverse/BitTorrentClientCollection/raw/master/TCP%20Congestion%20Control/BBR%204.12%20and%20below/tcp_tsunami.c ; fi
 
 echo "obj-m:=tcp_tsunami.o" > Makefile
