@@ -14,8 +14,8 @@
 # http://xiaofd.win/onekey-ruisu.html
 # https://teddysun.com/489.html
 
-ScriptVersion=2.0.0
-ScriptDate=2018.09.29
+ScriptVersion=2.0.1
+ScriptDate=2018.10.13
 
 # 颜色 -----------------------------------------------------------------------------------
 
@@ -154,14 +154,18 @@ ver_4_14=`dpkg -l | grep linux-image | awk '{print $2}' | awk -F '-' '{print $3}
 ver_4_15=`dpkg -l | grep linux-image | awk '{print $2}' | awk -F '-' '{print $3}' | grep "4.15"`
 ver_4_16=`dpkg -l | grep linux-image | awk '{print $2}' | awk -F '-' '{print $3}' | grep "4.16"`
 ver_4_17=`dpkg -l | grep linux-image | awk '{print $2}' | awk -F '-' '{print $3}' | grep "4.17"`
+ver_4_18=`dpkg -l | grep linux-image | awk '{print $2}' | awk -F '-' '{print $3}' | grep "4.18"`
+ver_4_19=`dpkg -l | grep linux-image | awk '{print $2}' | awk -F '-' '{print $3}' | grep "4.19"`
 
 # 检查 锐速 与 BBR 是否已启用
 [[ ` ps aux | grep appex | grep -v grep ` ]] && SSrunning="${green}是${jiacu}" || SSrunning="${red}否${jiacu}"
-# export tcp_control=$( awk '{print $1}' /proc/sys/net/ipv4/tcp_available_congestion_control )
-# if [[ $tcp_control =~ ("nanqinlang"|"tsunami") ]]; then bbrinuse="${green}是${jiacu}"
-# elif [[ `echo $tcp_control | grep bbr` ]]; then bbrinuse="${green}是${jiacu}"
-# else bbrinuse="${red}否${jiacu}" ; fi
-if [[ `lsmod | grep -E "bbr|nanqinlang|tsunami"` ]] ; then bbrinuse="${green}是${jiacu}" ; else bbrinuse="${red}否${jiacu}" ; fi
+
+if [[ $tcp_control =~ ("nanqinlang"|"tsunami") ]]; then bbrinuse="${green}是${jiacu}"
+elif [[ `echo $tcp_control | grep bbr` ]]; then bbrinuse="${green}是${jiacu}"
+else bbrinuse="${red}否${jiacu}" ; fi
+
+# Xanmod 里 bbr 不出现在 lsmod 里
+# if [[ `lsmod | grep -E "bbr|nanqinlang|tsunami"` ]] ; then bbrinuse="${green}是${jiacu}" ; else bbrinuse="${red}否${jiacu}" ; fi
 
 dpkg -l | grep linux-image   | awk '{print $2}' >> /tmp/system_kernel_list
 dpkg -l | grep linux-headers | awk '{print $2}' >> /tmp/system_kernel_list
@@ -290,7 +294,7 @@ if [[ $BBRKernel == "${green}是${jiacu}" ]]; then
     bbrname=bbr
     _enable_bbr ; echo
     if [[ ` lsmod | grep bbr ` ]]; then echo -e "\n  ${bold}BBR 已启用 ...\n${normal}"
-    else echo -e "\n  ${bold}${red}错误 BBR 开启失败！${normal}\n" ; exit 1 ; fi
+    else echo -e "\n  ${bold}${red}警告 BBR 可能开启失败！${normal}\n" ; exit 1 ; fi
 else
     _ask_continue2
   # echo -e "  ${bold}当前内核不支持 BBR，先安装 ${green}4.11.12${jiacu} 内核以启用 BBR ...${normal} "
@@ -677,6 +681,7 @@ deb-src http://snapshot.debian.org/archive/debian/20180620T205325Z/ jessie main 
 EOF
 apt-get update >> $Outputs 2>&1
 apt-get install -y linux-image-3.16.0-4-amd64 >> $Outputs 2>&1
+apt-get install -y linux-headers-3.16.0-4-common linux-headers-3.16.0-4-all >> $Outputs 2>&1
 }
 
 
