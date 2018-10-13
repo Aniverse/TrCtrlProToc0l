@@ -14,7 +14,7 @@
 # http://xiaofd.win/onekey-ruisu.html
 # https://teddysun.com/489.html
 
-ScriptVersion=2.0.2
+ScriptVersion=2.0.3
 ScriptDate=2018.10.13
 
 # 颜色 -----------------------------------------------------------------------------------
@@ -445,7 +445,7 @@ echo ; }
 function _selected_ss_kernel_install() {
 if   [[ $DISTRO == ubuntu ]]; then
      echo -e "\n  ${bold}安装 ${green}4.4.0-47${jiacu} 内核 ...${normal}"
-     _ubuntu_serverspeeder_kernel_4.4.0-47
+     _ubuntu_serverspeeder_kernel_4.4.0-47_apt
 elif [[ $DISTRO == debian ]]; then
      echo -e "\n  ${bold}安装 ${green}3.16.0-4${jiacu} 内核 ...${normal}"
      _debian_serverspeeder_kernel_3.16.0-4_apt
@@ -680,9 +680,9 @@ cat >>/etc/apt/sources.list<<EOF
 deb http://snapshot.debian.org/archive/debian/20180620T205325Z/ jessie main contrib non-free
 deb-src http://snapshot.debian.org/archive/debian/20180620T205325Z/ jessie main contrib non-free
 EOF
-apt-get update >> $Outputs 2>&1
-apt-get install -y linux-image-3.16.0-4-amd64 >> $Outputs 2>&1
-apt-get install -y linux-headers-3.16.0-4-common linux-headers-3.16.0-4-all >> $Outputs 2>&1
+apt-get update # >> $Outputs 2>&1
+apt-get install -y linux-image-3.16.0-4-amd64 # >> $Outputs 2>&1
+apt-get install -y linux-headers-3.16.0-4-common linux-headers-3.16.0-4-all # >> $Outputs 2>&1
 }
 
 
@@ -697,6 +697,14 @@ echo ` debconf-get-selections linux-headers-4.4.0-47 | grep -C5 "keep the local 
 echo ` debconf-get-selections linux-headers-4.4.0-47-generic | grep -C5 "keep the local version currently installed" | grep keep_current | sed "s/select/note/g"` | debconf-set-selections
 { dpkg -i [123].deb >> $Outputs 2>&1 ; } || { echo -e "\n  ${bold}${red}错误${jiacu} 安装 内核 失败！${normal}" | tee -a $Outputs ; exit 1 ; }
 rm  -rf [123].deb ; }
+
+
+
+# Ubuntu 安装 4.4.0-47 内核（apt-get install）（For ServerSpeeder）
+function _ubuntu_serverspeeder_kernel_4.4.0-47_apt() {
+apt-get update # >> $Outputs 2>&1
+apt-get install -y linux-image-4.4.0-47-generic linux-image-extra-4.4.0-47-generic linux-headers-4.4.0-47-generic # >> $Outputs 2>&1
+}
 
 
 
