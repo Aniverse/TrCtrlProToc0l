@@ -19,9 +19,9 @@ bash -c "$(wget --no-check-certificate -qO- https://github.com/Aniverse/TrCtrlPr
 - **Onekey Install, Onekey Switch**  
 本脚本可以安装、卸载 锐速、BBR、Yankee 版魔改 BBR、南琴浪 版魔改 BBR，并支持在以上任意的加速方案中一键切换  
 
-- **Adapt for Linux Kernel 4.13-4.15**  
-尝试针对 4.13-4.15 内核适配魔改版 BBR *（尚处于测试阶段，有时候会失败，求稳的话建议还是使用老版本内核比如 4.11.12）*  
-针对部分最新的 4.16 内核还需要安装 modules 的情况也做了处理，会先安装 modules  
+- **Adapt for Linux Kernel 4.13-4.18**  
+尝试针对 4.13-4.18 内核适配魔改版 BBR *（尚处于测试阶段，有时候会失败，求稳的话建议还是使用老版本内核比如 4.11.12）*  
+针对 4.16 及以上内核还需要安装 modules 的情况也做了处理，会先安装 modules  
 
 - **Adapt for Online.net Dedicated Server**  
 有一些 Online 独服的 Ubuntu 系统需要补充一些固件才能在更换高版本新内核后不翻车  
@@ -50,6 +50,9 @@ bash -c "$(wget --no-check-certificate -qO- https://github.com/Aniverse/TrCtrlPr
 - **检测当前 BBR、魔改 BBR 是否可以直接启用**  
 比如我已经编译完了 Yankee 和 nanqinlang 版魔改 BBR，检测到 `/lib/modules/$(uname -r)/kernel/net/ipv4` 里有对应文件存在的话，就直接启用算法而不是再次编译  
 
+- **检测当前系统里是否已安装可启用 锐速 或者 BBR 的内核**  
+这样无需再次安装，指定用那个内核或者卸载掉其他内核即可  
+
 - **4.11.12 内核使用预先编译好的魔改算法文件**  
 这样可以省略编译过程  
 
@@ -64,7 +67,7 @@ bash -c "$(wget --no-check-certificate -qO- https://github.com/Aniverse/TrCtrlPr
 - **无法删除 PVE 内核**  
 因为这个的包名不太一样……  
 
-- **Debian 无法安装 4.16 内核**  
+- **Debian 无法安装 4.16 及以上内核**  
 似乎无解...  
 
 ![Error01](https://github.com/Aniverse/TrCtrlProToc0l/raw/master/Images/Error01.png)
