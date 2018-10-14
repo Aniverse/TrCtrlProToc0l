@@ -14,7 +14,7 @@
 # http://xiaofd.win/onekey-ruisu.html
 # https://teddysun.com/489.html
 
-ScriptVersion=2.0.3
+ScriptVersion=2.0.4
 ScriptDate=2018.10.13
 
 # 颜色 -----------------------------------------------------------------------------------
@@ -371,31 +371,15 @@ function _ss_install() {
 if [[ $SSKernel == "${green}是${jiacu}" ]]; then
     echo -e "\n  ${bold}理论上当前内核已支持 ${green}锐速${jiacu}，直接安装 ... ${normal} "
     _serverspeeder_direct_install
-elif [[ $SSKernel == "${red}否${jiacu}" ]] && [[ $CODENAME == xenial ]]; then
+elif [[ $SSKernel == "${red}否${jiacu}" ]] && [[ $DISTRO == ubuntu ]]; then
     _ask_continue2
-    echo -ne "  ${bold}当前内核不支持 锐速，安装 ${green}3.16.0-43${jiacu} 内核 ... ${normal} \n"
-    export kernelver=3.16.0-43-generic
-    _ubuntu_serverspeeder_kernel_3.16.0-43
-    _ubuntu_serverspeeder_updategrub
-    _serverspeeder_autoinstall_after_reboot
-    [[ ! $DeBUG == 1 ]] && echo -e "\n  ${bold}即将重启系统，重启后会自动安装 ${green}锐速${jiacu} ... ${normal}\n" && reboot
-elif [[ $SSKernel == "${red}否${jiacu}" ]] && [[ $CODENAME == bionic ]]; then
-    _ask_continue2
-    echo -ne "  ${bold}当前内核不支持 锐速，安装 ${green}4.4.0-47${jiacu} 内核 ... ${normal} \n"
-    export kernelver=4.4.0-47-generic
+    echo -ne "  ${bold}当前内核不支持 锐速，安装 ${green}4.4.0-47{jiacu} 内核 ... ${normal} "
+    kernel_version=4.4.0-47
     _ubuntu_serverspeeder_kernel_4.4.0-47
-    _ubuntu_serverspeeder_updategrub
-    _serverspeeder_autoinstall_after_reboot
-    [[ ! $DeBUG == 1 ]] && echo -e "\n  ${bold}即将重启系统，重启后会自动安装 ${green}锐速${jiacu} ... ${normal}\n" && reboot
-elif [[ $SSKernel == "${red}否${jiacu}" ]] && [[ $CODENAME == jessie ]]; then
-    _ask_continue2
-    echo -ne "  ${bold}当前内核不支持 锐速，安装 ${green}3.12.1${jiacu} 内核 ... ${normal} "
-    kernel_version=3.12-1
-    _debian_serverspeeder_kernel_3.12.1
     _delete_kernel
     _serverspeeder_autoinstall_after_reboot
     [[ ! $DeBUG == 1 ]] && echo -e "\n  ${bold}即将重启系统，重启后会自动安装 ${green}锐速${jiacu} ... ${normal}\n" && reboot
-elif [[ $SSKernel == "${red}否${jiacu}" ]] && [[ $CODENAME == stretch ]]; then
+elif [[ $SSKernel == "${red}否${jiacu}" ]] && [[ $DISTRO == debian ]]; then
     _ask_continue2
     echo -ne "  ${bold}当前内核不支持 锐速，安装 ${green}3.16.0-4${jiacu} 内核 ... ${normal} "
     kernel_version=3.16.0-4
@@ -403,6 +387,38 @@ elif [[ $SSKernel == "${red}否${jiacu}" ]] && [[ $CODENAME == stretch ]]; then
     _delete_kernel
     _serverspeeder_autoinstall_after_reboot
     [[ ! $DeBUG == 1 ]] && echo -e "\n  ${bold}即将重启系统，重启后会自动安装 ${green}锐速${jiacu} ... ${normal}\n" && reboot
+# elif [[ $SSKernel == "${red}否${jiacu}" ]] && [[ $CODENAME == xenial ]]; then
+#     _ask_continue2
+#     echo -ne "  ${bold}当前内核不支持 锐速，安装 ${green}3.16.0-43${jiacu} 内核 ... ${normal} \n"
+#     export kernelver=3.16.0-43-generic
+#     _ubuntu_serverspeeder_kernel_3.16.0-43
+#     _ubuntu_serverspeeder_updategrub
+#     _serverspeeder_autoinstall_after_reboot
+#     [[ ! $DeBUG == 1 ]] && echo -e "\n  ${bold}即将重启系统，重启后会自动安装 ${green}锐速${jiacu} ... ${normal}\n" && reboot
+# elif [[ $SSKernel == "${red}否${jiacu}" ]] && [[ $CODENAME == bionic ]]; then
+#     _ask_continue2
+#     echo -ne "  ${bold}当前内核不支持 锐速，安装 ${green}4.4.0-47${jiacu} 内核 ... ${normal} \n"
+#     export kernelver=4.4.0-47-generic
+#     _ubuntu_serverspeeder_kernel_4.4.0-47
+#     _ubuntu_serverspeeder_updategrub
+#     _serverspeeder_autoinstall_after_reboot
+#     [[ ! $DeBUG == 1 ]] && echo -e "\n  ${bold}即将重启系统，重启后会自动安装 ${green}锐速${jiacu} ... ${normal}\n" && reboot
+# elif [[ $SSKernel == "${red}否${jiacu}" ]] && [[ $CODENAME == jessie ]]; then
+#     _ask_continue2
+#     echo -ne "  ${bold}当前内核不支持 锐速，安装 ${green}3.12.1${jiacu} 内核 ... ${normal} "
+#     kernel_version=3.12-1
+#     _debian_serverspeeder_kernel_3.12.1
+#     _delete_kernel
+#     _serverspeeder_autoinstall_after_reboot
+#     [[ ! $DeBUG == 1 ]] && echo -e "\n  ${bold}即将重启系统，重启后会自动安装 ${green}锐速${jiacu} ... ${normal}\n" && reboot
+# elif [[ $SSKernel == "${red}否${jiacu}" ]] && [[ $CODENAME == stretch ]]; then
+#     _ask_continue2
+#     echo -ne "  ${bold}当前内核不支持 锐速，安装 ${green}3.16.0-4${jiacu} 内核 ... ${normal} "
+#     kernel_version=3.16.0-4
+#     _debian_serverspeeder_kernel_3.16.0-4_apt
+#     _delete_kernel
+#     _serverspeeder_autoinstall_after_reboot
+#     [[ ! $DeBUG == 1 ]] && echo -e "\n  ${bold}即将重启系统，重启后会自动安装 ${green}锐速${jiacu} ... ${normal}\n" && reboot
 fi ; }
 
 
@@ -417,6 +433,7 @@ esac
 [[ `grep "Advanced options for Ubuntu" /etc/default/grub` ]] && sed -i 's/GRUB_DEFAULT=.*/GRUB_DEFAULT=""/' /etc/default/grub && update-grub >> $Outputs 2>&1
 wget --no-check-certificate -qO /tmp/appex.sh "https://raw.githubusercontent.com/0oVicero0/serverSpeeder_Install/master/appex.sh" && echo | bash /tmp/appex.sh 'uninstall'
 echo -e "  ${bold}${red}已卸载 锐速，但安装的内核仍保留${normal}\n" ; }
+
 
 
 # 卸载 BBR
@@ -443,12 +460,20 @@ echo ; }
 
 # 安装 特定锐速内核（BBR）
 function _selected_ss_kernel_install() {
-if   [[ $DISTRO == ubuntu ]]; then
-     echo -e "\n  ${bold}安装 ${green}4.4.0-47${jiacu} 内核 ...${normal}"
-     _ubuntu_serverspeeder_kernel_4.4.0-47_apt
-elif [[ $DISTRO == debian ]]; then
-     echo -e "\n  ${bold}安装 ${green}3.16.0-4${jiacu} 内核 ...${normal}"
-     _debian_serverspeeder_kernel_3.16.0-4_apt
+if   [[ $CODENAME == xenial ]]; then
+     echo -e "\n  ${bold}安装 ${green}3.16.0-43${jiacu} 内核 ...${normal}"
+     export kernelver=3.16.0-43-generic
+     _ubuntu_serverspeeder_kernel_3.16.0-43
+     _delete_kernel
+     _serverspeeder_autoinstall_after_reboot
+elif [[ $CODENAME == jessie ]]; then
+     echo -e "\n  ${bold}安装 ${green}3.12-1${jiacu} 内核 ...${normal}"
+     kernel_version=3.12-1
+     _debian_serverspeeder_kernel_3.12.1
+     _delete_kernel
+     _serverspeeder_autoinstall_after_reboot
+else
+     echo -n "\n  ${red}注意${jiacu} Debian 9 和 Ubuntu 18.04 无法使用更低版本的内核！${normal}"
 fi
 echo ; }
 
@@ -532,7 +557,8 @@ EOF
 # CPU 高性能模式，不过有的系统或者机器下好像没这选项……
 sed -i '$i\echo performance \| tee \/sys\/devices\/system\/cpu\/cpu*\/cpufreq\/scaling_governor \> \/dev\/null'  /etc/rc.local
 
-_delete_kernel
+# 先不删除内核吧……
+# _delete_kernel
 
 # echo -e "\n  ${bold}完成，即将重启 ...${normal} \n"
 # reboot
@@ -646,6 +672,7 @@ echo "exit 0" >> /etc/rc.local ; }
 
 
 
+
 ###################################################################################################################################################################
 
 
@@ -680,10 +707,10 @@ cat >>/etc/apt/sources.list<<EOF
 deb http://snapshot.debian.org/archive/debian/20180620T205325Z/ jessie main contrib non-free
 deb-src http://snapshot.debian.org/archive/debian/20180620T205325Z/ jessie main contrib non-free
 EOF
-apt-get update # >> $Outputs 2>&1
-apt-get install -y linux-image-3.16.0-4-amd64 # >> $Outputs 2>&1
-apt-get install -y linux-headers-3.16.0-4-common linux-headers-3.16.0-4-all # >> $Outputs 2>&1
-}
+apt-get update >> $Outputs 2>&1
+apt-get install -y linux-image-3.16.0-4-amd64 >> $Outputs 2>&1
+apt-get install -y linux-headers-3.16.0-4-common linux-headers-3.16.0-4-all >> $Outputs 2>&1
+[[ ! $( dpkg -l | grep linux-image-3.16.0-4-amd64 ) ]] && { echo -e "\n  ${bold}${red}错误${jiacu} 安装 内核 失败！${normal}" | tee -a $Outputs ; exit 1 ; } ; }
 
 
 
@@ -702,9 +729,9 @@ rm  -rf [123].deb ; }
 
 # Ubuntu 安装 4.4.0-47 内核（apt-get install）（For ServerSpeeder）
 function _ubuntu_serverspeeder_kernel_4.4.0-47_apt() {
-apt-get update # >> $Outputs 2>&1
-apt-get install -y linux-image-4.4.0-47-generic linux-image-extra-4.4.0-47-generic linux-headers-4.4.0-47-generic # >> $Outputs 2>&1
-}
+apt-get update >> $Outputs 2>&1
+apt-get install -y linux-image-4.4.0-47-generic linux-image-extra-4.4.0-47-generic linux-headers-4.4.0-47-generic >> $Outputs 2>&1
+[[ ! $( dpkg -l | grep linux-image-4.4.0-47-generic ) ]] && { echo -e "\n  ${bold}${red}错误${jiacu} 安装 内核 失败！${normal}" | tee -a $Outputs ; exit 1 ; } ; }
 
 
 
