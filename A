@@ -14,8 +14,8 @@
 # http://xiaofd.win/onekey-ruisu.html
 # https://teddysun.com/489.html
 
-ScriptVersion=2.0.5
-ScriptDate=2018.10.13
+ScriptVersion=2.0.6
+ScriptDate=2018.10.14
 
 # 颜色 -----------------------------------------------------------------------------------
 
@@ -121,6 +121,8 @@ running_kernel=` uname -r `
 arch=$( uname -m )
 lbit=$( getconf LONG_BIT )
 
+# dpkg -l | grep "$running_kernel"
+
 tcp_c_name=$tcp_control
 [[ $tcp_control == reno ]] && tcp_c_name="reno (系统自带算法)"
 [[ $tcp_control == cubic ]] && tcp_c_name="cubic (系统自带算法)"
@@ -199,7 +201,7 @@ echo -e  "  当前 硬盘 文件系统                   $( cat /proc/mounts | g
 echo -e  "  当前 硬盘 挂载方式                   $( cat /proc/mounts | grep -P "`df -k | sort -rn -k4 | awk '{print $1}' | head -1`\b" | awk '{print $4}' )"
 
 echo -e  "\n  当前系统内所有已安装的 kernel／headers／modules 列表\n"
-cat -n /tmp/system_kernel_list | sed 's/\t/ /g' | sed "s/ linux-/) ${green}linux-/g" | sed "s/     /  ${magenta}(0/g" | sed "s/    /  ${magenta}(/g"
+cat -n /tmp/system_kernel_list | sed 's/\t/ /g' | sed "s/ linux-/) ${green}linux-/g" | sed "s/ ovhkernel-/) ${green}ovhkernel-/g" | sed "s/     /  ${magenta}(0/g" | sed "s/    /  ${magenta}(/g"
 echo -e  "\n  ${jiacu}当前脚本版本：$ScriptVersion"
 [[ $DeBUG == 1 ]] && echo -e  "\n  当前脚本已处于调试模式"
 echo -e  "\n  ${yellow}${bold}使用本脚本前请先阅读本脚本 GitHub 上的 README；作者水平菜，不保证脚本不会翻车${jiacu}"
@@ -1098,7 +1100,8 @@ function _update_grub() { echo -ne "\n  ${bold}更新引导 ...  ${normal}" | te
 # 删除其他内核
 function _delete_kernel() {
 echo -e "\n  ${bold}卸载多余内核及其头文件 ... ${normal}\n" | tee -a $Outputs
-dpkg -l | grep linux-image   | grep -v "${kernel_version}" | awk '{print $2}' > /log/kernel_tobe_del_list
+dpkg -l | grep linux-image   | grep -v "${kernel_version}" | awk '{print $2}' >  /log/kernel_tobe_del_list
+dpkg -l | grep ovhkernel     | grep -v "${kernel_version}" | awk '{print $2}' >> /log/kernel_tobe_del_list
 dpkg -l | grep linux-headers | grep -v "${kernel_version}" | awk '{print $2}' >> /log/kernel_tobe_del_list
 dpkg -l | grep linux-modules | grep -v "${kernel_version}" | awk '{print $2}' >> /log/kernel_tobe_del_list
 kernel_total_num=` cat /log/kernel_tobe_del_list | wc -l `
