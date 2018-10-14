@@ -14,7 +14,7 @@
 # http://xiaofd.win/onekey-ruisu.html
 # https://teddysun.com/489.html
 
-ScriptVersion=2.0.4
+ScriptVersion=2.0.5
 ScriptDate=2018.10.13
 
 # 颜色 -----------------------------------------------------------------------------------
@@ -373,7 +373,7 @@ if [[ $SSKernel == "${green}是${jiacu}" ]]; then
     _serverspeeder_direct_install
 elif [[ $SSKernel == "${red}否${jiacu}" ]] && [[ $DISTRO == ubuntu ]]; then
     _ask_continue2
-    echo -ne "  ${bold}当前内核不支持 锐速，安装 ${green}4.4.0-47{jiacu} 内核 ... ${normal} "
+    echo -ne "  ${bold}当前内核不支持 锐速，安装 ${green}4.4.0-47${jiacu} 内核 ... ${normal} \n"
     kernel_version=4.4.0-47
     _ubuntu_serverspeeder_kernel_4.4.0-47
     _delete_kernel
@@ -381,7 +381,7 @@ elif [[ $SSKernel == "${red}否${jiacu}" ]] && [[ $DISTRO == ubuntu ]]; then
     [[ ! $DeBUG == 1 ]] && echo -e "\n  ${bold}即将重启系统，重启后会自动安装 ${green}锐速${jiacu} ... ${normal}\n" && reboot
 elif [[ $SSKernel == "${red}否${jiacu}" ]] && [[ $DISTRO == debian ]]; then
     _ask_continue2
-    echo -ne "  ${bold}当前内核不支持 锐速，安装 ${green}3.16.0-4${jiacu} 内核 ... ${normal} "
+    echo -ne "  ${bold}当前内核不支持 锐速，安装 ${green}3.16.0-4${jiacu} 内核 ... ${normal} \n"
     kernel_version=3.16.0-4
     _debian_serverspeeder_kernel_3.16.0-4_apt
     _delete_kernel
@@ -461,13 +461,13 @@ echo ; }
 # 安装 特定锐速内核（BBR）
 function _selected_ss_kernel_install() {
 if   [[ $CODENAME == xenial ]]; then
-     echo -e "\n  ${bold}安装 ${green}3.16.0-43${jiacu} 内核 ...${normal}"
-     export kernelver=3.16.0-43-generic
+     echo -e "\n  ${bold}安装 ${green}3.16.0-43${jiacu} 内核 ...${normal} \n"
+     kernelver=3.16.0-43-generic
      _ubuntu_serverspeeder_kernel_3.16.0-43
      _delete_kernel
      _serverspeeder_autoinstall_after_reboot
 elif [[ $CODENAME == jessie ]]; then
-     echo -e "\n  ${bold}安装 ${green}3.12-1${jiacu} 内核 ...${normal}"
+     echo -e "\n  ${bold}安装 ${green}3.12-1${jiacu} 内核 ...${normal} \n"
      kernel_version=3.12-1
      _debian_serverspeeder_kernel_3.12.1
      _delete_kernel
