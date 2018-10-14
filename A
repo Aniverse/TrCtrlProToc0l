@@ -14,7 +14,7 @@
 # http://xiaofd.win/onekey-ruisu.html
 # https://teddysun.com/489.html
 
-ScriptVersion=2.0.6
+ScriptVersion=2.0.7
 ScriptDate=2018.10.14
 
 # 颜色 -----------------------------------------------------------------------------------
@@ -261,7 +261,7 @@ case $response in
                 echo -ne "\n  ${bold}请输入你要 ${baihongse}保留${jiacu} 的内核版本，其他版本的内核将会被卸载：${normal} " ; read -e kernel_version
                 [[ ! ` dpkg -l | grep linux-image | grep "$kernel_version" ` ]] && { echo -e "\n  ${bold}${red}错误${jiacu} 大佬，你压根就没装这个内核吧！${normal}" ; unset kernel_version ; }
             done
-            _delete_kernel ;;
+            _delete_other_kernel ;;
         31) # 安装 xanmod
             _xanmod_install ;;
         90) # 重启
@@ -330,7 +330,7 @@ else
     _online_ubuntu_bbr_firmware
     _check_essential
     _bbr_kernel_4_11_12
-    kernel_version=4.11.12 && _delete_kernel
+    kernel_version=4.11.12 && _delete_other_kernel
     _bbr_tsunami_autoinstall_after_reboot
     bbrname=tsunami
     _enable_bbr
@@ -359,7 +359,7 @@ else
     _online_ubuntu_bbr_firmware
     _check_essential
     _bbr_kernel_4_11_12
-    kernel_version=4.11.12 && _delete_kernel
+    kernel_version=4.11.12 && _delete_other_kernel
     _bbr_nanqinlang_autoinstall_after_reboot
     bbrname=nanqinlang
     _enable_bbr
@@ -378,7 +378,7 @@ elif [[ $SSKernel == "${red}否${jiacu}" ]] && [[ $DISTRO == ubuntu ]]; then
     echo -ne "  ${bold}当前内核不支持 锐速，安装 ${green}4.4.0-47${jiacu} 内核 ... ${normal} \n"
     kernel_version=4.4.0-47
     _ubuntu_serverspeeder_kernel_4.4.0-47
-    _delete_kernel
+    _delete_other_kernel
     _serverspeeder_autoinstall_after_reboot
     [[ ! $DeBUG == 1 ]] && echo -e "\n  ${bold}即将重启系统，重启后会自动安装 ${green}锐速${jiacu} ... ${normal}\n" && reboot
 elif [[ $SSKernel == "${red}否${jiacu}" ]] && [[ $DISTRO == debian ]]; then
@@ -386,7 +386,7 @@ elif [[ $SSKernel == "${red}否${jiacu}" ]] && [[ $DISTRO == debian ]]; then
     echo -ne "  ${bold}当前内核不支持 锐速，安装 ${green}3.16.0-4${jiacu} 内核 ... ${normal} \n"
     kernel_version=3.16.0-4
     _debian_serverspeeder_kernel_3.16.0-4_apt
-    _delete_kernel
+    _delete_other_kernel
     _serverspeeder_autoinstall_after_reboot
     [[ ! $DeBUG == 1 ]] && echo -e "\n  ${bold}即将重启系统，重启后会自动安装 ${green}锐速${jiacu} ... ${normal}\n" && reboot
 # elif [[ $SSKernel == "${red}否${jiacu}" ]] && [[ $CODENAME == xenial ]]; then
@@ -410,7 +410,7 @@ elif [[ $SSKernel == "${red}否${jiacu}" ]] && [[ $DISTRO == debian ]]; then
 #     echo -ne "  ${bold}当前内核不支持 锐速，安装 ${green}3.12.1${jiacu} 内核 ... ${normal} "
 #     kernel_version=3.12-1
 #     _debian_serverspeeder_kernel_3.12.1
-#     _delete_kernel
+#     _delete_other_kernel
 #     _serverspeeder_autoinstall_after_reboot
 #     [[ ! $DeBUG == 1 ]] && echo -e "\n  ${bold}即将重启系统，重启后会自动安装 ${green}锐速${jiacu} ... ${normal}\n" && reboot
 # elif [[ $SSKernel == "${red}否${jiacu}" ]] && [[ $CODENAME == stretch ]]; then
@@ -418,7 +418,7 @@ elif [[ $SSKernel == "${red}否${jiacu}" ]] && [[ $DISTRO == debian ]]; then
 #     echo -ne "  ${bold}当前内核不支持 锐速，安装 ${green}3.16.0-4${jiacu} 内核 ... ${normal} "
 #     kernel_version=3.16.0-4
 #     _debian_serverspeeder_kernel_3.16.0-4_apt
-#     _delete_kernel
+#     _delete_other_kernel
 #     _serverspeeder_autoinstall_after_reboot
 #     [[ ! $DeBUG == 1 ]] && echo -e "\n  ${bold}即将重启系统，重启后会自动安装 ${green}锐速${jiacu} ... ${normal}\n" && reboot
 fi ; }
@@ -466,13 +466,13 @@ if   [[ $CODENAME == xenial ]]; then
      echo -e "\n  ${bold}安装 ${green}3.16.0-43${jiacu} 内核 ...${normal} \n"
      kernelver=3.16.0-43-generic
      _ubuntu_serverspeeder_kernel_3.16.0-43
-     _delete_kernel
+     _delete_other_kernel
      _serverspeeder_autoinstall_after_reboot
 elif [[ $CODENAME == jessie ]]; then
      echo -e "\n  ${bold}安装 ${green}3.12-1${jiacu} 内核 ...${normal} \n"
      kernel_version=3.12-1
      _debian_serverspeeder_kernel_3.12.1
-     _delete_kernel
+     _delete_other_kernel
      _serverspeeder_autoinstall_after_reboot
 else
      echo -n "\n  ${red}注意${jiacu} Debian 9 和 Ubuntu 18.04 无法使用更低版本的内核！${normal}"
@@ -560,7 +560,7 @@ EOF
 sed -i '$i\echo performance \| tee \/sys\/devices\/system\/cpu\/cpu*\/cpufreq\/scaling_governor \> \/dev\/null'  /etc/rc.local
 
 # 先不删除内核吧……
-# _delete_kernel
+# _delete_other_kernel
 
 # echo -e "\n  ${bold}完成，即将重启 ...${normal} \n"
 # reboot
@@ -1097,8 +1097,34 @@ function _update_grub() { echo -ne "\n  ${bold}更新引导 ...  ${normal}" | te
 
 
 
-# 删除其他内核
+# 删除指定内核
 function _delete_kernel() {
+echo -e "\n  ${bold}卸载指定内核及其头文件 ... ${normal}\n" | tee -a $Outputs
+
+dpkg -l | grep linux-image   | grep "${kernel_version}" | awk '{print $2}' >  /log/kernel_tobe_del_list
+dpkg -l | grep ovhkernel     | grep "${kernel_version}" | awk '{print $2}' >> /log/kernel_tobe_del_list
+dpkg -l | grep linux-headers | grep "${kernel_version}" | awk '{print $2}' >> /log/kernel_tobe_del_list
+dpkg -l | grep linux-modules | grep "${kernel_version}" | awk '{print $2}' >> /log/kernel_tobe_del_list
+kernel_total_num=` cat /log/kernel_tobe_del_list | wc -l `
+
+if [ $kernel_total_num > 1 ]; then
+    for (( integer = 1 ; integer <= ${kernel_total_num} ; integer++ )) ; do
+      # kernel_tobe_del=` dpkg -l | grep -E linux-[image,headers,modules] | grep -v binutils | awk '{print $2}' | grep -v "${kernel_version}" | head -${integer} `
+        kernel_tobe_del=` cat /log/kernel_tobe_del_list | sed -n "${integer}p" `
+        echo -ne "  卸载 ${kernel_tobe_del} ... " | tee -a $Outputs ; echo >> $Outputs
+        echo `debconf-get-selections ${deb_del} | grep removing-running-kernel | grep $running_kernel | sed s/true/false/` | debconf-set-selections
+        [[ $DeBUG == 1 ]] && { echo -e "\n  $integer, $kernel_tobe_del" ; }
+        apt-get -y purge $kernel_tobe_del >> $Outputs 2>&1 && { echo "${green}${bold}完成${normal}" | tee -a $Outputs ; } || { echo "${red}${bold}失败${normal}" | tee -a $Outputs ; }
+    done
+fi
+
+rm -f /log/kernel_tobe_del_list
+_update_grub ; }
+
+
+
+# 仅保留指定内核，删除其他内核
+function _delete_other_kernel() {
 echo -e "\n  ${bold}卸载多余内核及其头文件 ... ${normal}\n" | tee -a $Outputs
 dpkg -l | grep linux-image   | grep -v "${kernel_version}" | awk '{print $2}' >  /log/kernel_tobe_del_list
 dpkg -l | grep ovhkernel     | grep -v "${kernel_version}" | awk '{print $2}' >> /log/kernel_tobe_del_list
