@@ -14,8 +14,8 @@
 # http://xiaofd.win/onekey-ruisu.html
 # https://teddysun.com/489.html
 
-ScriptVersion=2.0.9
-ScriptDate=2018.10.16
+ScriptVersion=2.1.0
+ScriptDate=2018.10.18
 
 # 颜色 -----------------------------------------------------------------------------------
 
@@ -205,7 +205,9 @@ cat -n /tmp/system_kernel_list | sed 's/\t/ /g' | sed "s/ linux-/) ${green}linux
 echo -e  "\n  ${jiacu}当前脚本版本：$ScriptVersion"
 [[ $DeBUG == 1 ]] && echo -e  "\n  当前脚本已处于调试模式"
 echo -e  "\n  ${yellow}${bold}使用本脚本前请先阅读本脚本 GitHub 上的 README；作者水平菜，不保证脚本不会翻车${jiacu}"
-echo -e  "\n  如果运行时出错退出，可以输入这条命令查看日志：${red}cat $Outputs${jiacu}\n"
+echo -e  "\n  ${shanshuo}如果运行时出错退出，可以输入这条命令查看日志：${red}cat $Outputs${jiacu}\n"
+echo -e  "\n  ${shanshuo}如果运行时出错退出，可以输入这条命令查看日志：${red}cat $Outputs${jiacu}\n"
+echo -e  "\n  ${shanshuo}如果运行时出错退出，可以输入这条命令查看日志：${red}cat $Outputs${jiacu}\n"
 
 echo -e  "  ${green}(01) ${jiacu}安装 原版 BBR "
 echo -e  "  ${green}(02) ${jiacu}安装 魔改 BBR (tsunami) "
