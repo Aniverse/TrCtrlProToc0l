@@ -14,7 +14,7 @@
 # http://xiaofd.win/onekey-ruisu.html
 # https://teddysun.com/489.html
 
-ScriptVersion=2.1.0
+ScriptVersion=2.1.1
 ScriptDate=2018.10.18
 
 # 颜色 -----------------------------------------------------------------------------------
@@ -205,9 +205,13 @@ cat -n /tmp/system_kernel_list | sed 's/\t/ /g' | sed "s/ linux-/) ${green}linux
 echo -e  "\n  ${jiacu}当前脚本版本：$ScriptVersion"
 [[ $DeBUG == 1 ]] && echo -e  "\n  当前脚本已处于调试模式"
 echo -e  "\n  ${yellow}${bold}使用本脚本前请先阅读本脚本 GitHub 上的 README；作者水平菜，不保证脚本不会翻车${jiacu}"
-echo -e  "\n  ${shanshuo}如果运行时出错退出，可以输入这条命令查看日志：${red}cat $Outputs${jiacu}\n"
-echo -e  "\n  ${shanshuo}如果运行时出错退出，可以输入这条命令查看日志：${red}cat $Outputs${jiacu}\n"
-echo -e  "\n  ${shanshuo}如果运行时出错退出，可以输入这条命令查看日志：${red}cat $Outputs${jiacu}\n"
+echo -e  "\n  ${yellow}${bold}重要的事情说三遍！！！${jiacu}"
+echo -e  "\n  ${shanshuo}如果运行时出错退出，可以输入这条命令查看日志：${red}cat $Outputs${jiacu}"
+echo -e  "  ${shanshuo}如果运行时出错退出，可以输入这条命令查看日志：${red}cat $Outputs${jiacu}"
+echo -e  "  ${shanshuo}如果运行时出错退出，可以输入这条命令查看日志：${red}cat $Outputs${jiacu}"
+echo -e  "  如需报错请务必附上日志！如需报错请务必附上日志！如需报错请务必附上日志！${jiacu}\n"
+
+# 下次考虑把 exit 1 也加上报错信息提示
 
 echo -e  "  ${green}(01) ${jiacu}安装 原版 BBR "
 echo -e  "  ${green}(02) ${jiacu}安装 魔改 BBR (tsunami) "
