@@ -14,8 +14,8 @@
 # http://xiaofd.win/onekey-ruisu.html
 # https://teddysun.com/489.html
 
-ScriptVersion=2.0.8
-ScriptDate=2018.10.14
+ScriptVersion=2.0.9
+ScriptDate=2018.10.16
 
 # 颜色 -----------------------------------------------------------------------------------
 
@@ -379,6 +379,7 @@ elif [[ $SSKernel == "${red}否${jiacu}" ]] && [[ $DISTRO == ubuntu ]]; then
     kernel_version=4.4.0-47
     _ubuntu_serverspeeder_kernel_4.4.0-47_apt
     _delete_other_kernel
+    _delete_other_kernel # 可能上一次卸载的时候又给你强行安装一个 4.4.0 最新的内核，所以再删一次
     _serverspeeder_autoinstall_after_reboot
     [[ ! $DeBUG == 1 ]] && echo -e "\n  ${bold}即将重启系统，重启后会自动安装 ${green}锐速${jiacu} ... ${normal}\n" && reboot
 elif [[ $SSKernel == "${red}否${jiacu}" ]] && [[ $DISTRO == debian ]]; then
@@ -387,6 +388,7 @@ elif [[ $SSKernel == "${red}否${jiacu}" ]] && [[ $DISTRO == debian ]]; then
     kernel_version=3.16.0-4
     _debian_serverspeeder_kernel_3.16.0-4_apt
     _delete_other_kernel
+    _delete_other_kernel # 可能上一次卸载的时候又给你强行安装一个 3.16.0 最新的内核（目前是 3.16.0-7），所以再删一次
     _serverspeeder_autoinstall_after_reboot
     [[ ! $DeBUG == 1 ]] && echo -e "\n  ${bold}即将重启系统，重启后会自动安装 ${green}锐速${jiacu} ... ${normal}\n" && reboot
 # elif [[ $SSKernel == "${red}否${jiacu}" ]] && [[ $CODENAME == xenial ]]; then
