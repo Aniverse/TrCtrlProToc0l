@@ -14,8 +14,8 @@
 # http://xiaofd.win/onekey-ruisu.html
 # https://teddysun.com/489.html
 
-ScriptVersion=2.1.1
-ScriptDate=2018.10.18
+ScriptVersion=2.1.2
+ScriptDate=2018.10.21
 
 # 颜色 -----------------------------------------------------------------------------------
 
@@ -302,8 +302,9 @@ if [[ $BBRKernel == "${green}是${jiacu}" ]]; then
     echo -ne "\n  ${bold}理论上当前内核已支持 ${green}原版 BBR，不安装新内核，直接启用 BBR ...${normal} "
     bbrname=bbr
     _enable_bbr ; echo
-    if [[ ` lsmod | grep bbr ` ]]; then echo -e "\n  ${bold}BBR 已启用 ...\n${normal}"
-    else echo -e "\n  ${bold}${red}警告 BBR 可能开启失败！${normal}\n" ; exit 1 ; fi
+  # if [[ ` lsmod | grep bbr ` ]]; then echo -e "\n  ${bold}BBR 已启用 ...\n${normal}"
+  # else echo -e "\n  ${bold}${red}警告 BBR 可能开启失败！${normal}\n" ; exit 1 ; fi
+  echo -e "\n  ${bold}BBR 大概已经已启用了（说真的我也不确定...） \n${normal}"
 else
     _ask_continue2
   # echo -e "  ${bold}当前内核不支持 BBR，先安装 ${green}4.11.12${jiacu} 内核以启用 BBR ...${normal} "
