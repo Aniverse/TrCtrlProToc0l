@@ -14,7 +14,7 @@
 # http://xiaofd.win/onekey-ruisu.html
 # https://teddysun.com/489.html
 
-ScriptVersion=2.1.3
+ScriptVersion=2.1.4
 ScriptDate=2018.10.21
 
 # 颜色 -----------------------------------------------------------------------------------
@@ -474,7 +474,7 @@ function _selected_ss_kernel_install() {
 if   [[ $CODENAME == xenial ]]; then
      echo -e "\n  ${bold}安装 ${green}3.16.0-43${jiacu} 内核 ...${normal} \n"
      kernelver=3.16.0-43-generic
-     _ubuntu_serverspeeder_kernel_3.16.0-43
+     _ubuntu_serverspeeder_kernel_repo
      _delete_other_kernel
      _serverspeeder_autoinstall_after_reboot
 elif [[ $CODENAME == jessie ]]; then
@@ -755,8 +755,9 @@ wget --no-check-certificate -qO 3.deb https://github.com/Aniverse/SSKernel/raw/m
 echo ` debconf-get-selections linux-image-3.16.0-43-generic | grep -C5 "keep the local version currently installed" | grep keep_current | sed "s/select/note/g"` | debconf-set-selections
 echo ` debconf-get-selections linux-image-extra-3.16.0-43-generic | grep -C5 "keep the local version currently installed" | grep keep_current | sed "s/select/note/g"` | debconf-set-selections
 echo ` debconf-get-selections linux-headers-3.16.0-43-generic | grep -C5 "keep the local version currently installed" | grep keep_current | sed "s/select/note/g"` | debconf-set-selections
-{ dpkg -i [12].deb >> $Outputs 2>&1 ; } || { echo -e "\n  ${bold}${red}错误${jiacu} 安装 内核 失败！${normal}" | tee -a $Outputs ; exit 1 ; }
-# dpkg -i 3.deb >> $Outputs 2>&1 ; apt-get -f -y install
+{ dpkg -i 1.deb >> $Outputs 2>&1 ; } || { echo -e "\n  ${bold}${red}错误${jiacu} 安装 内核 失败！${normal}" | tee -a $Outputs ; exit 1 ; }
+dpkg -i 2.deb >> $Outputs 2>&1 ; apt-get -f -y install >> $Outputs 2>&1
+dpkg -i 3.deb >> $Outputs 2>&1 ; apt-get -f -y install >> $Outputs 2>&1
 rm  -rf [123].deb ; }
 
 
@@ -764,7 +765,7 @@ rm  -rf [123].deb ; }
 # Ubuntu 从系统源安装锐速内核（For ServerSpeeder）
 function _ubuntu_serverspeeder_kernel_repo() {
 sed -i '/deb http:\/\/security.ubuntu.com\/ubuntu trusty-security main/'d /etc/apt/sources.list
-echo "deb http://security.ubuntu.com/ubuntu trusty-security main" >> /etc/apt/sources.list
+[[ `grep "trusty-security" /etc/apt/sources.list` ]] && sleep 0 || echo "deb http://security.ubuntu.com/ubuntu trusty-security main" >> /etc/apt/sources.list
 echo -ne "\n  ${bold}添加源，更新 ...  ${normal}" | tee -a $Outputs ; echo >> $Outputs
 { apt-get update >> $Outputs 2>&1 ; } && { echo "${green}${bold}完成${normal}" | tee -a $Outputs ; }
 echo -ne "\n  ${bold}安装内核 ...  ${normal}" | tee -a $Outputs     ; echo >> $Outputs
