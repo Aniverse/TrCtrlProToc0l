@@ -14,7 +14,7 @@
 # http://xiaofd.win/onekey-ruisu.html
 # https://teddysun.com/489.html
 
-ScriptVersion=2.2.0
+ScriptVersion=2.2.1
 ScriptDate=2018.10.23
 
 # 颜色 -----------------------------------------------------------------------------------
@@ -58,6 +58,7 @@ CODENAME=`  cat /etc/os-release | grep VERSION= | tr '[A-Z]' '[a-z]' | sed 's/\"
 [[ $EUID -ne 0 ]] && echo -e "\n${red}错误${jiacu} 请使用 root 运行本脚本！${normal}" && exit 1
 [[ ! $DeBUG == 1 ]] &&
 [[ -d /proc/vz ]] && echo -e "\n${red}错误${jiacu} 不支持 OpenVZ！${normal}" && exit 1
+# Xen-PV 也不支持，不过就不作检测了……
 [[ ! $DeBUG == 1 ]] &&
 [[ ! $KernelBit == 64 ]] && echo -e "\n${red}错误${jiacu} 不支持非 64 位系统！${normal}" && exit 1
 [[ -z "$(dpkg -l |grep 'grub-')" ]] && echo -e "\n${red}错误${jiacu} 未发现 grub！${normal}" && exit 1
@@ -211,6 +212,8 @@ echo -e  "\n  ${shanshuo}如果运行时出错退出，可以输入这条命令�
 # echo -e  "  ${shanshuo}如果运行时出错退出，可以输入这条命令查看日志：${red}cat $Outputs${jiacu}"
 # echo -e  "  ${shanshuo}如果运行时出错退出，可以输入这条命令查看日志：${red}cat $Outputs${jiacu}"
 echo -e  "  如需报错请务必附上日志！${jiacu}\n"
+
+[[ ! $( dpkg -l | grep $(uname -r) ) ]] && echo -e "/n  ${bold}${red}注意${jiacu} 系统中检测不到你当前的内核，你可能正在使用来自 netboot 的内核。这种情况下本脚本的功能不一定能正常工作！/n"
 
 # 下次考虑把 exit 1 也加上报错信息提示
 
