@@ -54,7 +54,7 @@ bash -c "$(wget --no-check-certificate -qO- https://github.com/Aniverse/TrCtrlPr
 这样无需再次安装，指定用那个内核或者卸载掉其他内核即可  
 
 - **4.11.12 内核使用预先编译好的魔改算法文件**  
-这样可以省略编译过程  
+这样可以省略编译过程，也可以不用安装依赖……  
 
 ## Known Issues
 
@@ -64,11 +64,11 @@ bash -c "$(wget --no-check-certificate -qO- https://github.com/Aniverse/TrCtrlPr
 - **某些情况下重启后 锐速 或 BBR 没有安装成功**  
 没成功的话只能手动再来一次了……  
 
-- **无法删除 PVE 内核**  
-因为这个的包名不太一样……以后改  
+- **Debian 无法安装普通的 4.16 及以上内核**  
+因为依赖的原因装不上，暂时不知道有没有解决办法，不过 Xanmod 可以安装  
 
-- **Debian 无法安装 4.16 及以上内核**  
-似乎无解...  
+- **有时候提示卸载内核失败但其实是成功的**  
+因为卸载其他内核的时候就把那个内核给卸载了，所以等轮到卸载它的时候没东西可以卸载就提示失败    
 
 ![Error01](https://github.com/Aniverse/TrCtrlProToc0l/raw/master/Images/Error01.png)
 ![Error02](https://github.com/Aniverse/TrCtrlProToc0l/raw/master/Images/Error02.png)
