@@ -14,7 +14,7 @@
 # http://xiaofd.win/onekey-ruisu.html
 # https://teddysun.com/489.html
 
-ScriptVersion=2.1.6
+ScriptVersion=2.1.7
 ScriptDate=2018.10.23
 
 # 颜色 -----------------------------------------------------------------------------------
@@ -224,6 +224,7 @@ echo -e  "  ${green}(13) ${jiacu}安装 特定的锐速内核 "
 echo -e  "  ${green}(21) ${jiacu}卸载 BBR "
 echo -e  "  ${green}(22) ${jiacu}卸载 锐速 "
 echo -e  "  ${green}(23) ${jiacu}卸载 多余内核 "
+echo -e  "  ${green}(24) ${jiacu}卸载 指定内核 "
 [[ $DeBUG == 1 ]] &&
 echo -e  "  ${green}(31) ${jiacu}安装 Xanmod "
 echo -e  "  ${green}(90) ${jiacu}重启 "
@@ -268,6 +269,12 @@ case $response in
                 [[ ! ` dpkg -l | grep linux-image | grep "$kernel_version" ` ]] && { echo -e "\n  ${bold}${red}错误${jiacu} 大佬，你压根就没装这个内核吧！${normal}" ; unset kernel_version ; }
             done
             _delete_other_kernel ;;
+        23) # 卸载 多余内核
+            while [[ -z $kernel_version ]]; do
+                echo -ne "\n  ${bold}请输入你要 ${baihongse}卸载${jiacu} 的内核版本，其他版本的内核将会被保留：${normal} " ; read -e kernel_version
+                [[ ! ` dpkg -l | grep linux-image | grep "$kernel_version" ` ]] && { echo -e "\n  ${bold}${red}错误${jiacu} 大佬，你压根就没装这个内核吧！${normal}" ; unset kernel_version ; }
+            done
+            _delete_kernel ;;
         31) # 安装 xanmod
             _xanmod_install ;;
         90) # 重启
