@@ -14,7 +14,7 @@
 # http://xiaofd.win/onekey-ruisu.html
 # https://teddysun.com/489.html
 
-ScriptVersion=2.1.9
+ScriptVersion=2.2.0
 ScriptDate=2018.10.23
 
 # 颜色 -----------------------------------------------------------------------------------
@@ -171,6 +171,7 @@ else bbrinuse="${red}否${jiacu}" ; fi
 
 dpkg -l | grep linux-image   | awk '{print $2}' >> /tmp/system_kernel_list
 dpkg -l | grep ovhkernel     | awk '{print $2}' >> /tmp/system_kernel_list
+dpkg -l | grep pve-kernel    | awk '{print $2}' >> /tmp/system_kernel_list
 dpkg -l | grep linux-headers | awk '{print $2}' >> /tmp/system_kernel_list
 dpkg -l | grep linux-modules | awk '{print $2}' >> /tmp/system_kernel_list
 
@@ -1127,6 +1128,7 @@ echo -e "\n  ${bold}卸载指定内核及其头文件 ... ${normal}\n" | tee -a 
 
 dpkg -l | grep linux-image   | grep "${kernel_version}" | awk '{print $2}' >  /log/kernel_tobe_del_list
 dpkg -l | grep ovhkernel     | grep "${kernel_version}" | awk '{print $2}' >> /log/kernel_tobe_del_list
+dpkg -l | grep pve-kernel    | grep "${kernel_version}" | awk '{print $2}' >> /log/kernel_tobe_del_list
 dpkg -l | grep linux-headers | grep "${kernel_version}" | awk '{print $2}' >> /log/kernel_tobe_del_list
 dpkg -l | grep linux-modules | grep "${kernel_version}" | awk '{print $2}' >> /log/kernel_tobe_del_list
 kernel_total_num=` cat /log/kernel_tobe_del_list | wc -l `
@@ -1152,6 +1154,7 @@ function _delete_other_kernel() {
 echo -e "\n  ${bold}卸载其他内核及其头文件 ... ${normal}\n" | tee -a $Outputs
 dpkg -l | grep linux-image   | grep -v "${kernel_version}" | awk '{print $2}' >  /log/kernel_tobe_del_list
 dpkg -l | grep ovhkernel     | grep -v "${kernel_version}" | awk '{print $2}' >> /log/kernel_tobe_del_list
+dpkg -l | grep pve-kernel    | grep -v "${kernel_version}" | awk '{print $2}' >> /log/kernel_tobe_del_list
 dpkg -l | grep linux-headers | grep -v "${kernel_version}" | awk '{print $2}' >> /log/kernel_tobe_del_list
 dpkg -l | grep linux-modules | grep -v "${kernel_version}" | awk '{print $2}' >> /log/kernel_tobe_del_list
 kernel_total_num=` cat /log/kernel_tobe_del_list | wc -l `
