@@ -14,7 +14,7 @@
 # http://xiaofd.win/onekey-ruisu.html
 # https://teddysun.com/489.html
 
-ScriptVersion=2.1.8
+ScriptVersion=2.1.9
 ScriptDate=2018.10.23
 
 # 颜色 -----------------------------------------------------------------------------------
@@ -550,7 +550,7 @@ elif [[ $XanmodVer == 4.17 ]]; then
      echo ; dpkg -i linux-image*.deb ; dpkg -i linux-headers*.deb
    # echo ; apt-get install -y ./*.deb
 elif [[ $XanmodVer == 4.18  ]]; then
-     kernel_version=4.18.16 ; _xanmod_apt_install
+     kernel_version=4.18.16
      wget --no-check-certificate -q https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/4.18/linux-image-4.18.16-xanmod9_1.181020_amd64.deb
      wget --no-check-certificate -q https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/4.18/linux-headers-4.18.16-xanmod9_1.181020_amd64.deb
      echo ; dpkg -i linux-image*.deb ; dpkg -i linux-headers*.deb
@@ -1149,7 +1149,7 @@ _update_grub ; }
 
 # 仅保留指定内核，删除其他内核
 function _delete_other_kernel() {
-echo -e "\n  ${bold}卸载多余内核及其头文件 ... ${normal}\n" | tee -a $Outputs
+echo -e "\n  ${bold}卸载其他内核及其头文件 ... ${normal}\n" | tee -a $Outputs
 dpkg -l | grep linux-image   | grep -v "${kernel_version}" | awk '{print $2}' >  /log/kernel_tobe_del_list
 dpkg -l | grep ovhkernel     | grep -v "${kernel_version}" | awk '{print $2}' >> /log/kernel_tobe_del_list
 dpkg -l | grep linux-headers | grep -v "${kernel_version}" | awk '{print $2}' >> /log/kernel_tobe_del_list
