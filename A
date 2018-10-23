@@ -14,7 +14,7 @@
 # http://xiaofd.win/onekey-ruisu.html
 # https://teddysun.com/489.html
 
-ScriptVersion=2.2.1
+ScriptVersion=2.2.2
 ScriptDate=2018.10.23
 
 # 颜色 -----------------------------------------------------------------------------------
@@ -213,7 +213,7 @@ echo -e  "\n  ${shanshuo}如果运行时出错退出，可以输入这条命令�
 # echo -e  "  ${shanshuo}如果运行时出错退出，可以输入这条命令查看日志：${red}cat $Outputs${jiacu}"
 echo -e  "  如需报错请务必附上日志！${jiacu}\n"
 
-[[ ! $( dpkg -l | grep $(uname -r) ) ]] && echo -e "/n  ${bold}${red}注意${jiacu} 系统中检测不到你当前的内核，你可能正在使用来自 netboot 的内核。这种情况下本脚本的功能不一定能正常工作！/n"
+[[ ! $( dpkg -l | grep $(uname -r) ) ]] && echo -e "\n  ${bold}${red}注意${jiacu} 系统中检测不到你当前的内核，你可能正在使用来自 netboot 的内核。\n       这种情况下本脚本的功能不一定能正常工作！\n"
 
 # 下次考虑把 exit 1 也加上报错信息提示
 
@@ -307,16 +307,26 @@ esac ; }
 # 安装 原版 BBR
 function _obbr_install() {
 
-[[ `grep "Advanced options for Ubuntu" /etc/default/grub` ]] && sed -i 's/GRUB_DEFAULT=.*/GRUB_DEFAULT=""/' /etc/default/grub
+# [[ `grep "Advanced options for Ubuntu" /etc/default/grub` ]] && sed -i 's/GRUB_DEFAULT=.*/GRUB_DEFAULT=""/' /etc/default/grub
 
 if [[ $BBRKernel == "${green}是${jiacu}" ]]; then
-    echo -ne "\n  ${bold}理论上当前内核已支持 ${green}原版 BBR，不安装新内核，直接启用 BBR ...${normal} "
+
+    echo -ne "\n  ${bold}理论上当前内核已支持 ${green}原版 BBR，尝试直接启用 BBR ...${normal} "
     bbrname=bbr
     _enable_bbr ; echo
+
+  # 这个以后再拿去判断，现在（2018.10.23）懒得动了。。。
+    ls /lib/modules/$(uname -r)/kernel/net/ipv4 2>/dev/null | grep -q bbr && bbr_exist=yes || bbr_exist=no
+
   # if [[ ` lsmod | grep bbr ` ]]; then echo -e "\n  ${bold}BBR 已启用 ...\n${normal}"
   # else echo -e "\n  ${bold}${red}警告 BBR 可能开启失败！${normal}\n" ; exit 1 ; fi
-  echo -e "\n  ${bold}BBR 大概已经已启用了（说真的我也不确定...） \n${normal}"
+  # echo -e "\n  ${bold}BBR 大概已经已启用了（说真的我也不确定...） \n${normal}"
+
+    if [[ $(cat /proc/sys/net/ipv4/tcp_congestion_control) == bbr ]]; then echo -e "\n  ${bold}BBR 已启用 ...\n${normal}"
+    else echo -e "\n  ${bold}${red}警告 BBR 可能开启失败！考虑换个内核？${normal}\n" ; exit 1 ; fi
+
 else
+
     _ask_continue2
   # echo -e "  ${bold}当前内核不支持 BBR，先安装 ${green}4.11.12${jiacu} 内核以启用 BBR ...${normal} "
     _online_ubuntu_bbr_firmware
@@ -324,6 +334,7 @@ else
     bbrname=bbr
     _enable_bbr
     [[ ! $DeBUG == 1 ]] && echo -ne "\n  ${bold}即将重启系统，重启后 ${green}BBR${jiacu} 将会启动 ... ${normal}\n" && reboot
+
 fi ; }
 
 
@@ -331,7 +342,7 @@ fi ; }
 # 安装 Yankee版魔改 BBR
 function _ykbbr_install() {
 
-[[ `grep "Advanced options for Ubuntu" /etc/default/grub` ]] && sed -i 's/GRUB_DEFAULT=.*/GRUB_DEFAULT=0/' /etc/default/grub
+# [[ `grep "Advanced options for Ubuntu" /etc/default/grub` ]] && sed -i 's/GRUB_DEFAULT=.*/GRUB_DEFAULT=0/' /etc/default/grub
 
 if [[ $YKKernel == "${green}是${jiacu}" ]]; then
     echo -e "\n  ${bold}理论上当前内核已支持 ${green}Yankee${jiacu} 版魔改 BBR，安装并启用魔改 BBR ...${normal} "
@@ -360,7 +371,7 @@ fi ; }
 # 安装 南琴浪版魔改 BBR
 function _nqlbbr_install() {
 
-[[ `grep "Advanced options for Ubuntu" /etc/default/grub` ]] && sed -i 's/GRUB_DEFAULT=.*/GRUB_DEFAULT=""/' /etc/default/grub
+# [[ `grep "Advanced options for Ubuntu" /etc/default/grub` ]] && sed -i 's/GRUB_DEFAULT=.*/GRUB_DEFAULT=""/' /etc/default/grub
 
 if [[ $NQLKernel == "${green}是${jiacu}" ]]; then
     echo -e "\n  ${bold}理论上当前内核已支持 ${green}南琴浪${jiacu} 版魔改 BBR，安装并启用魔改 BBR ...${normal} "
@@ -969,6 +980,7 @@ sed -i '/net.core.default_qdisc.*/d' /etc/sysctl.conf
 sed -i '/net.ipv4.tcp_congestion_control.*/d' /etc/sysctl.conf
 echo "net.core.default_qdisc = fq" >> /etc/sysctl.conf
 echo "net.ipv4.tcp_congestion_control = $bbrname" >> /etc/sysctl.conf
+modprobe tcp_$bbrname >> $Outputs 2>&1
 # sysctl -w net.ipv4.tcp_congestion_control=$bbrname >> $Outputs 2>&1
 sysctl -p >> $Outputs 2>&1 ; }
 
