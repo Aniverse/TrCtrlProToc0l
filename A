@@ -14,7 +14,7 @@
 # http://xiaofd.win/onekey-ruisu.html
 # https://teddysun.com/489.html
 
-ScriptVersion=2.1.5
+ScriptVersion=2.1.6
 ScriptDate=2018.10.23
 
 # 颜色 -----------------------------------------------------------------------------------
@@ -746,6 +746,7 @@ rm  -rf [123].deb ; }
 
 # Ubuntu 安装 4.4.0-47 内核（apt-get install）（For ServerSpeeder）
 function _ubuntu_serverspeeder_kernel_4.4.0-47_apt() {
+[[ $CODENAME == bionic ]] && [[ ! `grep "xenial" /etc/apt/sources.list` ]] && echo -e "\ndeb http://archive.ubuntu.com/ubuntu/ xenial-security main restricted universe multiverse" >> /etc/apt/sources.list
 apt-get update >> $Outputs 2>&1
 apt-get install -y linux-image-4.4.0-47-generic linux-image-extra-4.4.0-47-generic linux-headers-4.4.0-47-generic >> $Outputs 2>&1
 [[ ! $( dpkg -l | grep linux-image-4.4.0-47-generic ) ]] && { echo -e "\n  ${bold}${red}错误${jiacu} 安装 内核 失败！${normal}" | tee -a $Outputs ; exit 1 ; } ; }
@@ -771,7 +772,7 @@ rm  -rf [123].deb ; }
 # Ubuntu 从系统源安装锐速内核（For ServerSpeeder）
 function _ubuntu_serverspeeder_kernel_repo() {
 sed -i '/deb http:\/\/security.ubuntu.com\/ubuntu trusty-security main/'d /etc/apt/sources.list
-[[ `grep "trusty-security" /etc/apt/sources.list` ]] && sleep 0 || echo "deb http://security.ubuntu.com/ubuntu trusty-security main" >> /etc/apt/sources.list
+[[ `grep "trusty-security" /etc/apt/sources.list` ]] && sleep 0 || echo -e "\ndeb http://security.ubuntu.com/ubuntu trusty-security main" >> /etc/apt/sources.list
 echo -ne "\n  ${bold}添加源，更新 ...  ${normal}" | tee -a $Outputs ; echo >> $Outputs
 { apt-get update >> $Outputs 2>&1 ; } && { echo "${green}${bold}完成${normal}" | tee -a $Outputs ; }
 echo -ne "\n  ${bold}安装内核 ...  ${normal}" | tee -a $Outputs     ; echo >> $Outputs
