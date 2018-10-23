@@ -21,7 +21,7 @@ bash -c "$(wget --no-check-certificate -qO- https://github.com/Aniverse/TrCtrlPr
 
 - **Adapt for Linux Kernel 4.13-4.18**  
 尝试针对 4.13-4.18 内核适配魔改版 BBR *（尚处于测试阶段，有时候会失败，求稳的话建议还是使用老版本内核比如 4.11.12）*  
-针对 4.16 及以上内核还需要安装 modules 的情况也做了处理，会先安装 modules  
+针对 4.16 及以上内核还需要安装 modules 的情况也做了处理，会先安装 modules（Debian 8/9 可能装不上）  
 
 - **Adapt for Online.net Dedicated Server**  
 有一些 Online 独服的 Ubuntu 系统需要补充一些固件才能在更换高版本新内核后不翻车  
@@ -65,7 +65,7 @@ bash -c "$(wget --no-check-certificate -qO- https://github.com/Aniverse/TrCtrlPr
 没成功的话只能手动再来一次了……  
 
 - **无法删除 PVE 内核**  
-因为这个的包名不太一样……  
+因为这个的包名不太一样……以后改  
 
 - **Debian 无法安装 4.16 及以上内核**  
 似乎无解...  
