@@ -14,7 +14,7 @@
 # http://xiaofd.win/onekey-ruisu.html
 # https://teddysun.com/489.html
 
-ScriptVersion=2.1.7
+ScriptVersion=2.1.8
 ScriptDate=2018.10.23
 
 # 颜色 -----------------------------------------------------------------------------------
@@ -269,7 +269,7 @@ case $response in
                 [[ ! ` dpkg -l | grep linux-image | grep "$kernel_version" ` ]] && { echo -e "\n  ${bold}${red}错误${jiacu} 大佬，你压根就没装这个内核吧！${normal}" ; unset kernel_version ; }
             done
             _delete_other_kernel ;;
-        23) # 卸载 多余内核
+        24) # 卸载 多余内核
             while [[ -z $kernel_version ]]; do
                 echo -ne "\n  ${bold}请输入你要 ${baihongse}卸载${jiacu} 的内核版本，其他版本的内核将会被保留：${normal} " ; read -e kernel_version
                 [[ ! ` dpkg -l | grep linux-image | grep "$kernel_version" ` ]] && { echo -e "\n  ${bold}${red}错误${jiacu} 大佬，你压根就没装这个内核吧！${normal}" ; unset kernel_version ; }
