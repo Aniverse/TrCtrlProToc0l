@@ -14,8 +14,8 @@
 # http://xiaofd.win/onekey-ruisu.html
 # https://teddysun.com/489.html
 
-ScriptVersion=2.2.2
-ScriptDate=2018.10.23
+ScriptVersion=2.2.3
+ScriptDate=2018.10.25
 
 # 颜色 -----------------------------------------------------------------------------------
 
@@ -104,7 +104,7 @@ function _menu() { clear ; echo
 # [[ $DeBUG == 1 ]] && { Outputs"/log/tcp.$SETUPDATE.log" ; }
 
 # 启用 rc.local
-[[ $CODENAME =~ (bionic|stretch) ]] && _enable_rclocal
+[[ $CODENAME =~ (bionic|stretch) ]] && [[ ! -f /etc/rc.local ]] && _enable_rclocal
 
 # 确保 debconf-get-selections 存在
 for ddd in debconf-set-selections debconf-get-selections ; do
@@ -204,7 +204,7 @@ echo -e  "  当前 硬盘 挂载方式                   $( cat /proc/mounts | g
 
 echo -e  "\n  当前系统内所有已安装的 kernel／headers／modules 列表\n"
 cat -n /tmp/system_kernel_list | sed 's/\t/ /g' | sed "s/ linux-/) ${green}linux-/g" | sed "s/ ovhkernel-/) ${green}ovhkernel-/g" | sed "s/     /  ${magenta}(0/g" | sed "s/    /  ${magenta}(/g"
-echo -e  "\n  ${jiacu}当前脚本版本：$ScriptVersion"
+echo -e  "\n  ${jiacu}当前脚本版本：$ScriptVersion        脚本更新时间：$ScriptDate"
 [[ $DeBUG == 1 ]] && echo -e  "\n  当前脚本已处于调试模式"
 echo -e  "\n  ${yellow}${bold}使用本脚本前请先阅读本脚本 GitHub 上的 README；作者水平菜，不保证脚本不会翻车${jiacu}"
 # echo -e  "\n  ${yellow}${bold}重要的事情说三遍！！！${jiacu}"
