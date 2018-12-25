@@ -14,8 +14,8 @@
 # http://xiaofd.win/onekey-ruisu.html
 # https://teddysun.com/489.html
 
-ScriptVersion=2.2.3
-ScriptDate=2018.10.25
+ScriptVersion=2.2.4
+ScriptDate=2018.12.25
 
 # 颜色 -----------------------------------------------------------------------------------
 
@@ -104,7 +104,7 @@ function _menu() { clear ; echo
 # [[ $DeBUG == 1 ]] && { Outputs"/log/tcp.$SETUPDATE.log" ; }
 
 # 启用 rc.local
-[[ $CODENAME =~ (bionic|stretch) ]] && [[ ! -f /etc/rc.local ]] && _enable_rclocal
+[[ $CODENAME =~ (bionic|stretch) ]] && _enable_rclocal
 
 # 确保 debconf-get-selections 存在
 for ddd in debconf-set-selections debconf-get-selections ; do
@@ -208,7 +208,7 @@ echo -e  "\n  ${jiacu}当前脚本版本：$ScriptVersion        脚本更新时
 [[ $DeBUG == 1 ]] && echo -e  "\n  当前脚本已处于调试模式"
 echo -e  "\n  ${yellow}${bold}使用本脚本前请先阅读本脚本 GitHub 上的 README；作者水平菜，不保证脚本不会翻车${jiacu}"
 # echo -e  "\n  ${yellow}${bold}重要的事情说三遍！！！${jiacu}"
-echo -e  "\n  ${shanshuo}如果运行时出错退出，可以输入这条命令查看日志：${red}cat $Outputs${jiacu}\n"
+[[ ! $DeBUG == 1 ]] && echo -e  "\n  ${shanshuo}如果运行时出错退出，可以输入这条命令查看日志：${red}cat $Outputs${jiacu}\n"
 # echo -e  "  ${shanshuo}如果运行时出错退出，可以输入这条命令查看日志：${red}cat $Outputs${jiacu}"
 # echo -e  "  ${shanshuo}如果运行时出错退出，可以输入这条命令查看日志：${red}cat $Outputs${jiacu}"
 echo -e  "  如需报错请务必附上日志！${jiacu}\n"
@@ -220,7 +220,8 @@ echo -e  "  如需报错请务必附上日志！${jiacu}\n"
 echo -e  "  ${green}(01) ${jiacu}安装 原版 BBR "
 echo -e  "  ${green}(02) ${jiacu}安装 魔改 BBR (tsunami) "
 echo -e  "  ${green}(03) ${jiacu}安装 魔改 BBR (nanqinlang) "
-echo -e  "  ${green}(04) ${jiacu}安装 锐速 "
+# echo -e  "  ${green}(04) ${jiacu}安装 bbrplus"
+echo -e  "  ${green}(06) ${jiacu}安装 锐速 "
 echo -e  "  ${green}(11) ${jiacu}安装 指定内核 "
 echo -e  "  ${green}(12) ${jiacu}安装 4.11.12 内核 "
 [[ $DeBUG == 1 ]] &&
@@ -255,7 +256,7 @@ case $response in
             _ykbbr_install ;;
     3 | 03) # 安装 魔改 BBR (nanqinlang)
             _nqlbbr_install ;;
-    4 | 04) # 安装 锐速
+    6 | 06) # 安装 锐速
             _ss_install ;;
         11) # 安装 最新内核
             _selected_kernel_install ;;
@@ -279,8 +280,10 @@ case $response in
                 [[ ! ` dpkg -l | grep linux-image | grep "$kernel_version" ` ]] && { echo -e "\n  ${bold}${red}错误${jiacu} 大佬，你压根就没装这个内核吧！${normal}" ; unset kernel_version ; }
             done
             _delete_kernel ;;
-        31) # 安装 xanmod
+        31) # 安装 xanmod，不删除其他内核
             _xanmod_install ;;
+        32) # 安装 xanmod
+            _xanmod_install ; _delete_other_kernel ; _delete_other_kernel ;;
         90) # 重启
             reboot ;;
         97) # 检查 IP 信息
@@ -542,8 +545,6 @@ if   [[ $XanmodVer == 4.12 ]]; then
      kernel_version=4.12.14
      wget --no-check-certificate -q https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/4.12/linux-image-4.12.14-xanmod15_1.170920_amd64.deb
      wget --no-check-certificate -q https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/4.12/linux-headers-4.12.14-xanmod15_1.170920_amd64.deb
-   # wget --no-check-certificate -q https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/intel-microcode_3.20180312.1_amd64.deb
-   # wget --no-check-certificate -q https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/iucode-tool_2.3.1-1_amd64.deb
      echo ; dpkg -i linux-image*.deb ; dpkg -i linux-headers*.deb
    # echo ; apt-get install -y ./*.deb
 elif [[ $XanmodVer == 4.15 ]]; then
@@ -576,28 +577,6 @@ fi
 # wget --no-check-certificate -q https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/linux-firmware_1.161_all.deb
 
 cd ; rm -rf deball
-
-mqo=1
-
-[[ $mqo == 1 ]] && {
-sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT=.*/GRUB_CMDLINE_LINUX_DEFAULT="quiet splash scsi_mod.use_blk_mq=y dm_mod.use_blk_mq=y"/' /etc/default/grub
-cat >/etc/udev/rules.d/60-schedulers.rules<<EOF
-ACTION=="add|change", KERNEL=="sd[a-z]", ATTR{queue/rotational}=="1", ATTR{queue/scheduler}="mq-deadline"
-EOF
-}
-
-[[ $mqo == 0 ]] && {
-[[ $(grep dm_mod.use_blk_mq=y /etc/default/grub) ]] && sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT=.*/GRUB_CMDLINE_LINUX_DEFAULT="quiet splash"/' /etc/default/grub
-cat >/etc/udev/rules.d/60-schedulers.rules<<EOF
-ACTION=="add|change", KERNEL=="sd[a-z]", ATTR{queue/rotational}=="1", ATTR{queue/scheduler}="deadline"
-EOF
-}
-
-# CPU 高性能模式，不过有的系统或者机器下好像没这选项……
-sed -i '$i\echo performance \| tee \/sys\/devices\/system\/cpu\/cpu*\/cpufreq\/scaling_governor \> \/dev\/null'  /etc/rc.local
-
-# 先不删除内核吧……
-# _delete_other_kernel
 
 # echo -e "\n  ${bold}完成，即将重启 ...${normal} \n"
 # reboot
@@ -1192,6 +1171,8 @@ _update_grub ; }
 
 # 启用 /etc/rc.local
 function _enable_rclocal() {
+
+[[ ! -f /etc/rc.local ]] &&
 cat <<EOF >/etc/rc.local
 #!/bin/sh -e
 #
@@ -1208,6 +1189,7 @@ cat <<EOF >/etc/rc.local
 
 exit 0
 EOF
+
 chmod +x /etc/rc.local
 systemctl start rc-local ; }
 
