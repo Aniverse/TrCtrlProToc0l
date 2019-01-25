@@ -14,8 +14,8 @@
 # http://xiaofd.win/onekey-ruisu.html
 # https://teddysun.com/489.html
 
-ScriptVersion=2.2.4
-ScriptDate=2018.12.25
+ScriptVersion=2.2.5
+ScriptDate=2019.01.25
 
 # 颜色 -----------------------------------------------------------------------------------
 
@@ -284,6 +284,12 @@ case $response in
             _xanmod_install ;;
         32) # 安装 xanmod
             _xanmod_install ; _delete_other_kernel ; _delete_other_kernel ;;
+        33) # 安装 xanmod，不删除其他内核
+            _liquorix_install ;;
+        34) # 安装 liquorix
+            _liquorix_install ; _delete_other_kernel ; _delete_other_kernel ;;
+        39) # 安装 HWE 内核
+            # apt install linux-generic-hwe-16.04 ;;
         90) # 重启
             reboot ;;
         97) # 检查 IP 信息
@@ -518,6 +524,7 @@ echo ; }
 
 # 安装 xanmod
 function _xanmod_apt_install() {
+# wget -q https://dl.xanmod.org/xanmod-repository.deb && dpkg -i xanmod-repository.deb
 echo 'deb http://deb.xanmod.org releases main' | tee /etc/apt/sources.list.d/xanmod-kernel.list
 wget -qO- http://deb.xanmod.org/gpg.key | apt-key add -
 apt-get update
@@ -570,8 +577,13 @@ elif [[ $XanmodVer == 4.18  ]]; then
      wget --no-check-certificate -q https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/4.18/linux-image-4.18.16-xanmod9_1.181020_amd64.deb
      wget --no-check-certificate -q https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/4.18/linux-headers-4.18.16-xanmod9_1.181020_amd64.deb
      echo ; dpkg -i linux-image*.deb ; dpkg -i linux-headers*.deb
+elif [[ $XanmodVer == 4.19  ]]; then
+     kernel_version=4.18.16
+     wget --no-check-certificate -q https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/4.19/linux-image-4.19.12-xanmod7_2.181223_amd64.deb
+     wget --no-check-certificate -q https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/4.19/linux-headers-4.19.12-xanmod7_2.181223_amd64.deb
+     echo ; dpkg -i linux-image*.deb ; dpkg -i linux-headers*.deb
 elif [[ $XanmodVer == apt  ]]; then
-     kernel_version=4.19 ; _xanmod_apt_install
+     kernel_version=4.20 ; _xanmod_apt_install
 fi
 
 # wget --no-check-certificate -q https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/linux-firmware_1.161_all.deb
