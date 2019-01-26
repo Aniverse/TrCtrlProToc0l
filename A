@@ -14,8 +14,8 @@
 # http://xiaofd.win/onekey-ruisu.html
 # https://teddysun.com/489.html
 
-ScriptVersion=2.2.5
-ScriptDate=2019.01.25
+ScriptVersion=2.2.6
+ScriptDate=2019.01.26
 
 # 颜色 -----------------------------------------------------------------------------------
 
@@ -230,8 +230,10 @@ echo -e  "  ${green}(21) ${jiacu}卸载 BBR "
 echo -e  "  ${green}(22) ${jiacu}卸载 锐速 "
 echo -e  "  ${green}(23) ${jiacu}卸载 多余内核 "
 echo -e  "  ${green}(24) ${jiacu}卸载 指定内核 "
-[[ $DeBUG == 1 ]] &&
+[[ $DeBUG == 1 ]] && {
 echo -e  "  ${green}(31) ${jiacu}安装 Xanmod "
+echo -e  "  ${green}(32) ${jiacu}安装 Xanmod，删除其他内核 "
+echo -e  "  ${green}(33) ${jiacu}安装 liquorix " ; }
 echo -e  "  ${green}(90) ${jiacu}重启 "
 [[ $DeBUG == 1 ]] &&
 echo -e  "  ${green}(97) ${jiacu}检查 IP 信息 " &&
@@ -280,14 +282,14 @@ case $response in
                 [[ ! ` dpkg -l | grep linux-image | grep "$kernel_version" ` ]] && { echo -e "\n  ${bold}${red}错误${jiacu} 大佬，你压根就没装这个内核吧！${normal}" ; unset kernel_version ; }
             done
             _delete_kernel ;;
-        31) # 安装 xanmod，不删除其他内核
+        31) # 安装 xanmod
             _xanmod_install ;;
-        32) # 安装 xanmod
+        32) # 安装 xanmod，删除其他内核
             _xanmod_install ; _delete_other_kernel ; _delete_other_kernel ;;
-        33) # 安装 xanmod，不删除其他内核
+        33) # 安装 liquorix
             _liquorix_install ;;
-        34) # 安装 liquorix
-            _liquorix_install ; _delete_other_kernel ; _delete_other_kernel ;;
+#       34) # 安装 liquorix，删除其他内核
+#           _liquorix_install ; _delete_other_kernel ; _delete_other_kernel ;;
         39) # 安装 HWE 内核
             # apt install linux-generic-hwe-16.04 ;;
         90) # 重启
@@ -594,6 +596,32 @@ cd ; rm -rf deball
 # reboot
 
 }
+
+
+
+
+
+# 安装 liquorix
+function _liquorix_install() {
+
+_online_ubuntu_bbr_firmware
+# apt-get update
+
+if   [[ $DISTRO == ubuntu ]]; then
+     [[ ! `command -v add-apt-repository`  ]] && apt-get install -y software-properties-common
+     add-apt-repository ppa:damentz/liquorix
+elif [[ $DISTRO == debian ]]; then
+     [[ ! $(command -v curl)  ]] && apt-get install -y curl
+     [ $(dpkg-query -W -f='${Status}' apt-transport-https 2>/dev/null | grep -c "ok installed") -eq 0 ] && apt-get install -y apt-transport-https
+     echo "deb http://liquorix.net/debian sid main
+deb-src http://liquorix.net/debian sid main" > /etc/apt/sources.list.d/liquorix.list
+     curl https://liquorix.net/linux-liquorix.pub | apt-key add -
+fi
+
+apt-get update
+apt-get install linux-image-liquorix-amd64 linux-headers-liquorix-amd64 -y ; }
+
+
 
 
 
