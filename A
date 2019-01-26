@@ -14,7 +14,7 @@
 # http://xiaofd.win/onekey-ruisu.html
 # https://teddysun.com/489.html
 
-ScriptVersion=2.2.8
+ScriptVersion=2.2.9
 ScriptDate=2019.01.26
 
 # 颜色 -----------------------------------------------------------------------------------
@@ -170,6 +170,7 @@ dpkg -l | grep ovhkernel     | awk '{print $2}' >> /tmp/system_kernel_list
 dpkg -l | grep pve-kernel    | awk '{print $2}' >> /tmp/system_kernel_list
 dpkg -l | grep linux-headers | awk '{print $2}' >> /tmp/system_kernel_list
 dpkg -l | grep linux-modules | awk '{print $2}' >> /tmp/system_kernel_list
+dpkg -l | grep generic-hwe   | awk '{print $2}' >> /tmp/system_kernel_list
 
 echo -e  " ${baizise}${bold}                                   El Psy Congroo!                                   ${normal} "
 echo -e  "  ${bold}"
@@ -284,7 +285,8 @@ case $response in
         33) # 安装 liquorix
             _liquorix_install ;;
         39) # 安装 HWE 内核
-            apt-get install -y linux-generic-hwe-16.04 ;;
+            [[ $CODENAME == xenial ]] && apt-get install -y linux-generic-hwe-16.04
+            [[ $CODENAME == bionic ]] && apt-get install -y linux-generic-hwe-18.04 ;;
         90) # 重启
             reboot ;;
         97) # 检查 IP 信息
@@ -1158,6 +1160,8 @@ dpkg -l | grep ovhkernel     | grep "${kernel_version}" | awk '{print $2}' >> /l
 dpkg -l | grep pve-kernel    | grep "${kernel_version}" | awk '{print $2}' >> /log/kernel_tobe_del_list
 dpkg -l | grep linux-headers | grep "${kernel_version}" | awk '{print $2}' >> /log/kernel_tobe_del_list
 dpkg -l | grep linux-modules | grep "${kernel_version}" | awk '{print $2}' >> /log/kernel_tobe_del_list
+dpkg -l | grep generic-hwe   | grep "${kernel_version}" | awk '{print $2}' >> /log/kernel_tobe_del_list
+
 kernel_total_num=` cat /log/kernel_tobe_del_list | wc -l `
 
 if [ $kernel_total_num > 1 ]; then
@@ -1184,6 +1188,8 @@ dpkg -l | grep ovhkernel     | grep -v "${kernel_version}" | awk '{print $2}' >>
 dpkg -l | grep pve-kernel    | grep -v "${kernel_version}" | awk '{print $2}' >> /log/kernel_tobe_del_list
 dpkg -l | grep linux-headers | grep -v "${kernel_version}" | awk '{print $2}' >> /log/kernel_tobe_del_list
 dpkg -l | grep linux-modules | grep -v "${kernel_version}" | awk '{print $2}' >> /log/kernel_tobe_del_list
+dpkg -l | grep generic-hwe   | grep -v "${kernel_version}" | awk '{print $2}' >> /log/kernel_tobe_del_list
+
 kernel_total_num=` cat /log/kernel_tobe_del_list | wc -l `
 
 if [ $kernel_total_num > 1 ]; then
