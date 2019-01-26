@@ -14,7 +14,7 @@
 # http://xiaofd.win/onekey-ruisu.html
 # https://teddysun.com/489.html
 
-ScriptVersion=2.2.6
+ScriptVersion=2.2.7
 ScriptDate=2019.01.26
 
 # 颜色 -----------------------------------------------------------------------------------
@@ -37,6 +37,11 @@ function isValidIpAddress() { echo $1 | grep -qE '^[0-9][0-9]?[0-9]?\.[0-9][0-9]
 function isInternalIpAddress() { echo $1 | grep -qE '(192\.168\.((\d{1,2})|(1\d{2})|(2[0-4]\d)|(25[0-5]))\.((\d{1,2})$|(1\d{2})$|(2[0-4]\d)$|(25[0-5])$))|(172\.((1[6-9])|(2\d)|(3[0-1]))\.((\d{1,2})|(1\d{2})|(2[0-4]\d)|(25[0-5]))\.((\d{1,2})$|(1\d{2})$|(2[0-4]\d)$|(25[0-5])$))|(10\.((\d{1,2})|(1\d{2})|(2[0-4]\d)|(25[0-5]))\.((\d{1,2})|(1\d{2})|(2[0-4]\d)|(25[0-5]))\.((\d{1,2})$|(1\d{2})$|(2[0-4]\d)$|(25[0-5])$))' ; }
 
 #  -----------------------------------------------------------------------------------
+
+cancel() { echo -e "${normal}"
+rm -f /tmp/system_kernel_list /log/kernel_tobe_del_list
+exit ; }
+trap cancel SIGINT
 
 # Outputs="/dev/null"
 export DEBIAN_FRONTEND=noninteractive
