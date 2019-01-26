@@ -14,7 +14,7 @@
 # http://xiaofd.win/onekey-ruisu.html
 # https://teddysun.com/489.html
 
-ScriptVersion=2.2.7
+ScriptVersion=2.2.8
 ScriptDate=2019.01.26
 
 # 颜色 -----------------------------------------------------------------------------------
@@ -87,16 +87,6 @@ region=$( echo $result | awk -F '"' '{print $4}' )
 city=$( echo $result | awk -F '"' '{print $6}' )
 isp=$( echo $result | awk -F '"' '{print $10}' )
 asn=$( wget -qO- https://ipapi.co/asn )
-
-# 非常蛋疼的设计，有点自欺欺人
-[[ $isp == "online.net" ]] && isp="Online.net"
-[[ $isp == "digitalocean.com" ]] && isp="Digital Ocean"
-[[ $isp == "hetzner.de" ]] && isp="Hetzner"
-[[ $isp == "leaseweb.com" ]] && isp="LeaseWeb"
-[[ `hostname -A | grep vultr` ]] && isp="Vultr, Choopa"
-[[ `hostname -A | grep seedhost` ]] && isp="SeedHost, LeaseWeb"
-[[ $asn == AS200052 ]] && isp="Feral Hosting"
-[[ $isp == "" ]] && isp="未检测到 ISP"
 
 showip=1
 }
@@ -293,10 +283,8 @@ case $response in
             _xanmod_install ; _delete_other_kernel ; _delete_other_kernel ;;
         33) # 安装 liquorix
             _liquorix_install ;;
-#       34) # 安装 liquorix，删除其他内核
-#           _liquorix_install ; _delete_other_kernel ; _delete_other_kernel ;;
         39) # 安装 HWE 内核
-            # apt install linux-generic-hwe-16.04 ;;
+            apt-get install -y linux-generic-hwe-16.04 ;;
         90) # 重启
             reboot ;;
         97) # 检查 IP 信息
