@@ -14,8 +14,8 @@
 # http://xiaofd.win/onekey-ruisu.html
 # https://teddysun.com/489.html
 
-ScriptVersion=2.2.9
-ScriptDate=2019.01.26
+ScriptVersion=2.3.0
+ScriptDate=2019.02.19
 
 # 颜色 -----------------------------------------------------------------------------------
 
@@ -408,7 +408,16 @@ function _ss_install() {
 if [[ $SSKernel == "${green}是${jiacu}" ]]; then
     echo -e "\n  ${bold}理论上当前内核已支持 ${green}锐速${jiacu}，直接安装 ... ${normal} "
     _serverspeeder_direct_install
-elif [[ $SSKernel == "${red}否${jiacu}" ]] && [[ $DISTRO == ubuntu ]]; then
+elif [[ $SSKernel == "${red}否${jiacu}" ]] && [[ $DISTRO == ubuntu ]] && [[ ! $CODENAME == bionic ]]; then
+    _ask_continue2
+    echo -ne "  ${bold}当前内核不支持 锐速，安装 ${green}3.16.0-43${jiacu} 内核 ... ${normal} \n"
+    export kernelver=3.16.0-43-generic
+    _ubuntu_serverspeeder_kernel_repo
+    _delete_other_kernel
+    _delete_other_kernel
+    _serverspeeder_autoinstall_after_reboot
+    [[ ! $DeBUG == 1 ]] && echo -e "\n  ${bold}即将重启系统，重启后会自动安装 ${green}锐速${jiacu} ... ${normal}\n" && reboot
+elif [[ $SSKernel == "${red}否${jiacu}" ]] && [[ $CODENAME == bionic ]]; then
     _ask_continue2
     echo -ne "  ${bold}当前内核不支持 锐速，安装 ${green}4.4.0-47${jiacu} 内核 ... ${normal} \n"
     kernel_version=4.4.0-47
@@ -426,22 +435,6 @@ elif [[ $SSKernel == "${red}否${jiacu}" ]] && [[ $DISTRO == debian ]]; then
     _delete_other_kernel # 可能上一次卸载的时候又给你强行安装一个 3.16.0 最新的内核（目前是 3.16.0-7），所以再删一次
     _serverspeeder_autoinstall_after_reboot
     [[ ! $DeBUG == 1 ]] && echo -e "\n  ${bold}即将重启系统，重启后会自动安装 ${green}锐速${jiacu} ... ${normal}\n" && reboot
-# elif [[ $SSKernel == "${red}否${jiacu}" ]] && [[ $CODENAME == xenial ]]; then
-#     _ask_continue2
-#     echo -ne "  ${bold}当前内核不支持 锐速，安装 ${green}3.16.0-43${jiacu} 内核 ... ${normal} \n"
-#     export kernelver=3.16.0-43-generic
-#     _ubuntu_serverspeeder_kernel_3.16.0-43
-#     _ubuntu_serverspeeder_updategrub
-#     _serverspeeder_autoinstall_after_reboot
-#     [[ ! $DeBUG == 1 ]] && echo -e "\n  ${bold}即将重启系统，重启后会自动安装 ${green}锐速${jiacu} ... ${normal}\n" && reboot
-# elif [[ $SSKernel == "${red}否${jiacu}" ]] && [[ $CODENAME == bionic ]]; then
-#     _ask_continue2
-#     echo -ne "  ${bold}当前内核不支持 锐速，安装 ${green}4.4.0-47${jiacu} 内核 ... ${normal} \n"
-#     export kernelver=4.4.0-47-generic
-#     _ubuntu_serverspeeder_kernel_4.4.0-47
-#     _ubuntu_serverspeeder_updategrub
-#     _serverspeeder_autoinstall_after_reboot
-#     [[ ! $DeBUG == 1 ]] && echo -e "\n  ${bold}即将重启系统，重启后会自动安装 ${green}锐速${jiacu} ... ${normal}\n" && reboot
 # elif [[ $SSKernel == "${red}否${jiacu}" ]] && [[ $CODENAME == jessie ]]; then
 #     _ask_continue2
 #     echo -ne "  ${bold}当前内核不支持 锐速，安装 ${green}3.12.1${jiacu} 内核 ... ${normal} "
