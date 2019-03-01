@@ -14,8 +14,8 @@
 # http://xiaofd.win/onekey-ruisu.html
 # https://teddysun.com/489.html
 
-ScriptVersion=2.3.0
-ScriptDate=2019.02.19
+ScriptVersion=2.3.1
+ScriptDate=2019.03.01
 
 # 颜色 -----------------------------------------------------------------------------------
 
@@ -199,14 +199,11 @@ echo -e  "  当前 硬盘 文件系统                   $( cat /proc/mounts | g
 echo -e  "  当前 硬盘 挂载方式                   $( cat /proc/mounts | grep -P "`df -k | sort -rn -k4 | awk '{print $1}' | head -1`\b" | awk '{print $4}' )"
 
 echo -e  "\n  当前系统内所有已安装的 kernel／headers／modules 列表\n"
-cat -n /tmp/system_kernel_list | sed 's/\t/ /g' | sed "s/ linux-/) ${green}linux-/g" | sed "s/ ovhkernel-/) ${green}ovhkernel-/g" | sed "s/     /  ${magenta}(0/g" | sed "s/    /  ${magenta}(/g"
+cat -n /tmp/system_kernel_list | sed 's/\t/ /g' | sed "s/ linux-/) ${green}linux-/g" | sed "s/ pve-/) ${green}pve-/g" | sed "s/ ovhkernel-/) ${green}ovhkernel-/g" | sed "s/     /  ${magenta}(0/g" | sed "s/    /  ${magenta}(/g"
 echo -e  "\n  ${jiacu}当前脚本版本：$ScriptVersion        脚本更新时间：$ScriptDate"
 [[ $DeBUG == 1 ]] && echo -e  "\n  当前脚本已处于调试模式"
 echo -e  "\n  ${yellow}${bold}使用本脚本前请先阅读本脚本 GitHub 上的 README；作者水平菜，不保证脚本不会翻车${jiacu}"
-# echo -e  "\n  ${yellow}${bold}重要的事情说三遍！！！${jiacu}"
 [[ ! $DeBUG == 1 ]] && echo -e  "\n  ${shanshuo}如果运行时出错退出，可以输入这条命令查看日志：${red}cat $Outputs${jiacu}\n"
-# echo -e  "  ${shanshuo}如果运行时出错退出，可以输入这条命令查看日志：${red}cat $Outputs${jiacu}"
-# echo -e  "  ${shanshuo}如果运行时出错退出，可以输入这条命令查看日志：${red}cat $Outputs${jiacu}"
 echo -e  "  如需报错请务必附上日志！${jiacu}\n"
 
 [[ ! $( dpkg -l | grep $(uname -r) ) ]] && echo -e "\n  ${bold}${red}注意${jiacu} 系统中检测不到你当前的内核，你可能正在使用来自 netboot 的内核。\n       这种情况下本脚本的功能不一定能正常工作！\n"
@@ -220,8 +217,9 @@ echo -e  "  ${green}(03) ${jiacu}安装 魔改 BBR (nanqinlang) "
 echo -e  "  ${green}(06) ${jiacu}安装 锐速 "
 echo -e  "  ${green}(11) ${jiacu}安装 指定内核 "
 echo -e  "  ${green}(12) ${jiacu}安装 4.11.12 内核 "
-[[ $DeBUG == 1 ]] &&
+[[ $DeBUG == 1 ]] && {
 echo -e  "  ${green}(13) ${jiacu}安装 特定的锐速内核 "
+echo -e  "  ${green}(14) ${jiacu}安装 特定的锐速内核 v2 " ; }
 echo -e  "  ${green}(21) ${jiacu}卸载 BBR "
 echo -e  "  ${green}(22) ${jiacu}卸载 锐速 "
 echo -e  "  ${green}(23) ${jiacu}卸载 多余内核 "
@@ -261,7 +259,9 @@ case $response in
         12) # 安装 4.11.12 内核
             _online_ubuntu_bbr_firmware ; _bbr_kernel_4_11_12 ;;
         13) # 安装 特定的锐速内核
-            _selected_ss_kernel_install ;;
+            ss_kernel_install ;;
+        14) # 安装 特定的锐速内核 V2
+            ss_kernel_install_v2 ;;
         21) # 卸载 BBR
             _bbr_uninstall ;;
         22) # 卸载 锐速
@@ -491,11 +491,11 @@ echo ; }
 
 
 # 安装 特定锐速内核（BBR）
-function _selected_ss_kernel_install() {
+function ss_kernel_install() {
 if   [[ $CODENAME == xenial ]]; then
-     echo -e "\n  ${bold}安装 ${green}3.16.0-43${jiacu} 内核 ...${normal} \n"
-     kernelver=3.16.0-43-generic
-     _ubuntu_serverspeeder_kernel_repo
+     echo -e "\n  ${bold}安装 ${green}4.4.0-47${jiacu} 内核 ...${normal} \n"
+     kernel_version=4.4.0-47
+     _ubuntu_serverspeeder_kernel_4.4.0-47_apt
      _delete_other_kernel
      _serverspeeder_autoinstall_after_reboot
 elif [[ $CODENAME == jessie ]]; then
@@ -505,9 +505,35 @@ elif [[ $CODENAME == jessie ]]; then
      _delete_other_kernel
      _serverspeeder_autoinstall_after_reboot
 else
-     echo -n "\n  ${red}注意${jiacu} Debian 9 和 Ubuntu 18.04 无法使用更低版本的内核！${normal}"
+     echo -n "\n  ${red}注意${jiacu} 本功能只支持 Debian 8 和 Ubuntu 16.04 ！${normal}"
 fi
 echo ; }
+
+
+
+
+
+# 安装 特定锐速内核（BBR）
+function ss_kernel_install_v2() {
+if   [[ $CODENAME == bionic ]]; then
+     echo -e "\n  ${bold}安装 ${green}4.15.0-30${jiacu} 内核 ...${normal} \n"
+     kernelver=4.15.0-30-generic
+     apt-get update
+     apt-get -y install linux-image-$kernelver linux-headers-$kernelver
+     _delete_other_kernel
+     _serverspeeder_autoinstall_after_reboot
+elif [[ $CODENAME == stretch ]]; then
+     echo -e "\n  ${bold}安装 ${green}3.12-1${jiacu} 内核 ...${normal} \n"
+     kernelver=4.9.0-4-amd64
+     apt-get update
+     apt-get -y install linux-image-$kernelver linux-headers-$kernelver
+     _delete_other_kernel
+     _serverspeeder_autoinstall_after_reboot
+else
+     echo -n "\n  ${red}注意${jiacu} 本功能只支持 Debian 9 和 Ubuntu 18.04 ！${normal}"
+fi
+echo ; }
+
 
 
 
