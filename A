@@ -14,7 +14,7 @@
 # http://xiaofd.win/onekey-ruisu.html
 # https://teddysun.com/489.html
 
-ScriptVersion=2.3.4
+ScriptVersion=2.3.5
 ScriptDate=2019.03.04
 
 # 颜色 -----------------------------------------------------------------------------------
@@ -410,6 +410,33 @@ fi ; }
 
 
 
+
+
+#S5# 安装 LotServer，先懒得做下去了，剩下的再说吧
+function _ls_install() {
+if [[ $SSKernel == "${green}是${jiacu}" ]]; then
+    echo -e "\n  ${bold}理论上当前内核已支持 ${green}锐速${jiacu}，直接安装 ... ${normal} "
+    lotserver_direct_install
+elif [[ $SSKernel == "${red}否${jiacu}" ]] && [[ $DISTRO == ubuntu ]]; then
+    _ask_continue2
+    ss_kernel_install_v2
+    _delete_other_kernel
+    _delete_other_kernel
+    lotserver_autoinstall_after_reboot
+    [[ ! $DeBUG == 1 ]] && echo -e "\n  ${bold}即将重启系统，重启后会自动安装 ${green}锐速${jiacu} ... ${normal}\n" && reboot
+elif [[ $SSKernel == "${red}否${jiacu}" ]] && [[ $DISTRO == debian ]]; then
+    _ask_continue2
+    ss_kernel_install_v2
+    _delete_other_kernel
+    _delete_other_kernel
+    lotserver_autoinstall_after_reboot
+    [[ ! $DeBUG == 1 ]] && echo -e "\n  ${bold}即将重启系统，重启后会自动安装 ${green}锐速${jiacu} ... ${normal}\n" && reboot
+fi ; }
+
+
+
+
+
 #S6# 安装 ServerSpeeder
 function _ss_install() {
 if [[ $SSKernel == "${green}是${jiacu}" ]]; then
@@ -462,6 +489,8 @@ fi ; }
 
 
 
+
+
 # 卸载 锐速
 function _ss_uninstall() {
 echo -ne "\n  ${bold}${red}警告 ${jiacu}即将开始卸载 ${green}锐速${jiacu}，敲 回车 继续，否则退出${normal} " ; read input
@@ -472,6 +501,8 @@ esac
 [[ `grep "Advanced options for Ubuntu" /etc/default/grub` ]] && sed -i 's/GRUB_DEFAULT=.*/GRUB_DEFAULT=""/' /etc/default/grub && update-grub >> $Outputs 2>&1
 wget --no-check-certificate -qO /tmp/appex.sh "https://raw.githubusercontent.com/0oVicero0/serverSpeeder_Install/master/appex.sh" && echo | bash /tmp/appex.sh 'uninstall'
 echo -e "  ${bold}${red}已卸载 锐速，但安装的内核仍保留${normal}\n" ; }
+
+
 
 
 
@@ -488,11 +519,14 @@ else echo -e "  ${bold}${red}错误 ${jiacu}你并没有使用本脚本安装 BB
 
 
 
+
+
 # 安装 指定内核（BBR）
 function _selected_kernel_install() {
 _get_version
 _install_required
 echo ; }
+
 
 
 
@@ -524,22 +558,20 @@ echo ; }
 
 #S14# 安装 特定锐速内核（New）
 function ss_kernel_install_v2() {
-if   [[ $CODENAME =~ ("xenial"|"bionic") ]]; then
+# 忘了其实必须有 Debian 9 / Ubuntu 18.04 的源……算了
+if   [[ $CODENAME == bionic ]]; then
      echo -e "\n  ${bold}安装 ${green}4.15.0-30${jiacu} 内核 ...${normal} \n"
      kernelver=4.15.0-30-generic
      apt-get update
      apt-get -y install linux-image-$kernelver linux-headers-$kernelver
-     _delete_other_kernel
-     _serverspeeder_autoinstall_after_reboot
-elif [[ $CODENAME =~ ("jessie"|"stretch") ]]; then
+elif [[ $CODENAME == stretch ]]; then
      echo -e "\n  ${bold}安装 ${green}4.9.0-4${jiacu} 内核 ...${normal} \n"
      kernelver=4.9.0-4-amd64
      apt-get update
      apt-get -y install linux-image-$kernelver linux-headers-$kernelver
-     _delete_other_kernel
-     _serverspeeder_autoinstall_after_reboot
 else
-     echo -n "\n  ${red}注意${jiacu} 本功能只支持 Debian 9 和 Ubuntu 18.04 ！${normal}"
+     echo -n "\n  ${red}注意${jiacu} 本功能只支持 Debian 9 和 18.04 ！${normal}"
+     exit 1
 fi
 echo ; }
 
@@ -555,6 +587,7 @@ wget -qO- http://deb.xanmod.org/gpg.key | apt-key add -
 apt-get update
 # apt-get install -y linux-xanmod-$kernel_version intel-microcode iucode-tool
 apt install -y linux-xanmod ; }
+
 
 
 
