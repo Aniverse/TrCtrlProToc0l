@@ -14,7 +14,7 @@
 # http://xiaofd.win/onekey-ruisu.html
 # https://teddysun.com/489.html
 
-ScriptVersion=2.3.7
+ScriptVersion=2.3.8
 ScriptDate=2019.03.04
 
 # 颜色 -----------------------------------------------------------------------------------
@@ -895,10 +895,7 @@ function _serverspeeder_direct_install() { wget --no-check-certificate -qO /tmp/
 [[ ` ps aux | grep appex | grep -v grep ` ]] && echo -e "\n${bold}${green}锐速已在运行 ...${normal}\n" || echo -e "\n${bold}${red}锐速尚未在运行，可能安装失败！${normal}\n" ; }
 
 function lotserver_direct_install() {
-wget -qO https://github.com/Aniverse/lotServer/raw/master/ls.sh
-sed -i '/^pause$/d' ls.sh
-bash ls.sh i
-rm -f ls.sh
+bash <(wget --no-check-certificate -qO- https://github.com/Aniverse/lotServer/raw/master/ls.sh) I
 [[ ` ps aux | grep appex | grep -v grep ` ]] && echo -e "\n${bold}${green}锐速已在运行 ...${normal}\n" || echo -e "\n${bold}${red}锐速尚未在运行，可能安装失败！${normal}\n" ; }
 
 
