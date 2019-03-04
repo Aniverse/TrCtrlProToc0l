@@ -14,7 +14,7 @@
 # http://xiaofd.win/onekey-ruisu.html
 # https://teddysun.com/489.html
 
-ScriptVersion=2.3.5
+ScriptVersion=2.3.6
 ScriptDate=2019.03.04
 
 # 颜色 -----------------------------------------------------------------------------------
@@ -278,7 +278,7 @@ case $response in
                 echo -ne "\n  ${bold}请输入你要 ${baihongse}保留${jiacu} 的内核版本，其他版本的内核将会被卸载：${normal} " ; read -e kernel_version
                 [[ ! ` dpkg -l | grep linux-image | grep "$kernel_version" ` ]] && { echo -e "\n  ${bold}${red}错误${jiacu} 大佬，你压根就没装这个内核吧！${normal}" ; unset kernel_version ; }
             done
-            _delete_other_kernel ;;
+            _delete_other_kernel ; _delete_other_kernel ;;
         24) # 卸载 多余内核
             while [[ -z $kernel_version ]]; do
                 echo -ne "\n  ${bold}请输入你要 ${baihongse}卸载${jiacu} 的内核版本，其他版本的内核将会被保留：${normal} " ; read -e kernel_version
@@ -561,14 +561,14 @@ function ss_kernel_install_v2() {
 # 忘了其实必须有 Debian 9 / Ubuntu 18.04 的源……算了
 if   [[ $CODENAME == bionic ]]; then
      echo -e "\n  ${bold}安装 ${green}4.15.0-30${jiacu} 内核 ...${normal} \n"
-     kernelver=4.15.0-30-generic
+     kernel_version=4.15.0-30-generic
      apt-get update
-     apt-get -y install linux-image-$kernelver linux-headers-$kernelver
+     apt-get -y install linux-image-$kernel_version linux-headers-$kernel_version
 elif [[ $CODENAME == stretch ]]; then
      echo -e "\n  ${bold}安装 ${green}4.9.0-4${jiacu} 内核 ...${normal} \n"
-     kernelver=4.9.0-4-amd64
+     kernel_version=4.9.0-4-amd64
      apt-get update
-     apt-get -y install linux-image-$kernelver linux-headers-$kernelver
+     apt-get -y install linux-image-$kernel_version linux-headers-$kernel_version
 else
      echo -n "\n  ${red}注意${jiacu} 本功能只支持 Debian 9 和 18.04 ！${normal}"
      exit 1
@@ -1241,7 +1241,7 @@ _update_grub ; }
 
 
 
-# 仅保留指定内核，删除其他内核
+#S23# 仅保留指定内核，删除其他内核
 function _delete_other_kernel() {
 echo -e "\n  ${bold}卸载其他内核及其头文件 ... ${normal}\n" | tee -a $Outputs
 dpkg -l | grep linux-image   | grep -v "${kernel_version}" | awk '{print $2}' >  /log/kernel_tobe_del_list
