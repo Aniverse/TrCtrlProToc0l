@@ -14,7 +14,7 @@
 # http://xiaofd.win/onekey-ruisu.html
 # https://teddysun.com/489.html
 
-ScriptVersion=2.3.1
+ScriptVersion=2.3.2
 ScriptDate=2019.03.01
 
 # 颜色 -----------------------------------------------------------------------------------
@@ -202,9 +202,9 @@ echo -e  "\n  当前系统内所有已安装的 kernel／headers／modules 列�
 cat -n /tmp/system_kernel_list | sed 's/\t/ /g' | sed "s/ linux-/) ${green}linux-/g" | sed "s/ pve-/) ${green}pve-/g" | sed "s/ ovhkernel-/) ${green}ovhkernel-/g" | sed "s/     /  ${magenta}(0/g" | sed "s/    /  ${magenta}(/g"
 echo -e  "\n  ${jiacu}当前脚本版本：$ScriptVersion        脚本更新时间：$ScriptDate"
 [[ $DeBUG == 1 ]] && echo -e  "\n  当前脚本已处于调试模式"
-echo -e  "\n  ${yellow}${bold}使用本脚本前请先阅读本脚本 GitHub 上的 README；作者水平菜，不保证脚本不会翻车${jiacu}"
-[[ ! $DeBUG == 1 ]] && echo -e  "\n  ${shanshuo}如果运行时出错退出，可以输入这条命令查看日志：${red}cat $Outputs${jiacu}\n"
-echo -e  "  如需报错请务必附上日志！${jiacu}\n"
+echo -e  "\n  ${yellow}${bold}使用本脚本前请先阅读本脚本 GitHub 上的 README；作者水平菜，不保证脚本不会翻车${jiacu}\n"
+[[ ! $DeBUG == 1 ]] && echo -e  "  ${shanshuo}如果运行时出错退出，可以输入这条命令查看日志：${red}cat $Outputs${jiacu}"
+echo -e  "\n  如需报错请务必附上日志！${jiacu}\n"
 
 [[ ! $( dpkg -l | grep $(uname -r) ) ]] && echo -e "\n  ${bold}${red}注意${jiacu} 系统中检测不到你当前的内核，你可能正在使用来自 netboot 的内核。\n       这种情况下本脚本的功能不一定能正常工作！\n"
 
@@ -496,6 +496,8 @@ if   [[ $CODENAME == xenial ]]; then
      echo -e "\n  ${bold}安装 ${green}4.4.0-47${jiacu} 内核 ...${normal} \n"
      kernel_version=4.4.0-47
      _ubuntu_serverspeeder_kernel_4.4.0-47_apt
+#    kernelver=3.16.0-43-generic
+#    _ubuntu_serverspeeder_kernel_repo
      _delete_other_kernel
      _serverspeeder_autoinstall_after_reboot
 elif [[ $CODENAME == jessie ]]; then
@@ -523,7 +525,7 @@ if   [[ $CODENAME == bionic ]]; then
      _delete_other_kernel
      _serverspeeder_autoinstall_after_reboot
 elif [[ $CODENAME == stretch ]]; then
-     echo -e "\n  ${bold}安装 ${green}3.12-1${jiacu} 内核 ...${normal} \n"
+     echo -e "\n  ${bold}安装 ${green}4.9.0-4${jiacu} 内核 ...${normal} \n"
      kernelver=4.9.0-4-amd64
      apt-get update
      apt-get -y install linux-image-$kernelver linux-headers-$kernelver
@@ -1209,6 +1211,7 @@ dpkg -l | grep linux-headers | grep -v "${kernel_version}" | awk '{print $2}' >>
 dpkg -l | grep linux-modules | grep -v "${kernel_version}" | awk '{print $2}' >> /log/kernel_tobe_del_list
 dpkg -l | grep generic-hwe   | grep -v "${kernel_version}" | awk '{print $2}' >> /log/kernel_tobe_del_list
 
+[[ $DeBUG == 1 ]] && cat /log/kernel_tobe_del_list
 kernel_total_num=` cat /log/kernel_tobe_del_list | wc -l `
 
 if [ $kernel_total_num > 1 ]; then
