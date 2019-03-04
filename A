@@ -14,7 +14,7 @@
 # http://xiaofd.win/onekey-ruisu.html
 # https://teddysun.com/489.html
 
-ScriptVersion=2.3.3
+ScriptVersion=2.3.4
 ScriptDate=2019.03.04
 
 # 颜色 -----------------------------------------------------------------------------------
@@ -135,7 +135,8 @@ tcp_c_name=$tcp_control
 
 # 检查理论上内核是否支持锐速
 SSKernel="${red}否${jiacu}"
-URLKernel='https://raw.githubusercontent.com/0oVicero0/serverSpeeder_kernel/master/serverSpeeder.txt'
+#URLKernel='https://raw.githubusercontent.com/0oVicero0/serverSpeeder_kernel/master/serverSpeeder.txt'
+URLKernel='https://raw.githubusercontent.com/MoeClub/lotServer/master/lotServer.log'
 AcceVer=$(wget --no-check-certificate -qO- "$URLKernel" |grep "$KNA/" |grep "/x$KernelBit/" |grep "/$running_kernel/" |awk -F'/' '{print $NF}' |sort -n -k 2 -t '_' |tail -n 1)
 MyKernel=$(wget --no-check-certificate -qO- "$URLKernel" |grep "$KNA/" |grep "/x$KernelBit/" |grep "/$running_kernel/" |grep "$AcceVer" |tail -n 1)
 [[ ! -z "$MyKernel" ]] && SSKernel="${green}是${jiacu}"
@@ -213,10 +214,12 @@ echo -e  "\n  如需报错请务必附上日志！${jiacu}\n"
 echo -e  "  ${green}(01) ${jiacu}安装 原版 BBR "
 echo -e  "  ${green}(02) ${jiacu}安装 魔改 BBR (tsunami) "
 echo -e  "  ${green}(03) ${jiacu}安装 魔改 BBR (nanqinlang) "
-# echo -e  "  ${green}(04) ${jiacu}安装 bbrplus"
-echo -e  "  ${green}(06) ${jiacu}安装 锐速 "
-echo -e  "  ${green}(11) ${jiacu}安装 指定内核 "
-echo -e  "  ${green}(12) ${jiacu}安装 4.11.12 内核 "
+[[ $DeBUG == 1 ]] && {
+echo -e  "  ${green}(04) ${jiacu}安装 bbrplus (暂无)"
+echo -e  "  ${green}(05) ${jiacu}安装 LotServer" ; }
+echo -e  "  ${green}(06) ${jiacu}安装 ServerSpeeder"
+echo -e  "  ${green}(11) ${jiacu}安装 指定内核"
+echo -e  "  ${green}(12) ${jiacu}安装 4.11.12 内核"
 [[ $DeBUG == 1 ]] && {
 echo -e  "  ${green}(13) ${jiacu}安装 特定的锐速内核 "
 echo -e  "  ${green}(14) ${jiacu}安装 特定的锐速内核 v2 " ; }
@@ -252,7 +255,11 @@ case $response in
             _ykbbr_install ;;
     3 | 03) # 安装 魔改 BBR (nanqinlang)
             _nqlbbr_install ;;
-    6 | 06) # 安装 锐速
+    4 | 04) # 安装 bbrplus
+            bbrplus_install ;;
+    5 | 05) # 安装 LotServer
+            _ls_install ;;
+    6 | 06) # 安装 ServerSpeeder
             _ss_install ;;
         11) # 安装 最新内核
             _selected_kernel_install ;;
@@ -403,7 +410,7 @@ fi ; }
 
 
 
-# 安装 锐速
+#S6# 安装 ServerSpeeder
 function _ss_install() {
 if [[ $SSKernel == "${green}是${jiacu}" ]]; then
     echo -e "\n  ${bold}理论上当前内核已支持 ${green}锐速${jiacu}，直接安装 ... ${normal} "
