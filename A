@@ -14,8 +14,8 @@
 # http://xiaofd.win/onekey-ruisu.html
 # https://teddysun.com/489.html
 
-ScriptVersion=2.3.2
-ScriptDate=2019.03.01
+ScriptVersion=2.3.3
+ScriptDate=2019.03.04
 
 # 颜色 -----------------------------------------------------------------------------------
 
@@ -490,7 +490,7 @@ echo ; }
 
 
 
-# 安装 特定锐速内核（BBR）
+#S13# 安装 特定锐速内核（OLD）
 function ss_kernel_install() {
 if   [[ $CODENAME == xenial ]]; then
      echo -e "\n  ${bold}安装 ${green}4.4.0-47${jiacu} 内核 ...${normal} \n"
@@ -515,16 +515,16 @@ echo ; }
 
 
 
-# 安装 特定锐速内核（BBR）
+#S14# 安装 特定锐速内核（New）
 function ss_kernel_install_v2() {
-if   [[ $CODENAME == bionic ]]; then
+if   [[ $CODENAME =~ ("xenial"|"bionic") ]]; then
      echo -e "\n  ${bold}安装 ${green}4.15.0-30${jiacu} 内核 ...${normal} \n"
      kernelver=4.15.0-30-generic
      apt-get update
      apt-get -y install linux-image-$kernelver linux-headers-$kernelver
      _delete_other_kernel
      _serverspeeder_autoinstall_after_reboot
-elif [[ $CODENAME == stretch ]]; then
+elif [[ $CODENAME =~ ("jessie"|"stretch") ]]; then
      echo -e "\n  ${bold}安装 ${green}4.9.0-4${jiacu} 内核 ...${normal} \n"
      kernelver=4.9.0-4-amd64
      apt-get update
@@ -540,7 +540,7 @@ echo ; }
 
 
 
-# 安装 xanmod
+# 安装 xanmod，apt
 function _xanmod_apt_install() {
 # wget -q https://dl.xanmod.org/xanmod-repository.deb && dpkg -i xanmod-repository.deb
 echo 'deb http://deb.xanmod.org releases main' | tee /etc/apt/sources.list.d/xanmod-kernel.list
