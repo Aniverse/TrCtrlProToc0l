@@ -14,7 +14,7 @@
 # http://xiaofd.win/onekey-ruisu.html
 # https://teddysun.com/489.html
 
-ScriptVersion=2.3.8
+ScriptVersion=2.3.9
 ScriptDate=2019.03.04
 
 # 颜色 -----------------------------------------------------------------------------------
@@ -187,9 +187,9 @@ echo -e  "  当前正在使用的 TCP 拥塞控制算法      ${green}$tcp_c_nam
 echo -e  "  当前可以使用的 TCP 拥塞控制算法      ${green}$tcp_control_all${jiacu}"
 echo -e  "  当前正在使用的系统内核               ${green}$running_kernel${jiacu}"
 echo -e  "  当前内核是否支持 原版 BBR            $BBRKernel"
-echo -e  "  当前内核是否支持 Yankee 版魔改 BBR   $YKKernel"
-echo -e  "  当前内核是否支持 南琴浪 版魔改 BBR   $NQLKernel"
-echo -e  "  当前内核是否支持 Vicer  版锐速       $SSKernel"
+echo -e  "  当前内核是否支持 Yankee  版魔改 BBR  $YKKernel"
+echo -e  "  当前内核是否支持 南琴浪  版魔改 BBR  $NQLKernel"
+echo -e  "  当前内核是否支持 Moeclub 版锐速      $SSKernel"
 echo -e  "  当前 BBR  是否已启用                 $bbrinuse"
 echo -e  "  当前 锐速 是否已启用                 $SSrunning"
 
@@ -207,7 +207,7 @@ echo -e  "\n  ${yellow}${bold}使用本脚本前请先阅读本脚本 GitHub 上
 [[ ! $DeBUG == 1 ]] && echo -e  "  ${shanshuo}如果运行时出错退出，可以输入这条命令查看日志：${red}cat $Outputs${jiacu}"
 echo -e  "\n  如需报错请务必附上日志！${jiacu}\n"
 
-[[ ! $( dpkg -l | grep $(uname -r) ) ]] && echo -e "\n  ${bold}${red}注意${jiacu} 系统中检测不到你当前的内核，你可能正在使用来自 netboot 的内核。\n       这种情况下本脚本的功能不一定能正常工作！\n"
+[[ ! $( dpkg -l | grep $(uname -r) ) ]] && echo -e "\n  ${bold}${red}注意${jiacu} 系统中似乎检测不到你当前的内核，你可能正在使用来自 netboot 的内核。\n       这种情况下本脚本的功能不一定能正常工作！\n"
 
 # 下次考虑把 exit 1 也加上报错信息提示
 
@@ -216,8 +216,8 @@ echo -e  "  ${green}(02) ${jiacu}安装 魔改 BBR (tsunami) "
 echo -e  "  ${green}(03) ${jiacu}安装 魔改 BBR (nanqinlang) "
 [[ $DeBUG == 1 ]] && {
 echo -e  "  ${green}(04) ${jiacu}安装 bbrplus (暂无)"
-echo -e  "  ${green}(05) ${jiacu}安装 LotServer" ; }
-echo -e  "  ${green}(06) ${jiacu}安装 ServerSpeeder"
+echo -e  "  ${green}(05) ${jiacu}安装 LotServer / 锐速" ; }
+echo -e  "  ${green}(06) ${jiacu}安装 ServerSpeeder / 锐速"
 echo -e  "  ${green}(11) ${jiacu}安装 指定内核"
 echo -e  "  ${green}(12) ${jiacu}安装 4.11.12 内核"
 [[ $DeBUG == 1 ]] && {
@@ -558,7 +558,6 @@ echo ; }
 
 #S14# 安装 特定锐速内核（New）
 function ss_kernel_install_v2() {
-# 忘了其实必须有 Debian 9 / Ubuntu 18.04 的源……算了
 if   [[ $CODENAME == bionic ]]; then
      echo -e "\n  ${bold}安装 ${green}4.15.0-30${jiacu} 内核 ...${normal} \n"
      kernel_version=4.15.0-30-generic
@@ -570,7 +569,7 @@ elif [[ $CODENAME == stretch ]]; then
      apt-get update
      apt-get -y install linux-image-$kernel_version linux-headers-$kernel_version
 else
-     echo -n "\n  ${red}注意${jiacu} 本功能只支持 Debian 9 和 18.04 ！${normal}"
+     echo -n "\n  ${red}注意${jiacu} 本功能只支持 Debian 9 和 Ubuntu 18.04 ！${normal}"
      exit 1
 fi
 echo ; }
@@ -636,7 +635,8 @@ elif [[ $XanmodVer == 4.18  ]]; then
      wget --no-check-certificate -q https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/4.18/linux-headers-4.18.16-xanmod9_1.181020_amd64.deb
      echo ; dpkg -i linux-image*.deb ; dpkg -i linux-headers*.deb
 elif [[ $XanmodVer == 4.19  ]]; then
-     kernel_version=4.18.16
+# 啥时候有空更新下
+     kernel_version=4.19.12
      wget --no-check-certificate -q https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/4.19/linux-image-4.19.12-xanmod7_2.181223_amd64.deb
      wget --no-check-certificate -q https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/4.19/linux-headers-4.19.12-xanmod7_2.181223_amd64.deb
      echo ; dpkg -i linux-image*.deb ; dpkg -i linux-headers*.deb
