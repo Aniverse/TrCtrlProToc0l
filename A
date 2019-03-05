@@ -14,8 +14,8 @@
 # http://xiaofd.win/onekey-ruisu.html
 # https://teddysun.com/489.html
 
-ScriptVersion=2.3.9
-ScriptDate=2019.03.04
+ScriptVersion=2.4.0
+ScriptDate=2019.03.05
 
 # 颜色 -----------------------------------------------------------------------------------
 
@@ -824,6 +824,7 @@ EOF
 apt-get update >> $Outputs 2>&1
 apt-get install -y linux-image-3.16.0-4-amd64 >> $Outputs 2>&1
 apt-get install -y linux-headers-3.16.0-4-common linux-headers-3.16.0-4-all >> $Outputs 2>&1
+apt-get install -y grep unzip ethtool >> $Outputs 2>&1
 [[ ! $( dpkg -l | grep linux-image-3.16.0-4-amd64 ) ]] && { echo -e "\n  ${bold}${red}错误${jiacu} 安装 内核 失败！${normal}" | tee -a $Outputs ; exit 1 ; } ; }
 
 
@@ -836,6 +837,7 @@ wget --no-check-certificate -qO 3.deb https://github.com/Aniverse/BitTorrentClie
 echo ` debconf-get-selections linux-image-4.4.0-47-generic | grep -C5 "keep the local version currently installed" | grep keep_current | sed "s/select/note/g"` | debconf-set-selections
 echo ` debconf-get-selections linux-headers-4.4.0-47 | grep -C5 "keep the local version currently installed" | grep keep_current | sed "s/select/note/g"` | debconf-set-selections
 echo ` debconf-get-selections linux-headers-4.4.0-47-generic | grep -C5 "keep the local version currently installed" | grep keep_current | sed "s/select/note/g"` | debconf-set-selections
+apt-get install -y grep unzip ethtool >> $Outputs 2>&1
 { dpkg -i [123].deb >> $Outputs 2>&1 ; } || { echo -e "\n  ${bold}${red}错误${jiacu} 安装 内核 失败！${normal}" | tee -a $Outputs ; exit 1 ; }
 rm  -rf [123].deb ; }
 
@@ -846,6 +848,7 @@ function _ubuntu_serverspeeder_kernel_4.4.0-47_apt() {
 [[ $CODENAME == bionic ]] && [[ ! `grep "xenial" /etc/apt/sources.list` ]] && echo -e "\ndeb http://archive.ubuntu.com/ubuntu/ xenial-security main restricted universe multiverse" >> /etc/apt/sources.list
 apt-get update >> $Outputs 2>&1
 apt-get install -y linux-image-4.4.0-47-generic linux-image-extra-4.4.0-47-generic linux-headers-4.4.0-47-generic >> $Outputs 2>&1
+apt-get install -y grep unzip ethtool >> $Outputs 2>&1
 [[ ! $( dpkg -l | grep linux-image-4.4.0-47-generic ) ]] && { echo -e "\n  ${bold}${red}错误${jiacu} 安装 内核 失败！${normal}" | tee -a $Outputs ; exit 1 ; } ; }
 
 
@@ -856,6 +859,7 @@ apt-get -y install module-init-tools >> $Outputs 2>&1
 wget --no-check-certificate -qO 1.deb https://github.com/Aniverse/SSKernel/raw/master/Ubuntu/linux-image-3.16.0-43-generic_3.16.0-43.58~14.04.1_amd64.deb
 wget --no-check-certificate -qO 2.deb https://github.com/Aniverse/SSKernel/raw/master/Ubuntu/image-extra/linux-image-extra-3.16.0-43-generic_3.16.0-43.58~14.04.1_amd64.deb
 wget --no-check-certificate -qO 3.deb https://github.com/Aniverse/SSKernel/raw/master/Ubuntu/headers/linux-headers-3.16.0-43-generic_3.16.0-43.58~14.04.1_amd64.deb
+apt-get install -y grep unzip ethtool >> $Outputs 2>&1
 echo ` debconf-get-selections linux-image-3.16.0-43-generic | grep -C5 "keep the local version currently installed" | grep keep_current | sed "s/select/note/g"` | debconf-set-selections
 echo ` debconf-get-selections linux-image-extra-3.16.0-43-generic | grep -C5 "keep the local version currently installed" | grep keep_current | sed "s/select/note/g"` | debconf-set-selections
 echo ` debconf-get-selections linux-headers-3.16.0-43-generic | grep -C5 "keep the local version currently installed" | grep keep_current | sed "s/select/note/g"` | debconf-set-selections
@@ -873,6 +877,7 @@ sed -i '/deb http:\/\/security.ubuntu.com\/ubuntu trusty-security main/'d /etc/a
 echo -ne "\n  ${bold}添加源，更新 ...  ${normal}" | tee -a $Outputs ; echo >> $Outputs
 { apt-get update >> $Outputs 2>&1 ; } && { echo "${green}${bold}完成${normal}" | tee -a $Outputs ; }
 echo -ne "\n  ${bold}安装内核 ...  ${normal}" | tee -a $Outputs     ; echo >> $Outputs
+apt-get install -y grep unzip ethtool >> $Outputs 2>&1
 apt-get -y install linux-image-extra-$kernelver linux-image-$kernelver linux-headers-$kernelver >> $Outputs 2>&1 && { echo "${green}${bold}完成${normal}" | tee -a $Outputs ; }
 [[ ! ` dpkg -l | grep linux-image-$kernelver ` ]] && { echo "${bold}${red}失败${normal}" | tee -a $Outputs ; exit 1 ; }
 sed -i '/deb http:\/\/security.ubuntu.com\/ubuntu trusty-security main/'d /etc/apt/sources.list
