@@ -14,8 +14,8 @@
 # http://xiaofd.win/onekey-ruisu.html
 # https://teddysun.com/489.html
 
-ScriptVersion=2.4.0
-ScriptDate=2019.03.05
+ScriptVersion=2.4.2
+ScriptDate=2019.03.10
 
 # 颜色 -----------------------------------------------------------------------------------
 
@@ -216,13 +216,15 @@ echo -e  "  ${green}(02) ${jiacu}安装 魔改 BBR (tsunami) "
 echo -e  "  ${green}(03) ${jiacu}安装 魔改 BBR (nanqinlang) "
 [[ $DeBUG == 1 ]] && {
 echo -e  "  ${green}(04) ${jiacu}安装 bbrplus (暂无)"
-echo -e  "  ${green}(05) ${jiacu}安装 LotServer / 锐速" ; }
-echo -e  "  ${green}(06) ${jiacu}安装 ServerSpeeder / 锐速"
+echo -e  "  ${green}(05) ${jiacu}安装 锐速 / LotServer" ; }
+echo -e  "  ${green}(06) ${jiacu}安装 锐速 / ServerSpeeder"
+[[ $DeBUG == 1 ]] &&
 echo -e  "  ${green}(11) ${jiacu}安装 指定内核"
 echo -e  "  ${green}(12) ${jiacu}安装 4.11.12 内核"
 [[ $DeBUG == 1 ]] && {
-echo -e  "  ${green}(13) ${jiacu}安装 特定的锐速内核 "
-echo -e  "  ${green}(14) ${jiacu}安装 特定的锐速内核 v2 " ; }
+echo -e  "  ${green}(13) ${jiacu}安装 SS 内核（不支持 Debian 9）"
+echo -e  "  ${green}(14) ${jiacu}安装 LS 内核（Stretch and Bionic）"
+echo -e  "  ${green}(15) ${jiacu}安装 SS 内核（不支持 Ubuntu 18.04）" ; }
 echo -e  "  ${green}(21) ${jiacu}卸载 BBR "
 echo -e  "  ${green}(22) ${jiacu}卸载 锐速 "
 echo -e  "  ${green}(23) ${jiacu}卸载 多余内核 "
@@ -260,15 +262,18 @@ case $response in
     5 | 05) # 安装 LotServer
             _ls_install ;;
     6 | 06) # 安装 ServerSpeeder
-            _ss_install ;;
+            ss_install ;;
         11) # 安装 最新内核
             _selected_kernel_install ;;
         12) # 安装 4.11.12 内核
             _online_ubuntu_bbr_firmware ; _bbr_kernel_4_11_12 ;;
         13) # 安装 特定的锐速内核
             ss_kernel_install ;;
-        14) # 安装 特定的锐速内核 V2
+        14) # 安装 新版锐速支持的内核（只支持新系统）
             ss_kernel_install_v2 ;;
+        15) # 安装 普通的锐速内核
+            [[ $DISTRO == debian ]] && _debian_serverspeeder_kernel_3.16.0-4_apt
+            [[ $CODENAME == xenial ]] && kernelver=3.16.0-43-generic && _ubuntu_serverspeeder_kernel_repo ;;
         21) # 卸载 BBR
             _bbr_uninstall ;;
         22) # 卸载 锐速
@@ -438,7 +443,7 @@ fi ; }
 
 
 #S6# 安装 ServerSpeeder
-function _ss_install() {
+function ss_install() {
 if [[ $SSKernel == "${green}是${jiacu}" ]]; then
     echo -e "\n  ${bold}理论上当前内核已支持 ${green}锐速${jiacu}，直接安装 ... ${normal} "
     _serverspeeder_direct_install
@@ -533,7 +538,7 @@ echo ; }
 
 #S13# 安装 特定锐速内核（OLD）
 function ss_kernel_install() {
-if   [[ $CODENAME == xenial ]]; then
+if   [[ $CODENAME =~ (xenial|bionic) ]]; then
      echo -e "\n  ${bold}安装 ${green}4.4.0-47${jiacu} 内核 ...${normal} \n"
      kernel_version=4.4.0-47
      _ubuntu_serverspeeder_kernel_4.4.0-47_apt
@@ -548,7 +553,7 @@ elif [[ $CODENAME == jessie ]]; then
      _delete_other_kernel
      _serverspeeder_autoinstall_after_reboot
 else
-     echo -n "\n  ${red}注意${jiacu} 本功能只支持 Debian 8 和 Ubuntu 16.04 ！${normal}"
+     echo -ne "\n  ${red}注意${jiacu} 本功能只支持 Debian 8 和 Ubuntu 16.04/18.04 ！${normal}"
 fi
 echo ; }
 
