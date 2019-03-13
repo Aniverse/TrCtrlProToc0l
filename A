@@ -14,8 +14,8 @@
 # http://xiaofd.win/onekey-ruisu.html
 # https://teddysun.com/489.html
 
-ScriptVersion=2.4.2
-ScriptDate=2019.03.10
+ScriptVersion=2.4.3
+ScriptDate=2019.03.14
 
 # 颜色 -----------------------------------------------------------------------------------
 
@@ -260,7 +260,7 @@ case $response in
     4 | 04) # 安装 bbrplus
             bbrplus_install ;;
     5 | 05) # 安装 LotServer
-            _ls_install ;;
+            ls_install ;;
     6 | 06) # 安装 ServerSpeeder
             ss_install ;;
         11) # 安装 最新内核
@@ -418,7 +418,7 @@ fi ; }
 
 
 #S5# 安装 LotServer，先懒得做下去了，剩下的再说吧
-function _ls_install() {
+function ls_install() {
 if [[ $SSKernel == "${green}是${jiacu}" ]]; then
     echo -e "\n  ${bold}理论上当前内核已支持 ${green}锐速${jiacu}，直接安装 ... ${normal} "
     lotserver_direct_install
@@ -905,7 +905,7 @@ function _serverspeeder_direct_install() { wget --no-check-certificate -qO /tmp/
 [[ ` ps aux | grep appex | grep -v grep ` ]] && echo -e "\n${bold}${green}锐速已在运行 ...${normal}\n" || echo -e "\n${bold}${red}锐速尚未在运行，可能安装失败！${normal}\n" ; }
 
 function lotserver_direct_install() {
-bash <(wget --no-check-certificate -qO- https://github.com/Aniverse/lotServer/raw/master/ls.sh) I
+bash <(wget --no-check-certificate -qO- https://github.com/Aniverse/lotServer/raw/master/lotServer.sh) I
 [[ ` ps aux | grep appex | grep -v grep ` ]] && echo -e "\n${bold}${green}锐速已在运行 ...${normal}\n" || echo -e "\n${bold}${red}锐速尚未在运行，可能安装失败！${normal}\n" ; }
 
 
