@@ -14,8 +14,8 @@
 # http://xiaofd.win/onekey-ruisu.html
 # https://teddysun.com/489.html
 
-ScriptVersion=2.4.3
-ScriptDate=2019.03.14
+ScriptVersion=2.4.4
+ScriptDate=2019.03.15
 
 # 颜色 -----------------------------------------------------------------------------------
 
@@ -567,7 +567,7 @@ if   [[ $CODENAME == bionic ]]; then
      echo -e "\n  ${bold}安装 ${green}4.15.0-30${jiacu} 内核 ...${normal} \n"
      kernel_version=4.15.0-30-generic
      apt-get update
-     apt-get -y install linux-image-$kernel_version linux-headers-$kernel_version
+     apt-get -y install linux-image-$kernel_version linux-headers-$kernel_version linux-modules-$kernel_version linux-modules-extra-$kernel_version
 elif [[ $CODENAME == stretch ]]; then
      echo -e "\n  ${bold}安装 ${green}4.9.0-4${jiacu} 内核 ...${normal} \n"
      kernel_version=4.9.0-4-amd64
@@ -936,6 +936,17 @@ fi ; }
 
 # 安装 4.11.12 的内核（For BBR）
 function _bbr_kernel_4_11_12() {
+if [[ $CODENAME =~ (stretch|buster) ]]; then
+    [[ ! `dpkg -l | grep libssl1.0.0` ]] && {
+    echo -ne "\n  ${bold}安装 libssl1.0.0 ...${normal} " | tee -a $Outputs
+    wget --no-check-certificate https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Deb%20Package/Jessie/libssl1.0.0_1.0.1t-1+deb8u7_amd64.deb -O libssl1.0.deb >> $Outputs 2>&1
+    dpkg -i libssl1.0.deb >> $Outputs 2>&1
+    rm -f libssl1.0.deb ; echo | tee -a $Outputs
+    [[ ! `dpkg -l | grep libssl1.0.0` ]] && { echo -e "\n  ${red}错误${bold} 安装 libssl1.0.0 失败！${normal}" | tee -a $Outputs ; exit 1 ; } ; }
+else
+    [[ ! `dpkg -l | grep libssl1.0.0` ]] && { echo -ne "\n  ${bold}安装 libssl1.0.0 ...${normal} " | tee -a $Outputs ; apt-get install -y libssl1.0.0 >> $Outputs 2>&1 ; echo | tee -a $Outputs
+    [[ ! `dpkg -l | grep libssl1.0.0` ]] && { echo -e  "\n$  ${red}错误${bold} 安装 libssl1.0.0 失败！${normal}" | tee -a $Outputs ; exit 1 ; } ; }
+fi
 echo -ne "\n  ${bold}安装 4.11.12 内核及其头文件 ... ${normal} " | tee -a $Outputs ; echo >> $Outputs
 wget --no-check-certificate -qO 1.deb https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Linux%20Kernel/BBR/linux-headers-4.11.12-all.deb
 wget --no-check-certificate -qO 2.deb https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Linux%20Kernel/BBR/linux-headers-4.11.12-amd64.deb
@@ -971,7 +982,7 @@ echo | tee -a $Outputs ; }
 [[ ! `dpkg -l | grep libelf-dev` ]] && { echo -ne "\n  ${bold}安装 libelf-dev ...${normal} " | tee -a $Outputs ; apt-get install -y libelf1 libelf-dev >> $Outputs 2>&1 ; echo | tee -a $Outputs
 [[ ! `dpkg -l | grep libelf-dev` ]] && { echo -e  "\n  ${red}错误${bold} 安装 libelf-dev 失败！${normal}" | tee -a $Outputs ; exit 1 ; } ; }
 
-if [[ $CODENAME == stretch ]]; then
+if [[ $CODENAME =~ (stretch|buster) ]]; then
     [[ ! `dpkg -l | grep libssl1.0.0` ]] && {
     echo -ne "\n  ${bold}安装 libssl1.0.0 ...${normal} " | tee -a $Outputs
     wget --no-check-certificate https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Deb%20Package/Jessie/libssl1.0.0_1.0.1t-1+deb8u7_amd64.deb -O libssl1.0.deb >> $Outputs 2>&1
