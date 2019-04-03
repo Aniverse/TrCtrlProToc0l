@@ -14,8 +14,8 @@
 # http://xiaofd.win/onekey-ruisu.html
 # https://teddysun.com/489.html
 
-ScriptVersion=2.4.4
-ScriptDate=2019.03.15
+ScriptVersion=2.4.5
+ScriptDate=2019.04.03
 
 # 颜色 -----------------------------------------------------------------------------------
 
@@ -222,9 +222,9 @@ echo -e  "  ${green}(06) ${jiacu}安装 锐速 / ServerSpeeder"
 echo -e  "  ${green}(11) ${jiacu}安装 指定内核"
 echo -e  "  ${green}(12) ${jiacu}安装 4.11.12 内核"
 [[ $DeBUG == 1 ]] && {
-echo -e  "  ${green}(13) ${jiacu}安装 SS 内核（不支持 Debian 9）"
-echo -e  "  ${green}(14) ${jiacu}安装 LS 内核（Stretch and Bionic）"
-echo -e  "  ${green}(15) ${jiacu}安装 SS 内核（不支持 Ubuntu 18.04）" ; }
+echo -e  "  ${green}(13) ${jiacu}安装 SS 内核（4.4.0-47／3.12.1）"
+echo -e  "  ${green}(14) ${jiacu}安装 LS 内核（4.15.0-30／4.9.0-4）"
+echo -e  "  ${green}(15) ${jiacu}安装 SS 内核（3.16.0-43／3.16.0-4）" ; }
 echo -e  "  ${green}(21) ${jiacu}卸载 BBR "
 echo -e  "  ${green}(22) ${jiacu}卸载 锐速 "
 echo -e  "  ${green}(23) ${jiacu}卸载 多余内核 "
@@ -272,7 +272,7 @@ case $response in
         14) # 安装 新版锐速支持的内核（只支持新系统）
             ss_kernel_install_v2 ;;
         15) # 安装 普通的锐速内核
-            [[ $DISTRO == debian ]] && _debian_serverspeeder_kernel_3.16.0-4_apt
+            [[ $DISTROL == debian ]] && _debian_serverspeeder_kernel_3.16.0-4_apt
             [[ $CODENAME == xenial ]] && kernelver=3.16.0-43-generic && _ubuntu_serverspeeder_kernel_repo ;;
         21) # 卸载 BBR
             _bbr_uninstall ;;
@@ -822,6 +822,7 @@ rm  -rf 1.deb ; }
 
 # Debian 安装 3.16.0-4 内核（apt-get install）（For ServerSpeeder）
 function _debian_serverspeeder_kernel_3.16.0-4_apt() {
+[[ ! $( grep snapshot.debian.org /etc/apt/sources.list) ]] &&
 cat >>/etc/apt/sources.list<<EOF
 deb http://snapshot.debian.org/archive/debian/20180620T205325Z/ jessie main contrib non-free
 deb-src http://snapshot.debian.org/archive/debian/20180620T205325Z/ jessie main contrib non-free
