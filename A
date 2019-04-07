@@ -14,8 +14,8 @@
 # http://xiaofd.win/onekey-ruisu.html
 # https://teddysun.com/489.html
 
-ScriptVersion=2.4.5
-ScriptDate=2019.04.03
+ScriptVersion=2.4.6
+ScriptDate=2019.04.07
 
 # 颜色 -----------------------------------------------------------------------------------
 
@@ -267,12 +267,12 @@ case $response in
             _selected_kernel_install ;;
         12) # 安装 4.11.12 内核
             _online_ubuntu_bbr_firmware ; _bbr_kernel_4_11_12 ;;
-        13) # 安装 特定的锐速内核
+        13) # 安装 特定的锐速内核（（4.4.0-47／3.12.1））
             ss_kernel_install ;;
-        14) # 安装 新版锐速支持的内核（只支持新系统）
+        14) # 安装 新版锐速支持的内核（只支持新系统），（4.15.0-30／4.9.0-4）
             ss_kernel_install_v2 ;;
-        15) # 安装 普通的锐速内核
-            [[ $DISTROL == debian ]] && _debian_serverspeeder_kernel_3.16.0-4_apt
+        15) # 安装 SS 内核（3.16.0-43／3.16.0-4）
+            [[ $DISTRO == Debian ]] && _debian_serverspeeder_kernel_3.16.0-4_apt
             [[ $CODENAME == xenial ]] && kernelver=3.16.0-43-generic && _ubuntu_serverspeeder_kernel_repo ;;
         21) # 卸载 BBR
             _bbr_uninstall ;;
@@ -574,7 +574,7 @@ elif [[ $CODENAME == stretch ]]; then
      apt-get update
      apt-get -y install linux-image-$kernel_version linux-headers-$kernel_version
 else
-     echo -n "\n  ${red}注意${jiacu} 本功能只支持 Debian 9 和 Ubuntu 18.04 ！${normal}"
+     echo -ne "\n  ${red}注意${jiacu} 本功能只支持 Debian 9 和 Ubuntu 18.04 ！${normal}"
      exit 1
 fi
 echo ; }
