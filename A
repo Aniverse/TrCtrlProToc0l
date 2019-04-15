@@ -14,8 +14,8 @@
 # http://xiaofd.win/onekey-ruisu.html
 # https://teddysun.com/489.html
 
-ScriptVersion=2.4.7
-ScriptDate=2019.04.07
+ScriptVersion=2.4.8
+ScriptDate=2019.04.15
 
 # 颜色 -----------------------------------------------------------------------------------
 
@@ -214,17 +214,15 @@ echo -e  "\n  如需报错请务必附上日志！${jiacu}\n"
 echo -e  "  ${green}(01) ${jiacu}安装 原版 BBR "
 echo -e  "  ${green}(02) ${jiacu}安装 魔改 BBR (tsunami) "
 echo -e  "  ${green}(03) ${jiacu}安装 魔改 BBR (nanqinlang) "
-[[ $DeBUG == 1 ]] && {
-echo -e  "  ${green}(04) ${jiacu}安装 bbrplus (暂无)"
-echo -e  "  ${green}(05) ${jiacu}安装 锐速 / LotServer" ; }
+#echo -e  "  ${green}(04) ${jiacu}安装 bbrplus (暂无)"
+echo -e  "  ${green}(05) ${jiacu}安装 锐速 / LotServer"
 echo -e  "  ${green}(06) ${jiacu}安装 锐速 / ServerSpeeder"
 [[ $DeBUG == 1 ]] &&
 echo -e  "  ${green}(11) ${jiacu}安装 指定内核"
 echo -e  "  ${green}(12) ${jiacu}安装 4.11.12 内核"
-[[ $DeBUG == 1 ]] && {
 echo -e  "  ${green}(13) ${jiacu}安装 SS 内核（4.4.0-47／3.12.1）"
-echo -e  "  ${green}(14) ${jiacu}安装 LS 内核（4.15.0-30／4.9.0-4）"
-echo -e  "  ${green}(15) ${jiacu}安装 SS 内核（3.16.0-43／3.16.0-4）" ; }
+echo -e  "  ${green}(14) ${jiacu}安装 SS 内核（3.16.0-43／3.16.0-4）"
+echo -e  "  ${green}(15) ${jiacu}安装 LS 内核（4.15.0-30／4.9.0-4）"
 echo -e  "  ${green}(21) ${jiacu}卸载 BBR "
 echo -e  "  ${green}(22) ${jiacu}卸载 锐速 "
 echo -e  "  ${green}(23) ${jiacu}卸载 多余内核 "
@@ -269,11 +267,11 @@ case $response in
             _online_ubuntu_bbr_firmware ; _bbr_kernel_4_11_12 ;;
         13) # 安装 特定的锐速内核（（4.4.0-47／3.12.1））
             ss_kernel_install ;;
-        14) # 安装 新版锐速支持的内核（只支持新系统），（4.15.0-30／4.9.0-4）
-            ss_kernel_install_v2 ;;
-        15) # 安装 SS 内核（3.16.0-43／3.16.0-4）
+        14) # 安装 SS 内核（3.16.0-43／3.16.0-4）
             [[ $DISTRO == debian ]] && _debian_serverspeeder_kernel_3.16.0-4_apt
             [[ $CODENAME == xenial ]] && kernelver=3.16.0-43-generic && _ubuntu_serverspeeder_kernel_repo ;;
+        15) # 安装 新版锐速支持的内核（只支持新系统），（4.15.0-30／4.9.0-4）
+            ss_kernel_install_v2 ;;
         21) # 卸载 BBR
             _bbr_uninstall ;;
         22) # 卸载 锐速
@@ -772,23 +770,28 @@ echo "exit 0" >> /etc/rc.local ; }
 
 # 重启后自动安装锐速
 function _serverspeeder_autoinstall_after_reboot() {
-
 mkdir -p /etc/autoinstall
-
+wget --no-check-certificate -qO /tmp/appex.sh "https://raw.githubusercontent.com/0oVicero0/serverSpeeder_Install/master/appex.sh"
 cat > /etc/autoinstall/appexinstall.sh << EOF
-wget --no-check-certificate -qO /tmp/appex.sh "https://raw.githubusercontent.com/0oVicero0/serverSpeeder_Install/master/appex.sh" && echo | bash /tmp/appex.sh 'install'
+echo | bash /etc/autoinstall/ 'install'
 cp /etc/rc.local.bak /etc/rc.local
 EOF
-
 [[ ! -f /etc/rc.local.bak ]] && cp /etc/rc.local /etc/rc.local.bak
-
 sed -i '$d' /etc/rc.local
 echo "bash /etc/autoinstall/appexinstall.sh" >> /etc/rc.local
 echo "exit 0" >> /etc/rc.local ; }
 
-
-
-
+function _lotserver_autoinstall_after_reboot() {
+mkdir -p /etc/autoinstall
+wget --no-check-certificate -qO /etc/autoinstall/Install.sh https://github.com/MoeClub/lotServer/raw/master/Install.sh
+cat > /etc/autoinstall/appexinstall.sh << EOF
+echo | bash /etc/autoinstall/Install.sh install
+cp /etc/rc.local.bak /etc/rc.local
+EOF
+[[ ! -f /etc/rc.local.bak ]] && cp /etc/rc.local /etc/rc.local.bak
+sed -i '$d' /etc/rc.local
+echo "bash /etc/autoinstall/appexinstall.sh" >> /etc/rc.local
+echo "exit 0" >> /etc/rc.local ; }
 
 
 
@@ -903,11 +906,12 @@ _update_grub ; }
 
 # 内核匹配的情况下安装锐速
 function _serverspeeder_direct_install() { wget --no-check-certificate -qO /tmp/appex.sh "https://raw.githubusercontent.com/0oVicero0/serverSpeeder_Install/master/appex.sh" && echo | bash /tmp/appex.sh 'install'
-[[ ` ps aux | grep appex | grep -v grep ` ]] && echo -e "\n${bold}${green}锐速已在运行 ...${normal}\n" || echo -e "\n${bold}${red}锐速尚未在运行，可能安装失败！${normal}\n" ; }
+ps aux | grep -v grep | grep -q appex && echo -e "\n${bold}${green}锐速已在运行 ...${normal}\n" || echo -e "\n${bold}${red}锐速尚未在运行，可能安装失败！${normal}\n" ; }
 
 function lotserver_direct_install() {
-bash <(wget --no-check-certificate -qO- https://github.com/Aniverse/lotServer/raw/master/lotServer.sh) I
-[[ ` ps aux | grep appex | grep -v grep ` ]] && echo -e "\n${bold}${green}锐速已在运行 ...${normal}\n" || echo -e "\n${bold}${red}锐速尚未在运行，可能安装失败！${normal}\n" ; }
+# bash <(wget --no-check-certificate -qO- https://github.com/Aniverse/lotServer/raw/master/lotServer.sh) I
+echo | bash <(wget --no-check-certificate -qO- https://github.com/MoeClub/lotServer/raw/master/Install.sh) install
+ps aux | grep -v grep | grep -q appex && echo -e "\n${bold}${green}锐速已在运行 ...${normal}\n" || echo -e "\n${bold}${red}锐速尚未在运行，可能安装失败！${normal}\n" ; }
 
 
 
