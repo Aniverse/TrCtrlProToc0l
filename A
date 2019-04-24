@@ -15,7 +15,7 @@
 # https://teddysun.com/489.html
 
 ScriptVersion=2.5.0
-ScriptDate=2019.04.24
+ScriptDate=2019.04.25
 
 # 颜色 -----------------------------------------------------------------------------------
 
@@ -71,28 +71,6 @@ CODENAME=`  cat /etc/os-release | grep VERSION= | tr '[A-Z]' '[a-z]' | sed 's/\"
 [[ ! $SysSupport == 1 ]] && echo -e "\n${red}错误${jiacu} 不支持 Debian 8/9、Ubuntu 16.04/18.04 以外的系统！${normal}" && exit 1
 mkdir -p /log
 
-
-function _ip() { echo -e "\n${bold}正在检查服务器的 IP 信息 ...${normal}"
-
-serveripv4=$( ifconfig | grep -Eo 'inet (addr:)?([0-9]*\.){3}[0-9]*' | grep -Eo '([0-9]*\.){3}[0-9]*' | grep -v '127.0.0.1' )
-isInternalIpAddress "$serveripv4" || serveripv4=$( wget --no-check-certificate -t1 -T6 -qO- v4.ipv6-test.com/api/myip.php )
-isValidIpAddress "$serveripv4" || serveripv4=$( wget --no-check-certificate -t1 -T6 -qO- checkip.dyndns.org | sed -e 's/.*Current IP Address: //' -e 's/<.*$//' )
-isValidIpAddress "$serveripv4" || serveripv4=$( wget --no-check-certificate -t1 -T7 -qO- ipecho.net/plain )
-isValidIpAddress "$serveripv4" || { echo "${bold}${red}${shanshuo}ERROR ${jiacu}${underline}Failed to detect your public IPv4 address, use internal address instead${normal}" ; serveripv4=$( ifconfig | grep -Eo 'inet (addr:)?([0-9]*\.){3}[0-9]*' | grep -Eo '([0-9]*\.){3}[0-9]*' | grep -v '127.0.0.1' ) ; }
-serveripv6=$( wget -t1 -T5 -qO- v6.ipv6-test.com/api/myip.php | grep -Eo "[0-9a-z:]+" | head -n1 )
-
-result=$( wget -qO- http://freeapi.ipip.net/$serveripv4 )
-country=$( echo $result | awk -F '"' '{print $2}' )
-region=$( echo $result | awk -F '"' '{print $4}' )
-city=$( echo $result | awk -F '"' '{print $6}' )
-isp=$( echo $result | awk -F '"' '{print $10}' )
-asn=$( wget -qO- https://ipapi.co/asn )
-
-showip=1
-}
-
-
-
 # 菜单
 function _menu() { clear ; echo
 
@@ -136,7 +114,7 @@ tcp_c_name=$tcp_control
 # 检查理论上内核是否支持锐速
 SSKernel="${red}否${jiacu}"
 #URLKernel='https://raw.githubusercontent.com/0oVicero0/serverSpeeder_kernel/master/serverSpeeder.txt'
-URLKernel='https://raw.githubusercontent.com/MoeClub/lotServer/master/lotServer.log'
+URLKernel='https://raw.githubusercontent.com/Aniverse/lotServer/master/lotServer.log'
 AcceVer=$(wget --no-check-certificate -qO- "$URLKernel" |grep "$KNA/" |grep "/x$KernelBit/" |grep "/$running_kernel/" |awk -F'/' '{print $NF}' |sort -n -k 2 -t '_' |tail -n 1)
 MyKernel=$(wget --no-check-certificate -qO- "$URLKernel" |grep "$KNA/" |grep "/x$KernelBit/" |grep "/$running_kernel/" |grep "$AcceVer" |tail -n 1)
 [[ ! -z "$MyKernel" ]] && SSKernel="${green}是${jiacu}"
@@ -175,12 +153,6 @@ dpkg -l | grep generic-hwe   | awk '{print $2}' >> /tmp/system_kernel_list
 
 echo -e  " ${baizise}${bold}                                   El Psy Congroo!                                   ${normal} "
 echo -e  "  ${bold}"
-[[ $showip == 1 ]] && {
-echo -e  "  IPv4 地址                            ${green}$serveripv4${jiacu}"
-[[ $serveripv6 ]] &&
-echo -e  "  IPv6 地址                            ${green}$serveripv6${jiacu}"
-echo -e  "  ASN／ISP                             ${green}$asn, $isp${jiacu}"
-echo -e  "  地理位置                             ${green}$city, $region, $country${jiacu}" ; }
 echo -e  "  当前操作系统                         ${green}$DISTROU $osversion $CODENAME (x$lbit)${jiacu}"
 echo -e  "  当前正在使用的 TCP 拥塞控制算法      ${green}$tcp_c_name${jiacu}"
 [[ $DeBUG == 1 ]] &&
@@ -193,19 +165,13 @@ echo -e  "  当前内核是否支持 Moeclub 版锐速      $SSKernel"
 echo -e  "  当前 BBR  是否已启用                 $bbrinuse"
 echo -e  "  当前 锐速 是否已启用                 $SSrunning"
 
-[[ $DeBUG == 1 ]] && echo &&
-echo -e  "  当前 CPU  调度方式                   $( cat /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor 2>/dev/null | head -1                       )" && 
-echo -e  "  当前 硬盘 调度算法                   $( cat /sys/block/[sv]da/queue/scheduler 2>/dev/null | cut -d '[' -f2|cut -d ']'  -f1                    )" && 
-echo -e  "  当前 硬盘 文件系统                   $( cat /proc/mounts | grep -P "`df -k | sort -rn -k4 | awk '{print $1}' | head -1`\b" | awk '{print $3}' )" && 
-echo -e  "  当前 硬盘 挂载方式                   $( cat /proc/mounts | grep -P "`df -k | sort -rn -k4 | awk '{print $1}' | head -1`\b" | awk '{print $4}' )"
-
 echo -e  "\n  当前系统内所有已安装的 kernel／headers／modules 列表\n"
 cat -n /tmp/system_kernel_list | sed 's/\t/ /g' | sed "s/ linux-/) ${green}linux-/g" | sed "s/ pve-/) ${green}pve-/g" | sed "s/ ovhkernel-/) ${green}ovhkernel-/g" | sed "s/     /  ${magenta}(0/g" | sed "s/    /  ${magenta}(/g"
 echo -e  "\n  ${jiacu}当前脚本版本：$ScriptVersion        脚本更新时间：$ScriptDate"
 [[ $DeBUG == 1 ]] && echo -e  "\n  当前脚本已处于调试模式"
 echo -e  "\n  ${yellow}${bold}使用本脚本前请先阅读本脚本 GitHub 上的 README；作者水平菜，不保证脚本不会翻车${jiacu}\n"
-[[ ! $DeBUG == 1 ]] && echo -e  "  ${shanshuo}如果运行时出错退出，可以输入这条命令查看日志：${red}cat $Outputs${jiacu}"
-echo -e  "\n  如需报错请务必附上日志！${jiacu}\n"
+echo -e  "  如果运行时出错退出，可以输入这条命令查看日志：${red}cat $Outputs${jiacu}"
+echo -e  "\n  如需报错请务必附上日志${jiacu}\n"
 
 [[ ! $( dpkg -l | grep $(uname -r) ) ]] && echo -e "\n  ${bold}${red}注意${jiacu} 系统中似乎检测不到你当前的内核，你可能正在使用来自 netboot 的内核。\n       这种情况下本脚本的功能不一定能正常工作！\n"
 
@@ -216,13 +182,13 @@ echo -e  "  ${green}(02) ${jiacu}安装 魔改 BBR (tsunami) "
 echo -e  "  ${green}(03) ${jiacu}安装 魔改 BBR (nanqinlang) "
 #echo -e  "  ${green}(04) ${jiacu}安装 bbrplus (暂无)"
 echo -e  "  ${green}(05) ${jiacu}安装 锐速 / LotServer"
-echo -e  "  ${green}(06) ${jiacu}安装 锐速 / ServerSpeeder"
+echo -e  "  ${green}(06) ${jiacu}安装 锐速 / ServerSpeeder （高版本适配）"
 [[ $DeBUG == 1 ]] &&
 echo -e  "  ${green}(11) ${jiacu}安装 指定内核"
 echo -e  "  ${green}(12) ${jiacu}安装 4.11.12 内核"
-echo -e  "  ${green}(13) ${jiacu}安装 SS 内核（4.4.0-47／3.12.1）"
-echo -e  "  ${green}(14) ${jiacu}安装 SS 内核（3.16.0-43／3.16.0-4）"
-echo -e  "  ${green}(15) ${jiacu}安装 LS 内核（4.15.0-30／4.9.0-4）"
+echo -e  "  ${green}(13) ${jiacu}安装 ServerSpeeder 内核（4.4.0-47 或 3.12.1）"
+echo -e  "  ${green}(14) ${jiacu}安装 ServerSpeeder 内核（3.16.0-43 或 3.16.0-4）"
+echo -e  "  ${green}(15) ${jiacu}安装 LotServer 内核（4.15.0-30 或 4.9.0-4）"
 echo -e  "  ${green}(21) ${jiacu}卸载 BBR "
 echo -e  "  ${green}(22) ${jiacu}卸载 锐速 "
 echo -e  "  ${green}(23) ${jiacu}卸载 多余内核 "
@@ -230,10 +196,10 @@ echo -e  "  ${green}(24) ${jiacu}卸载 指定内核 "
 [[ $DeBUG == 1 ]] && {
 echo -e  "  ${green}(31) ${jiacu}安装 Xanmod "
 echo -e  "  ${green}(32) ${jiacu}安装 Xanmod，删除其他内核 "
-echo -e  "  ${green}(33) ${jiacu}安装 liquorix " ; }
+echo -e  "  ${green}(33) ${jiacu}安装 liquorix "
+echo -e  "  ${green}(39) ${jiacu}安装 HWE 内核" ; }
 echo -e  "  ${green}(90) ${jiacu}重启 "
 [[ $DeBUG == 1 ]] &&
-echo -e  "  ${green}(97) ${jiacu}检查 IP 信息 " &&
 echo -e  "  ${green}(98) ${jiacu}调试 "
 echo -e  "  ${green}(99) ${jiacu}返回 \n"
 rm -f /tmp/system_kernel_list ; }
@@ -252,9 +218,9 @@ case $response in
     1 | 01) # 安装 原版 BBR
             _obbr_install ;;
     2 | 02) # 安装 魔改 BBR (Yankee)
-            _ykbbr_install ;;
+            ykbbr_install ;;
     3 | 03) # 安装 魔改 BBR (nanqinlang)
-            _nqlbbr_install ;;
+            nqlbbr_install ;;
     4 | 04) # 安装 bbrplus
             bbrplus_install ;;
     5 | 05) # 安装 LotServer
@@ -265,12 +231,12 @@ case $response in
             _selected_kernel_install ;;
         12) # 安装 4.11.12 内核
             _online_ubuntu_bbr_firmware ; _bbr_kernel_4_11_12 ;;
-        13) # 安装 特定的锐速内核（（4.4.0-47／3.12.1））
+        13) # 安装 特定的 ServerSpeeder 内核（4.4.0-47／3.12.1）
             ss_kernel_install ;;
-        14) # 安装 SS 内核（3.16.0-43／3.16.0-4）
+        14) # 安装 ServerSpeeder 内核（3.16.0-43／3.16.0-4）
             [[ $DISTRO == debian ]] && _debian_serverspeeder_kernel_3.16.0-4_apt
             [[ $CODENAME == xenial ]] && kernelver=3.16.0-43-generic && _ubuntu_serverspeeder_kernel_repo ;;
-        15) # 安装 新版锐速支持的内核（只支持新系统），（4.15.0-30／4.9.0-4）
+        15) # 安装 LotServer 支持的内核（只支持新系统）（4.15.0-30／4.9.0-4）
             ss_kernel_install_v2 ;;
         21) # 卸载 BBR
             _bbr_uninstall ;;
@@ -356,7 +322,7 @@ fi ; }
 
 
 # 安装 Yankee版魔改 BBR
-function _ykbbr_install() {
+function ykbbr_install() {
 
 # [[ `grep "Advanced options for Ubuntu" /etc/default/grub` ]] && sed -i 's/GRUB_DEFAULT=.*/GRUB_DEFAULT=0/' /etc/default/grub
 
@@ -385,7 +351,7 @@ fi ; }
 
 
 # 安装 南琴浪版魔改 BBR
-function _nqlbbr_install() {
+function nqlbbr_install() {
 
 # [[ `grep "Advanced options for Ubuntu" /etc/default/grub` ]] && sed -i 's/GRUB_DEFAULT=.*/GRUB_DEFAULT=""/' /etc/default/grub
 
@@ -572,7 +538,7 @@ elif [[ $CODENAME == stretch ]]; then
      apt-get update
      apt-get -y install linux-image-$kernel_version linux-headers-$kernel_version
 else
-     echo -ne "\n  ${red}注意${jiacu} 本功能只支持 Debian 9 和 Ubuntu 18.04 ！${normal}"
+     echo -ne "\n  ${red}注意${jiacu} 本功能只支持 Debian 9／Ubuntu 18.04 ！${normal}"
      exit 1
 fi
 echo ; }
@@ -597,10 +563,7 @@ apt install -y linux-xanmod ; }
 # 安装 xanmod
 function _xanmod_install() {
 
-# echo -ne "\n  ${bold}输入你要安装的 Xanmod 版本：${normal} " ; read -e XanmodVer ; echo
 echo ; read -ep "  ${bold}输入你要安装的 Xanmod 版本： ${normal}" XanmodVer ; echo -e ""
-
-# read -ep "  ${bold}是否启用 mq ？（1/0）${normal} " mqo ; echo -e ""
 
 _online_ubuntu_bbr_firmware
 
@@ -613,25 +576,21 @@ if   [[ $XanmodVer == 4.12 ]]; then
      wget --no-check-certificate -q https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/4.12/linux-image-4.12.14-xanmod15_1.170920_amd64.deb
      wget --no-check-certificate -q https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/4.12/linux-headers-4.12.14-xanmod15_1.170920_amd64.deb
      echo ; dpkg -i linux-image*.deb ; dpkg -i linux-headers*.deb
-   # echo ; apt-get install -y ./*.deb
 elif [[ $XanmodVer == 4.15 ]]; then
      kernel_version=4.15.13
      wget --no-check-certificate -q https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/4.15/linux-image-4.15.13-xanmod12_1.180325_amd64.deb
      wget --no-check-certificate -q https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/4.15/linux-headers-4.15.13-xanmod12_1.180325_amd64.deb
      echo ; dpkg -i linux-image*.deb ; dpkg -i linux-headers*.deb
-   # echo ; apt-get install -y ./*.deb
 elif [[ $XanmodVer == 4.16 ]]; then
      kernel_version=4.16.12
      wget --no-check-certificate -q https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/4.16/linux-image-4.16.12-xanmod11_2.180526_amd64.deb
      wget --no-check-certificate -q https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/4.16/linux-headers-4.16.12-xanmod11_2.180526_amd64.deb
      echo ; dpkg -i linux-image*.deb ; dpkg -i linux-headers*.deb
-   # echo ; apt-get install -y ./*.deb
 elif [[ $XanmodVer == 4.17 ]]; then
      kernel_version=4.17.14
      wget --no-check-certificate -q https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/4.17/linux-image-4.17.14-xanmod9_1.180810_amd64.deb
      wget --no-check-certificate -q https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/4.17/linux-headers-4.17.14-xanmod9_1.180810_amd64.deb
      echo ; dpkg -i linux-image*.deb ; dpkg -i linux-headers*.deb
-   # echo ; apt-get install -y ./*.deb
 elif [[ $XanmodVer == 4.18  ]]; then
      kernel_version=4.18.16
      wget --no-check-certificate -q https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/4.18/linux-image-4.18.16-xanmod9_1.181020_amd64.deb
@@ -644,15 +603,10 @@ elif [[ $XanmodVer == 4.19  ]]; then
      wget --no-check-certificate -q https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/4.19/linux-headers-4.19.12-xanmod7_2.181223_amd64.deb
      echo ; dpkg -i linux-image*.deb ; dpkg -i linux-headers*.deb
 elif [[ $XanmodVer == apt  ]]; then
-     kernel_version=4.20 ; _xanmod_apt_install
+     kernel_version=5.0 ; _xanmod_apt_install
 fi
 
-# wget --no-check-certificate -q https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/linux-firmware_1.161_all.deb
-
 cd ; rm -rf deball
-
-# echo -e "\n  ${bold}完成，即将重启 ...${normal} \n"
-# reboot
 
 }
 
@@ -784,9 +738,9 @@ echo "exit 0" >> /etc/rc.local ; }
 
 function lotserver_autoinstall_after_reboot() {
 mkdir -p /etc/autoinstall
-wget --no-check-certificate -qO /etc/autoinstall/Install.sh https://github.com/MoeClub/lotServer/raw/master/Install.sh
+wget --no-check-certificate -qO /etc/autoinstall/Install.sh https://github.com/Aniverse/lotServer/raw/master/Install.sh
 cat > /etc/autoinstall/appexinstall.sh << EOF
-echo | bash /etc/autoinstall/Install.sh install
+bash /etc/autoinstall/Install.sh I b
 cp /etc/rc.local.bak /etc/rc.local
 EOF
 [[ ! -f /etc/rc.local.bak ]] && cp /etc/rc.local /etc/rc.local.bak
@@ -910,8 +864,7 @@ function _serverspeeder_direct_install() { wget --no-check-certificate -qO /tmp/
 ps aux | grep -v grep | grep -q appex && echo -e "\n${bold}${green}锐速已在运行 ...${normal}\n" || echo -e "\n${bold}${red}锐速尚未在运行，可能安装失败！${normal}\n" ; }
 
 function lotserver_direct_install() {
-# bash <(wget --no-check-certificate -qO- https://github.com/Aniverse/lotServer/raw/master/lotServer.sh) I
-echo | bash <(wget --no-check-certificate -qO- https://github.com/MoeClub/lotServer/raw/master/Install.sh) install
+bash <(wget --no-check-certificate -qO- https://github.com/Aniverse/lotServer/raw/master/Install.sh) I b
 ps aux | grep -v grep | grep -q appex && echo -e "\n${bold}${green}锐速已在运行 ...${normal}\n" || echo -e "\n${bold}${red}锐速尚未在运行，可能安装失败！${normal}\n" ; }
 
 
