@@ -14,8 +14,8 @@
 # http://xiaofd.win/onekey-ruisu.html
 # https://teddysun.com/489.html
 
-ScriptVersion=2.4.8
-ScriptDate=2019.04.15
+ScriptVersion=2.5.0
+ScriptDate=2019.04.24
 
 # 颜色 -----------------------------------------------------------------------------------
 
@@ -39,7 +39,7 @@ function isInternalIpAddress() { echo $1 | grep -qE '(192\.168\.((\d{1,2})|(1\d{
 #  -----------------------------------------------------------------------------------
 
 cancel() { echo -e "${normal}"
-rm -f /tmp/system_kernel_list /log/kernel_tobe_del_list
+rm -f /tmp/system_kernel_list /log/kernel_tobe_del_list $HOME/1
 exit ; }
 trap cancel SIGINT
 
@@ -99,7 +99,7 @@ function _menu() { clear ; echo
 # [[ $DeBUG == 1 ]] && { Outputs"/log/tcp.$SETUPDATE.log" ; }
 
 # 启用 rc.local
-[[ $CODENAME =~ (bionic|stretch) ]] && _enable_rclocal
+[[ $CODENAME =~ (bionic|stretch) ]] && enable_rclocal
 
 # 确保 debconf-get-selections 存在
 for ddd in debconf-set-selections debconf-get-selections ; do
@@ -692,6 +692,7 @@ apt-get install linux-image-liquorix-amd64 linux-headers-liquorix-amd64 -y ; }
 
 
 # 重启后自动安装 南琴浪 版 BBR
+# 太蠢了，下次改改
 function _bbr_nanqinlang_autoinstall_after_reboot() {
 
 mkdir -p /etc/autoinstall
@@ -717,7 +718,7 @@ cp -rf tcp_nanqinlang.ko /lib/modules/\$(uname -r)/kernel/net/ipv4
 insmod /lib/modules/\$(uname -r)/kernel/net/ipv4/tcp_nanqinlang.ko
 depmod -a
 
-rm -rf tcp_nanqinlang.c Makefile
+rm -f Makefile tcp_nanqinlang.* .tcp_nanqinlang.*
 cp /etc/rc.local.bak /etc/rc.local
 sysctl -p
 EOF
@@ -755,7 +756,7 @@ cp -rf tcp_tsunami.ko /lib/modules/\$(uname -r)/kernel/net/ipv4
 depmod -a
 modprobe tcp_tsunami
 
-rm -rf tcp_tsunami.c Makefile
+rm -f Makefile tcp_tsunami.* .tcp_tsunami.*
 cp /etc/rc.local.bak /etc/rc.local
 sysctl -p
 EOF
@@ -781,7 +782,7 @@ sed -i '$d' /etc/rc.local
 echo "bash /etc/autoinstall/appexinstall.sh" >> /etc/rc.local
 echo "exit 0" >> /etc/rc.local ; }
 
-function _lotserver_autoinstall_after_reboot() {
+function lotserver_autoinstall_after_reboot() {
 mkdir -p /etc/autoinstall
 wget --no-check-certificate -qO /etc/autoinstall/Install.sh https://github.com/MoeClub/lotServer/raw/master/Install.sh
 cat > /etc/autoinstall/appexinstall.sh << EOF
@@ -1047,7 +1048,7 @@ cp -rf tcp_nanqinlang.ko /lib/modules/$(uname -r)/kernel/net/ipv4 >> $Outputs 2>
 insmod /lib/modules/$(uname -r)/kernel/net/ipv4/tcp_nanqinlang.ko >> $Outputs 2>&1
 depmod -a >> $Outputs 2>&1
 
-rm -rf tcp_nanqinlang.c Makefile
+rm -f Makefile tcp_nanqinlang.* .tcp_nanqinlang.*
 echo ; }
 
 
@@ -1072,7 +1073,7 @@ cp -rf ./tcp_tsunami.ko /lib/modules/$(uname -r)/kernel/net/ipv4 >> $Outputs 2>&
 depmod -a >> $Outputs 2>&1
 modprobe tcp_tsunami >> $Outputs 2>&1
 
-rm -rf tcp_tsunami.c Makefile
+rm -f Makefile tcp_tsunami.* .tcp_tsunami.*
 echo ; }
 
 
@@ -1299,7 +1300,7 @@ _update_grub ; }
 
 
 # 启用 /etc/rc.local
-function _enable_rclocal() {
+function enable_rclocal() {
 
 [[ ! -f /etc/rc.local ]] &&
 cat <<EOF >/etc/rc.local
