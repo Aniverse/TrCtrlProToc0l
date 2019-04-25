@@ -28,12 +28,16 @@ for supported_kernel in $supported_list ; do
 done
 [[ ! -f $filename ]] && echo -e "下载源码失败！" && exit 1
 
-echo "obj-m := tcp_$tcp_cc.o" > Makefile
+echo "obj-m:=tcp_$tcp_cc.o" > Makefile
+gcc_ver=$(gcc --version | grep -Eo '[0-9]+\.[0-9]+\.[0-9]+' | head -1)
+[[ $gcc_ver == 7.3 ]] && [[ $kernel_v2 == 4.15 ]] && echo "ccflags-y=-I/usr/lib/gcc/x86_64-linux-gnu/7/include" >> Makefile
+
 mkdir -p /lib/modules/$(uname -r)/build
 make -C /lib/modules/$(uname -r)/build M=$(pwd) modules CC=$(which gcc)
 cp -rf tcp_$tcp_cc.ko /lib/modules/$(uname -r)/kernel/net/ipv4
 insmod /lib/modules/$(uname -r)/kernel/net/ipv4/tcp_$tcp_cc.ko
-depmod -a $OutputLOG
+modprobe tcp_$tcp_cc
+depmod -a
 
 cd ..
 rm -rf compile_tcp_cc
