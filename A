@@ -13,7 +13,7 @@
 # https://teddysun.com/489.html
 
 #################################################################################
-ScriptVersion=2.6.6
+ScriptVersion=2.6.7
 ScriptDate=2019.04.25
 
 usage_guide() {
@@ -129,7 +129,7 @@ ls /lib/modules/$(uname -r)/kernel/net/ipv4 2>/dev/null | grep -q bbr && bbr_exi
 
 kernel_vvv=$(uname -r | cut -d- -f1)
 if version_ge $kernel_vvv 4.9  ; then BBRKernel="${green}是${jiacu}" ; else BBRKernel="${red}否${jiacu}" ; fi
-if version_ge $kernel_vvv 4.10 && ! version_ge $kernel_vvv 5.1 ; then YKKernel="${green}是${jiacu}"  ; else YKKernel="${red}否${jiacu}" ; fi
+if version_ge $kernel_vvv 4.9.3 && ! version_ge $kernel_vvv 5.1 ; then YKKernel="${green}是${jiacu}"  ; else YKKernel="${red}否${jiacu}" ; fi
 if version_ge $kernel_vvv 4.9.3  && ! version_ge $kernel_vvv 5.1 ; then NQLKernel="${green}是${jiacu}" ; else NQLKernel="${red}否${jiacu}" ; fi
 if version_ge $kernel_vvv 4.14  && ! version_ge $kernel_vvv 5.1 ; then BBRPKernel="${green}是${jiacu}" ; else BBRPKernel="${red}否${jiacu}" ; fi
 
@@ -929,7 +929,7 @@ sed -i '/net.core.default_qdisc.*/d' /etc/sysctl.conf
 sed -i '/net.ipv4.tcp_congestion_control.*/d' /etc/sysctl.conf
 echo "net.core.default_qdisc = fq" >> /etc/sysctl.conf
 echo "net.ipv4.tcp_congestion_control = $bbr" >> /etc/sysctl.conf
-modprobe tcp_$bbrname >> $Outputs 2>&1
+modprobe tcp_$bbr >> $Outputs 2>&1
 # sysctl -w net.ipv4.tcp_congestion_control=$bbr >> $Outputs 2>&1
 sysctl -p >> $Outputs 2>&1 ; }
 
