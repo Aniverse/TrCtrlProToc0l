@@ -3,8 +3,8 @@
 # Author: Aniverse
 # https://github.com/Aniverse/TrCtrlProToc0l
 #
-# bash -c "$(wget --no-check-certificate -qO- https://github.com/Aniverse/TrCtrlProToc0l/raw/master/A)"
-# bash <(curl -s https://raw.githubusercontent.com/Aniverse/TrCtrlProToc0l/master/A)
+# 
+# 
 #
 # https://github.com/FunctionClub/YankeeBBR
 # https://sometimesnaive.org/article/linux/bash/tcp_nanqinlang
@@ -14,8 +14,15 @@
 # http://xiaofd.win/onekey-ruisu.html
 # https://teddysun.com/489.html
 
-ScriptVersion=2.6.0.alpha
+#################################################################################
+ScriptVersion=2.6.0.alpha2
 ScriptDate=2019.04.25
+
+usage_guide() {
+bash <(wget -qO- https://github.com/Aniverse/TrCtrlProToc0l/raw/master/A)
+bash <(curl -s https://raw.githubusercontent.com/Aniverse/TrCtrlProToc0l/master/A)
+}
+#################################################################################
 
 # 颜色 -----------------------------------------------------------------------------------
 
@@ -180,6 +187,7 @@ echo -e  "  ${green}(12) ${jiacu}安装 4.11.12 内核"
 echo -e  "  ${green}(13) ${jiacu}安装 ServerSpeeder 内核（4.4.0-47 或 3.12.1）"
 echo -e  "  ${green}(14) ${jiacu}安装 ServerSpeeder 内核（3.16.0-43 或 3.16.0-4）"
 echo -e  "  ${green}(15) ${jiacu}安装 LotServer 内核（4.15.0-30 或 4.9.0-4）"
+echo -e  "  ${green}(16) ${jiacu}安装 4.14.91-bbrplus 内核"
 echo -e  "  ${green}(21) ${jiacu}卸载 BBR "
 echo -e  "  ${green}(22) ${jiacu}卸载 锐速 "
 echo -e  "  ${green}(23) ${jiacu}卸载 多余内核 "
@@ -212,7 +220,7 @@ case $response in
     3 | 03) # 安装 魔改 BBR (nanqinlang)
             nqlbbr_install ;;
     4 | 04) # 安装 bbrplus
-            bbrplus_install ;;
+            bbr_plus_install ;;
     5 | 05) # 安装 LotServer
             ls_install ;;
     6 | 06) # 安装 ServerSpeeder
@@ -228,10 +236,12 @@ case $response in
             [[ $CODENAME == xenial ]] && kernelver=3.16.0-43-generic && ubuntu_serverspeeder_kernel_repo ;;
         15) # 安装 LotServer 支持的内核（只支持新系统）（4.15.0-30／4.9.0-4）
             ss_kernel_install_v2 ;;
+        16) # 安装 bbrplus 内核
+            bbr_plus_kernel_4_14_91 ;;
         21) # 卸载 BBR
-            _bbr_uninstall ;;
+            bbr_uninstall ;;
         22) # 卸载 锐速
-            _ss_uninstall ;;
+            ss_uninstall ;;
         23) # 卸载 多余内核
             while [[ -z $kernel_version ]]; do
                 echo -ne "\n  ${bold}请输入你要 ${baihongse}保留${jiacu} 的内核版本，其他版本的内核将会被卸载：${normal} " ; read -e kernel_version
@@ -433,7 +443,7 @@ fi ; }
 
 
 # 卸载 锐速
-function _ss_uninstall() {
+function ss_uninstall() {
 echo -ne "\n  ${bold}${red}警告 ${jiacu}即将开始卸载 ${green}锐速${jiacu}，敲 回车 继续，否则退出${normal} " ; read input
 case $input in
     "" ) echo ;;
@@ -448,7 +458,7 @@ echo -e "  ${bold}${red}已卸载 锐速，但安装的内核仍保留${normal}\
 
 
 # 卸载 BBR
-function _bbr_uninstall() {
+function bbr_uninstall() {
 echo -ne "\n  ${bold}${red}警告 ${jiacu}即将开始卸载 ${green}BBR${jiacu}，敲 回车 继续，否则退出${normal} " ; read input
 case $input in
     "" ) echo ;;
