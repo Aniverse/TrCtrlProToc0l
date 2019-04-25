@@ -3,9 +3,16 @@
 # https://github.com/Aniverse/TrCtrlProToc0l
 # Author: Aniverse
 #
-# bash <(curl -s https://raw.githubusercontent.com/Aniverse/TrCtrlProToc0l/master/compile_tcp_cc.sh) tsunami nanqinlang bbrplus
 script_update=2019.04.25
-script_version=1.0.3
+script_version=1.0.4
+########################################################################################################
+
+usage_guide() {
+apt-get install -y libelf-dev build-essential
+bash <(curl -s https://raw.githubusercontent.com/Aniverse/TrCtrlProToc0l/master/compile_tcp_cc.sh) tsunami nanqinlang bbrplus
+}
+########################################################################################################
+
 
 tcp_cc=$1
 #[[ -n $Outputs ]] && OutputLOG=">> $OutputLOG 2>&1"
@@ -19,7 +26,7 @@ version_ge $kernel_v 4.9.3 && [[ $tcp_cc == nanqinlang ]] && supported_list="4.9
 version_ge $kernel_v 4.9.3  && [[ $tcp_cc == tsunami ]]    && supported_list="4.9 4.10 4.11 4.12 4.13 4.14 4.15 4.16 4.17 4.18 4.19 4.20 5.0"
 version_ge $kernel_v 4.14  && [[ $tcp_cc == bbrplus ]]    && supported_list="4.14 4.15 4.16 4.17 4.18 4.19 4.20 5.0"
 
-mkdir compile_tcp_cc
+mkdir -p compile_tcp_cc
 cd compile_tcp_cc
 
 for supported_kernel in $supported_list ; do

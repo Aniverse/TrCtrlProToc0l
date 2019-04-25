@@ -183,7 +183,7 @@ echo -e  "  ${green}(06) ${jiacu}安装 锐速 / ServerSpeeder "
 [[ $DeBUG == 1 ]] &&
 echo -e  "  ${green}(11) ${jiacu}安装 指定内核"
 echo -e  "  ${green}(12) ${jiacu}安装 4.11.12 内核"
-echo -e  "  ${green}(13) ${jiacu}安装 ServerSpeeder 内核（4.4.0-47 或 3.12.1）"
+echo -e  "  ${green}(13) ${jiacu}安装 ServerSpeeder 内核（4.4.0-47  或 3.12.1）"
 echo -e  "  ${green}(14) ${jiacu}安装 ServerSpeeder 内核（3.16.0-43 或 3.16.0-4）"
 echo -e  "  ${green}(15) ${jiacu}安装 LotServer     内核（4.15.0-30 或 4.9.0-4）"
 echo -e  "  ${green}(16) ${jiacu}安装 4.14.91-bbrplus 内核"
