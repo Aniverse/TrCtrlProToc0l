@@ -13,7 +13,7 @@
 # https://teddysun.com/489.html
 
 #################################################################################
-ScriptVersion=2.6.4
+ScriptVersion=2.6.5
 ScriptDate=2019.04.25
 
 usage_guide() {
@@ -309,7 +309,7 @@ if [[ $YKKernel == "${green}是${jiacu}" ]]; then
     bash <(wget --no-check-certificate -qO- https://raw.githubusercontent.com/Aniverse/TrCtrlProToc0l/master/compile_tcp_cc.sh) tsunami >> $Outputs 2>&1
     enable_bbr tsunami
     if [[ ` lsmod | grep tsunami ` ]]; then echo -e "\n  ${bold}已开启 ${green}Yankee 版魔改 BBR${jiacu} ...${normal}\n"
-    else echo -e "\n  ${bold}${red}错误 ${green}Yankee 版魔改 BBR${jiacu} 开启失败！${normal}\n" ; exit 1 ; fi
+    else echo -e "\n  ${bold}${red}错误 ${green}Yankee 版魔改 BBR${jiacu} 开启失败！考虑换个内核？${normal}\n" ; exit 1 ; fi
 else
     ask_continue2
   # echo -e "  ${bold}当前内核不支持 ${green}Yankee${jiacu} 版魔改 BBR，先安装 ${green}4.11.12${jiacu} 内核 ...${normal} "
@@ -333,7 +333,7 @@ if [[ $NQLKernel == "${green}是${jiacu}" ]]; then
     bash <(wget --no-check-certificate -qO- https://raw.githubusercontent.com/Aniverse/TrCtrlProToc0l/master/compile_tcp_cc.sh) nanqinlang >> $Outputs 2>&1
     enable_bbr nanqinlang
     if [[ ` lsmod | grep nanqinlang ` ]]; then echo -e "\n  ${bold}已开启 ${green}南琴浪${jiacu} 版魔改 BBR ...${normal}\n\n"
-    else echo -e "\n  ${bold}${red}错误 ${green}南琴浪 版魔改 BBR${jiacu} 开启失败！${normal}\n" ; exit 1 ; fi
+    else echo -e "\n  ${bold}${red}错误 ${green}南琴浪 版魔改 BBR${jiacu} 开启失败！考虑换个内核？${normal}\n" ; exit 1 ; fi
 else
     ask_continue2
   # echo -e "  ${bold}当前内核不支持 ${green}南琴浪${jiacu} 版魔改 BBR，先安装 ${green}4.11.12${jiacu} 内核 ...${normal} "
@@ -353,13 +353,13 @@ fi ; }
 #S4# 安装 BBR Plus
 function bbr_plus_install() {
 if [[ $BBRPKernel == "${green}是${jiacu}" ]]; then
-    echo -e "\n  ${bold}理论上当前内核已支持 ${green}bbrplus${jiacu}，安装并启用魔改 BBR ...${normal} "
+    echo -e "\n  ${bold}理论上当前内核已支持 ${green}bbrplus${jiacu}，实际上能不能装上我也不知道 ...${normal} "
     check_headers
     check_essential
     bash <(wget --no-check-certificate -qO- https://raw.githubusercontent.com/Aniverse/TrCtrlProToc0l/master/compile_tcp_cc.sh) bbrplus >> $Outputs 2>&1
     enable_bbr bbrplus
     if [[ ` lsmod | grep tsunami ` ]]; then echo -e "\n  ${bold}已开启 ${green}bbrplus${jiacu} ...${normal}\n"
-    else echo -e "\n  ${bold}${red}错误 ${green}bbrplus${jiacu} 开启失败！${normal}\n" ; exit 1 ; fi
+    else echo -e "\n  ${bold}${red}错误 ${green}bbrplus${jiacu} 开启失败！考虑装 4.14.91 内核试试？${normal}\n" ; exit 1 ; fi
 else
     ask_continue2
     online_ubuntu_bbr_firmware
