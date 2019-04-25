@@ -13,7 +13,7 @@
 # https://teddysun.com/489.html
 
 #################################################################################
-ScriptVersion=2.6.7
+ScriptVersion=2.6.8
 ScriptDate=2019.04.25
 
 usage_guide() {
@@ -232,7 +232,7 @@ case $response in
         13) # 安装 特定的 ServerSpeeder 内核（4.4.0-47／3.12.1）
             ss_kernel_install ;;
         14) # 安装 ServerSpeeder 内核（3.16.0-43／3.16.0-4）
-            [[ $DISTRO == debian ]] && _debian_serverspeeder_kernel_3.16.0-4_apt
+            [[ $DISTRO == debian ]] && debian_ssr_kernel_3.16.0-4_apt
             [[ $CODENAME == xenial ]] && kernelver=3.16.0-43-generic && ubuntu_serverspeeder_kernel_repo ;;
         15) # 安装 LotServer 支持的内核（只支持新系统）（4.15.0-30／4.9.0-4）
             ss_kernel_install_v2 ;;
@@ -372,9 +372,9 @@ else
     kernel_version=4.14.91
     bbr_plus_kernel_4_14_91
     delete_other_kernel
-    bbr_plus_autoinstall # 其实那个内核里好像已经带了编译好的……
+  # bbr_plus_autoinstall # 其实那个内核里好像已经带了编译好的……
     enable_bbr bbrplus
-    [[ ! $DeBUG == 1 ]] && echo -e "\n  ${bold}即将重启系统，重启后会自动安装 ${green}bbrplus${jiacu} 版魔改 BBR ... ${normal}\n" && reboot
+    [[ ! $DeBUG == 1 ]] && echo -e "\n  ${bold}即将重启系统，重启后会自动安装 ${green}bbrplus ... ${normal}\n" && reboot
 fi ; }
 
 
@@ -424,7 +424,7 @@ elif [[ $SSKernel == "${red}否${jiacu}" ]] && [[ $CODENAME == bionic ]]; then
     ask_continue2
     echo -ne "  ${bold}当前内核不支持 锐速，安装 ${green}4.4.0-47${jiacu} 内核 ... ${normal} \n"
     kernel_version=4.4.0-47
-    _ubuntu_serverspeeder_kernel_4.4.0-47_apt
+    ubuntu_ss_kernel_4.4.0-47_apt
     delete_other_kernel
     delete_other_kernel # 可能上一次卸载的时候又给你强行安装一个 4.4.0 最新的内核，所以再删一次
     serverspeeder_autoinstall
@@ -433,7 +433,7 @@ elif [[ $SSKernel == "${red}否${jiacu}" ]] && [[ $DISTRO == debian ]]; then
     ask_continue2
     echo -ne "  ${bold}当前内核不支持 锐速，安装 ${green}3.16.0-4${jiacu} 内核 ... ${normal} \n"
     kernel_version=3.16.0-4
-    _debian_serverspeeder_kernel_3.16.0-4_apt
+    debian_ssr_kernel_3.16.0-4_apt
     delete_other_kernel
     delete_other_kernel # 可能上一次卸载的时候又给你强行安装一个 3.16.0 最新的内核（目前是 3.16.0-7），所以再删一次
     serverspeeder_autoinstall
@@ -489,7 +489,7 @@ function ss_kernel_install() {
 if   [[ $CODENAME =~ (xenial|bionic) ]]; then
      echo -e "\n  ${bold}安装 ${green}4.4.0-47${jiacu} 内核 ...${normal} \n"
      kernel_version=4.4.0-47
-     _ubuntu_serverspeeder_kernel_4.4.0-47_apt
+     ubuntu_ss_kernel_4.4.0-47_apt
 elif [[ $CODENAME == jessie ]]; then
      echo -e "\n  ${bold}安装 ${green}3.12-1${jiacu} 内核 ...${normal} \n"
      kernel_version=3.12-1
@@ -702,7 +702,7 @@ rm  -rf [12].deb ; echo ; }
 
 
 # Debian 安装 3.16.0-4 内核（For ServerSpeeder）
-function _debian_serverspeeder_kernel_3.16.0-4() {
+function debian_ss_kernel_3.16.0-4() {
 wget --no-check-certificate -qO 1.deb https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Linux%20Kernel/ServerSpeeder/linux-image-3.16.0-4.deb
 echo ` debconf-get-selections linux-image-3.16.0-4-amd64 | grep -C5 "keep the local version currently installed" | grep keep_current | sed "s/select/note/g"` | debconf-set-selections
 { dpkg -i 1.deb >> $Outputs 2>&1 ; } || { echo -e "\n  ${bold}${red}错误${jiacu} 安装 内核 失败！${normal}" | tee -a $Outputs ; exit 1 ; }
@@ -711,14 +711,16 @@ rm  -rf 1.deb ; }
 
 
 # Debian 安装 3.16.0-4 内核（apt-get install）（For ServerSpeeder）
-function _debian_serverspeeder_kernel_3.16.0-4_apt() {
+function debian_ssr_kernel_3.16.0-4_apt() {
 grep snapshot.debian.org /etc/apt/sources.list -q ||
 cat >> /etc/apt/sources.list << EOF
 deb http://snapshot.debian.org/archive/debian/20180620T205325Z/ jessie main contrib non-free
 deb-src http://snapshot.debian.org/archive/debian/20180620T205325Z/ jessie main contrib non-free
 EOF
 echo 'Acquire::Check-Valid-Until 0;' > /etc/apt/apt.conf.d/10-no-check-valid-until
+echo -ne "\n  ${bold}添加源，更新 ...  ${normal}" | tee -a $Outputs ; echo >> $Outputs
 apt-get update >> $Outputs 2>&1
+echo -ne "\n  ${bold}安装内核 ...  ${normal}" | tee -a $Outputs ; echo >> $Outputs
 apt-get install -y linux-image-3.16.0-4-amd64 >> $Outputs 2>&1
 apt-get install -y linux-headers-3.16.0-4-common linux-headers-3.16.0-4-all >> $Outputs 2>&1
 apt-get install -y grep unzip ethtool >> $Outputs 2>&1
@@ -727,7 +729,7 @@ apt-get install -y grep unzip ethtool >> $Outputs 2>&1
 
 
 # Ubuntu 安装 4.4.0-47 内核（For ServerSpeeder）
-function _ubuntu_serverspeeder_kernel_4.4.0-47() {
+function ubuntu_ss_kernel_4.4.0-47() {
 wget --no-check-certificate -qO 1.deb https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Linux%20Kernel/ServerSpeeder/linux-image-4.4.0-47.deb
 wget --no-check-certificate -qO 2.deb https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Linux%20Kernel/ServerSpeeder/linux-headers-4.4.0-47-all.deb
 wget --no-check-certificate -qO 3.deb https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Linux%20Kernel/ServerSpeeder/linux-headers-4.4.0-47.deb
@@ -741,9 +743,11 @@ rm  -rf [123].deb ; }
 
 
 # Ubuntu 安装 4.4.0-47 内核（apt-get install）（For ServerSpeeder）
-function _ubuntu_serverspeeder_kernel_4.4.0-47_apt() {
+function ubuntu_ss_kernel_4.4.0-47_apt() {
 [[ $CODENAME == bionic ]] && [[ ! `grep "xenial" /etc/apt/sources.list` ]] && echo -e "\ndeb http://archive.ubuntu.com/ubuntu/ xenial-security main restricted universe multiverse" >> /etc/apt/sources.list
+echo -ne "\n  ${bold}添加源，更新 ...  ${normal}" | tee -a $Outputs ; echo >> $Outputs
 apt-get update >> $Outputs 2>&1
+echo -ne "\n  ${bold}安装内核 ...  ${normal}" | tee -a $Outputs ; echo >> $Outputs
 apt-get install -y linux-image-4.4.0-47-generic linux-image-extra-4.4.0-47-generic linux-headers-4.4.0-47-generic >> $Outputs 2>&1
 apt-get install -y grep unzip ethtool >> $Outputs 2>&1
 [[ ! $( dpkg -l | grep linux-image-4.4.0-47-generic ) ]] && { echo -e "\n  ${bold}${red}错误${jiacu} 安装 内核 失败！${normal}" | tee -a $Outputs ; exit 1 ; } ; }
