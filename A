@@ -14,7 +14,7 @@
 # http://xiaofd.win/onekey-ruisu.html
 # https://teddysun.com/489.html
 
-ScriptVersion=2.5.1
+ScriptVersion=2.6.0.alpha
 ScriptDate=2019.04.25
 
 # 颜色 -----------------------------------------------------------------------------------
@@ -123,15 +123,9 @@ ls /lib/modules/$(uname -r)/kernel/net/ipv4 2>/dev/null | grep -q bbr && bbr_exi
 
 kernel_vvv=$(uname -r | cut -d- -f1)
 if version_ge $kernel_vvv 4.9  ; then BBRKernel="${green}是${jiacu}" ; else BBRKernel="${red}否${jiacu}" ; fi
-if version_ge $kernel_vvv 4.10 && ! version_ge $kernel_vvv 4.19 ; then YKKernel="${green}是${jiacu}"  ; else YKKernel="${red}否${jiacu}" ; fi
-if version_ge $kernel_vvv 4.9.3  && ! version_ge $kernel_vvv 4.19 ; then NQLKernel="${green}是${jiacu}" ; else NQLKernel="${red}否${jiacu}" ; fi
-ver_4_13=`dpkg -l | grep linux-image | awk '{print $2}' | awk -F '-' '{print $3}' | grep "4.13"`
-ver_4_14=`dpkg -l | grep linux-image | awk '{print $2}' | awk -F '-' '{print $3}' | grep "4.14"`
-ver_4_15=`dpkg -l | grep linux-image | awk '{print $2}' | awk -F '-' '{print $3}' | grep "4.15"`
-ver_4_16=`dpkg -l | grep linux-image | awk '{print $2}' | awk -F '-' '{print $3}' | grep "4.16"`
-ver_4_17=`dpkg -l | grep linux-image | awk '{print $2}' | awk -F '-' '{print $3}' | grep "4.17"`
-ver_4_18=`dpkg -l | grep linux-image | awk '{print $2}' | awk -F '-' '{print $3}' | grep "4.18"`
-ver_4_19=`dpkg -l | grep linux-image | awk '{print $2}' | awk -F '-' '{print $3}' | grep "4.19"`
+if version_ge $kernel_vvv 4.10 && ! version_ge $kernel_vvv 5.0 ; then YKKernel="${green}是${jiacu}"  ; else YKKernel="${red}否${jiacu}" ; fi
+if version_ge $kernel_vvv 4.9.3  && ! version_ge $kernel_vvv 5.0 ; then NQLKernel="${green}是${jiacu}" ; else NQLKernel="${red}否${jiacu}" ; fi
+if version_ge $kernel_vvv 4.14  && ! version_ge $kernel_vvv 5.0 ; then BBRPKernel="${green}是${jiacu}" ; else BBRPKernel="${red}否${jiacu}" ; fi
 
 # 检查 锐速 与 BBR 是否已启用
 [[ ` ps aux | grep appex | grep -v grep ` ]] && SSrunning="${green}是${jiacu}" || SSrunning="${red}否${jiacu}"
@@ -155,6 +149,7 @@ echo -e  "  当前正在使用的 TCP 拥塞控制算法      ${green}$tcp_c_nam
 echo -e  "  当前可以使用的 TCP 拥塞控制算法      ${green}$tcp_control_all${jiacu}"
 echo -e  "  当前正在使用的系统内核               ${green}$running_kernel${jiacu}"
 echo -e  "  当前内核是否支持 原版 BBR            $BBRKernel"
+echo -e  "  当前内核是否支持 BBR Plus            $BBRPKernel"
 echo -e  "  当前内核是否支持 Yankee  版魔改 BBR  $YKKernel"
 echo -e  "  当前内核是否支持 南琴浪  版魔改 BBR  $NQLKernel"
 echo -e  "  当前内核是否支持 Moeclub 版锐速      $SSKernel"
@@ -174,11 +169,11 @@ echo -e  "\n  如需报错请务必附上日志${jiacu}\n"
 # 下次考虑把 exit 1 也加上报错信息提示
 
 echo -e  "  ${green}(01) ${jiacu}安装 原版 BBR "
-echo -e  "  ${green}(02) ${jiacu}安装 魔改 BBR (tsunami) "
-echo -e  "  ${green}(03) ${jiacu}安装 魔改 BBR (nanqinlang) "
-#echo -e  "  ${green}(04) ${jiacu}安装 bbrplus (暂无)"
-echo -e  "  ${green}(05) ${jiacu}安装 锐速 / LotServer"
-echo -e  "  ${green}(06) ${jiacu}安装 锐速 / ServerSpeeder （高版本适配）"
+echo -e  "  ${green}(02) ${jiacu}安装 魔改 BBR / tsunami "
+echo -e  "  ${green}(03) ${jiacu}安装 魔改 BBR / nanqinlang "
+echo -e  "  ${green}(04) ${jiacu}安装 bbrplus "
+echo -e  "  ${green}(05) ${jiacu}安装 锐速 / LotServer "
+echo -e  "  ${green}(06) ${jiacu}安装 锐速 / ServerSpeeder（适配更高版本内核）"
 [[ $DeBUG == 1 ]] &&
 echo -e  "  ${green}(11) ${jiacu}安装 指定内核"
 echo -e  "  ${green}(12) ${jiacu}安装 4.11.12 内核"
@@ -274,18 +269,17 @@ esac ; }
 
 
 
-
 ###################################################################################################################################################################
+# [[ `grep "Advanced options for Ubuntu" /etc/default/grub` ]] && sed -i 's/GRUB_DEFAULT=.*/GRUB_DEFAULT=""/' /etc/default/grub
 
 
 
 
 
-# 安装 原版 BBR
+#S1# 安装 原版 BBR
 function bbr_install() {
 if [[ $BBRKernel == "${green}是${jiacu}" ]]; then
     echo -ne "\n  ${bold}理论上当前内核已支持 ${green}原版 BBR，尝试直接启用 BBR ...${normal} "
-    bbrname=bbr
     enable_bbr ; echo
     grep bbr /proc/sys/net/ipv4/tcp_congestion_control -q && echo -e "\n  ${bold}BBR 已启用 ...\n${normal}" || echo -e "\n  ${bold}${red}警告 BBR 可能开启失败！考虑换个内核？${normal}\n"
 else
@@ -293,22 +287,20 @@ else
   # echo -e "  ${bold}当前内核不支持 BBR，先安装 ${green}4.11.12${jiacu} 内核以启用 BBR ...${normal} "
     online_ubuntu_bbr_firmware
     bbr_kernel_4_11_12
-    bbrname=bbr
     enable_bbr
     [[ ! $DeBUG == 1 ]] && echo -ne "\n  ${bold}即将重启系统，重启后 ${green}BBR${jiacu} 将会启动 ... ${normal}\n" && reboot
 fi ; }
 
 
 
-# 安装 Yankee版魔改 BBR
+#S2# 安装 Yankee版魔改 BBR
 function ykbbr_install() {
 if [[ $YKKernel == "${green}是${jiacu}" ]]; then
     echo -e "\n  ${bold}理论上当前内核已支持 ${green}Yankee${jiacu} 版魔改 BBR，安装并启用魔改 BBR ...${normal} "
     check_headers
     check_essential
-    bbr_tsunami
-    bbrname=tsunami
-    enable_bbr
+    bash <(wget --no-check-certificate -qO https://raw.githubusercontent.com/Aniverse/TrCtrlProToc0l/master/compile_tcp_cc.sh) tsunami
+    enable_bbr tsunami
     if [[ ` lsmod | grep tsunami ` ]]; then echo -e "\n  ${bold}已开启 ${green}Yankee 版魔改 BBR${jiacu} ...${normal}\n"
     else echo -e "\n  ${bold}${red}错误 ${green}Yankee 版魔改 BBR${jiacu} 开启失败！${normal}\n" ; exit 1 ; fi
 else
@@ -318,26 +310,21 @@ else
     check_essential
     bbr_kernel_4_11_12
     kernel_version=4.11.12 && delete_other_kernel
-    bbr_tsunami_autoinstall_after_reboot
-    bbrname=tsunami
-    enable_bbr
+    bbr_tsunami_autoinstall
+    enable_bbr tsunami
     [[ ! $DeBUG == 1 ]] && echo -e "\n  ${bold}即将重启系统，重启后会自动安装 ${green}Yankee${jiacu} 版魔改 BBR ... ${normal}\n" && reboot
 fi ; }
 
 
 
-# 安装 南琴浪版魔改 BBR
+#S3# 安装 南琴浪版魔改 BBR
 function nqlbbr_install() {
-
-# [[ `grep "Advanced options for Ubuntu" /etc/default/grub` ]] && sed -i 's/GRUB_DEFAULT=.*/GRUB_DEFAULT=""/' /etc/default/grub
-
 if [[ $NQLKernel == "${green}是${jiacu}" ]]; then
     echo -e "\n  ${bold}理论上当前内核已支持 ${green}南琴浪${jiacu} 版魔改 BBR，安装并启用魔改 BBR ...${normal} "
     check_headers
     check_essential
-    bbr_nanqinlang
-    bbrname=nanqinlang
-    enable_bbr
+    bash <(wget --no-check-certificate -qO https://raw.githubusercontent.com/Aniverse/TrCtrlProToc0l/master/compile_tcp_cc.sh) nanqinlang
+    enable_bbr nanqinlang
     if [[ ` lsmod | grep nanqinlang ` ]]; then echo -e "\n  ${bold}已开启 ${green}南琴浪${jiacu} 版魔改 BBR ...${normal}\n\n"
     else echo -e "\n  ${bold}${red}错误 ${green}南琴浪 版魔改 BBR${jiacu} 开启失败！${normal}\n" ; exit 1 ; fi
 else
@@ -347,9 +334,8 @@ else
     check_essential
     bbr_kernel_4_11_12
     kernel_version=4.11.12 && delete_other_kernel
-    bbr_nanqinlang_autoinstall_after_reboot
-    bbrname=nanqinlang
-    enable_bbr
+    bbr_nanqinlang_autoinstall
+    enable_bbr nanqinlang
     [[ ! $DeBUG == 1 ]] && echo -e "\n  ${bold}即将重启系统，重启后会自动安装 ${green}南琴浪${jiacu} 版魔改 BBR ... ${normal}\n" && reboot
 fi ; }
 
@@ -357,7 +343,33 @@ fi ; }
 
 
 
-#S5# 安装 LotServer，先懒得做下去了，剩下的再说吧
+#S4# 安装 BBR Plus
+function bbr_plus_install() {
+if [[ $BBRPKernel == "${green}是${jiacu}" ]]; then
+    echo -e "\n  ${bold}理论上当前内核已支持 ${green}bbrplus${jiacu}，安装并启用魔改 BBR ...${normal} "
+    check_headers
+    check_essential
+    bash <(wget --no-check-certificate -qO https://raw.githubusercontent.com/Aniverse/TrCtrlProToc0l/master/compile_tcp_cc.sh) bbrplus
+    enable_bbr bbrplus
+    if [[ ` lsmod | grep tsunami ` ]]; then echo -e "\n  ${bold}已开启 ${green}bbrplus${jiacu} ...${normal}\n"
+    else echo -e "\n  ${bold}${red}错误 ${green}bbrplus${jiacu} 开启失败！${normal}\n" ; exit 1 ; fi
+else
+    ask_continue2
+    online_ubuntu_bbr_firmware
+    check_essential
+    kernel_version=4.14.91
+    bbr_plus_kernel_4_14_91
+    delete_other_kernel
+    bbr_plus_autoinstall # 其实那个内核里好像已经带了编译好的……
+    enable_bbr bbrplus
+    [[ ! $DeBUG == 1 ]] && echo -e "\n  ${bold}即将重启系统，重启后会自动安装 ${green}bbrplus${jiacu} 版魔改 BBR ... ${normal}\n" && reboot
+fi ; }
+
+
+
+
+
+#S5# 安装 LotServer
 function ls_install() {
 if [[ $SSKernel == "${green}是${jiacu}" ]]; then
     echo -e "\n  ${bold}理论上当前内核已支持 ${green}锐速${jiacu}，直接安装 ... ${normal} "
@@ -367,14 +379,14 @@ elif [[ $SSKernel == "${red}否${jiacu}" ]] && [[ $DISTRO == ubuntu ]]; then
     ss_kernel_install_v2
     delete_other_kernel
     delete_other_kernel
-    lotserver_autoinstall_after_reboot
+    lotserver_autoinstall
     [[ ! $DeBUG == 1 ]] && echo -e "\n  ${bold}即将重启系统，重启后会自动安装 ${green}锐速${jiacu} ... ${normal}\n" && reboot
 elif [[ $SSKernel == "${red}否${jiacu}" ]] && [[ $DISTRO == debian ]]; then
     ask_continue2
     ss_kernel_install_v2
     delete_other_kernel
     delete_other_kernel
-    lotserver_autoinstall_after_reboot
+    lotserver_autoinstall
     [[ ! $DeBUG == 1 ]] && echo -e "\n  ${bold}即将重启系统，重启后会自动安装 ${green}锐速${jiacu} ... ${normal}\n" && reboot
 fi ; }
 
@@ -394,7 +406,7 @@ elif [[ $SSKernel == "${red}否${jiacu}" ]] && [[ $DISTRO == ubuntu ]] && [[ ! $
     ubuntu_serverspeeder_kernel_repo
     delete_other_kernel
     delete_other_kernel
-    serverspeeder_autoinstall_after_reboot
+    serverspeeder_autoinstall
     [[ ! $DeBUG == 1 ]] && echo -e "\n  ${bold}即将重启系统，重启后会自动安装 ${green}锐速${jiacu} ... ${normal}\n" && reboot
 elif [[ $SSKernel == "${red}否${jiacu}" ]] && [[ $CODENAME == bionic ]]; then
     ask_continue2
@@ -403,7 +415,7 @@ elif [[ $SSKernel == "${red}否${jiacu}" ]] && [[ $CODENAME == bionic ]]; then
     _ubuntu_serverspeeder_kernel_4.4.0-47_apt
     delete_other_kernel
     delete_other_kernel # 可能上一次卸载的时候又给你强行安装一个 4.4.0 最新的内核，所以再删一次
-    serverspeeder_autoinstall_after_reboot
+    serverspeeder_autoinstall
     [[ ! $DeBUG == 1 ]] && echo -e "\n  ${bold}即将重启系统，重启后会自动安装 ${green}锐速${jiacu} ... ${normal}\n" && reboot
 elif [[ $SSKernel == "${red}否${jiacu}" ]] && [[ $DISTRO == debian ]]; then
     ask_continue2
@@ -412,7 +424,7 @@ elif [[ $SSKernel == "${red}否${jiacu}" ]] && [[ $DISTRO == debian ]]; then
     _debian_serverspeeder_kernel_3.16.0-4_apt
     delete_other_kernel
     delete_other_kernel # 可能上一次卸载的时候又给你强行安装一个 3.16.0 最新的内核（目前是 3.16.0-7），所以再删一次
-    serverspeeder_autoinstall_after_reboot
+    serverspeeder_autoinstall
     [[ ! $DeBUG == 1 ]] && echo -e "\n  ${bold}即将重启系统，重启后会自动安装 ${green}锐速${jiacu} ... ${normal}\n" && reboot
 fi ; }
 
@@ -443,7 +455,7 @@ case $input in
     *  ) echo ; _read_response ;;
 esac
 tcp_control=` sysctl net.ipv4.tcp_available_congestion_control | awk '{print $3}' `
-if [[ $tcp_control =~ ("nanqinlang"|"tsunami"|"bbr"|"bbr_powered") ]]; then bbrname=$tcp_control ; _disable_bbr ; echo -e "  ${bold}${red}已卸载 BBR，但安装的内核仍保留${normal}\n"
+if [[ $tcp_control =~ ("nanqinlang"|"tsunami"|"bbr"|"bbr_powered") ]]; then bbrname=$tcp_control ; disable_bbr ; echo -e "  ${bold}${red}已卸载 BBR，但安装的内核仍保留${normal}\n"
 else echo -e "  ${bold}${red}错误 ${jiacu}你并没有使用本脚本安装 BBR ...${normal}\n" ; _read_response ; fi ; }
 
 
@@ -572,7 +584,6 @@ cd ; rm -rf deball
 function _liquorix_install() {
 
 online_ubuntu_bbr_firmware
-# apt-get update
 
 if   [[ $DISTRO == ubuntu ]]; then
      [[ ! `command -v add-apt-repository`  ]] && apt-get install -y software-properties-common
@@ -597,88 +608,48 @@ apt-get install linux-image-liquorix-amd64 linux-headers-liquorix-amd64 -y ; }
 
 
 
-
-
-# 重启后自动安装 南琴浪 版 BBR
-# 太蠢了，下次改改
-function bbr_nanqinlang_autoinstall_after_reboot() {
-
+# 重启后自动安装 BBR Plus
+function bbr_plus_autoinstall() {
 mkdir -p /etc/autoinstall
 [[ ! -f /etc/rc.local.bak ]] && cp /etc/rc.local /etc/rc.local.bak
-
-cat > /etc/autoinstall/nqlbbr.sh <<EOF
-ver_4_13=\`dpkg -l | grep linux-image | awk '{print \$2}' | awk -F '-' '{print \$3}' | grep "4.13"\`
-ver_4_14=\`dpkg -l | grep linux-image | awk '{print \$2}' | awk -F '-' '{print \$3}' | grep "4.14"\`
-ver_4_15=\`dpkg -l | grep linux-image | awk '{print \$2}' | awk -F '-' '{print \$3}' | grep "4.15"\`
-ver_4_16=\`dpkg -l | grep linux-image | awk '{print \$2}' | awk -F '-' '{print \$3}' | grep "4.16"\`
-
-if   [[ ! -z "\${ver_4_13}" ]]; then wget --no-check-certificate -qO tcp_nanqinlang.c https://github.com/Aniverse/BitTorrentClientCollection/raw/master/TCP%20Congestion%20Control/BBR%204.13/tcp_nanqinlang.c
-elif [[ ! -z "\${ver_4_14}" ]]; then wget --no-check-certificate -qO tcp_nanqinlang.c https://github.com/Aniverse/BitTorrentClientCollection/raw/master/TCP%20Congestion%20Control/BBR%204.14/tcp_nanqinlang.c
-elif [[ ! -z "\${ver_4_15}" ]]; then wget --no-check-certificate -qO tcp_nanqinlang.c https://github.com/Aniverse/BitTorrentClientCollection/raw/master/TCP%20Congestion%20Control/BBR%204.15/tcp_nanqinlang.c
-elif [[ ! -z "\${ver_4_16}" ]]; then wget --no-check-certificate -qO tcp_nanqinlang.c https://github.com/Aniverse/BitTorrentClientCollection/raw/master/TCP%20Congestion%20Control/BBR%204.16/tcp_nanqinlang.c
-elif [[ ! -z "\${ver_4_17}" ]]; then wget --no-check-certificate -qO tcp_nanqinlang.c https://github.com/Aniverse/BitTorrentClientCollection/raw/master/TCP%20Congestion%20Control/BBR%204.17/tcp_nanqinlang.c
-elif [[ ! -z "\${ver_4_18}" ]]; then wget --no-check-certificate -qO tcp_nanqinlang.c https://github.com/Aniverse/BitTorrentClientCollection/raw/master/TCP%20Congestion%20Control/BBR%204.18/tcp_nanqinlang.c
-else wget --no-check-certificate -qO tcp_nanqinlang.c https://github.com/Aniverse/BitTorrentClientCollection/raw/master/TCP%20Congestion%20Control/BBR%204.12%20and%20below/tcp_nanqinlang.c ; fi
-
-echo "obj-m := tcp_nanqinlang.o" > Makefile
-make -C /lib/modules/\$(uname -r)/build M=\`pwd\` modules CC=\`which gcc\`
-cp -rf tcp_nanqinlang.ko /lib/modules/\$(uname -r)/kernel/net/ipv4
-insmod /lib/modules/\$(uname -r)/kernel/net/ipv4/tcp_nanqinlang.ko
-depmod -a
-
-rm -f Makefile tcp_nanqinlang.* .tcp_nanqinlang.*
+cat > /etc/autoinstall/bbrplus.sh <<EOF
+bash <(wget --no-check-certificate -qO https://raw.githubusercontent.com/Aniverse/TrCtrlProToc0l/master/compile_tcp_cc.sh) bbrplus
 cp /etc/rc.local.bak /etc/rc.local
 sysctl -p
 EOF
+sed -i '$d' /etc/rc.local
+echo "bash /etc/autoinstall/bbrplus.sh" >> /etc/rc.local
+echo "exit 0" >> /etc/rc.local ; }
 
+# 重启后自动安装 南琴浪 版 BBR
+function bbr_nanqinlang_autoinstall() {
+mkdir -p /etc/autoinstall
+[[ ! -f /etc/rc.local.bak ]] && cp /etc/rc.local /etc/rc.local.bak
+cat > /etc/autoinstall/nqlbbr.sh <<EOF
+bash <(wget --no-check-certificate -qO https://raw.githubusercontent.com/Aniverse/TrCtrlProToc0l/master/compile_tcp_cc.sh) nanqinlang
+cp /etc/rc.local.bak /etc/rc.local
+sysctl -p
+EOF
 sed -i '$d' /etc/rc.local
 echo "bash /etc/autoinstall/nqlbbr.sh" >> /etc/rc.local
 echo "exit 0" >> /etc/rc.local ; }
 
-
-
 # 重启后自动安装 Yankee 版 BBR
-function bbr_tsunami_autoinstall_after_reboot() {
-
+function bbr_tsunami_autoinstall() {
 mkdir -p /etc/autoinstall
 [[ ! -f /etc/rc.local.bak ]] && cp /etc/rc.local /etc/rc.local.bak
-
 cat > /etc/autoinstall/ykbbr.sh <<EOF
-ver_4_13=\`dpkg -l | grep linux-image | awk '{print \$2}' | awk -F '-' '{print \$3}' | grep "4.13"\`
-ver_4_14=\`dpkg -l | grep linux-image | awk '{print \$2}' | awk -F '-' '{print \$3}' | grep "4.14"\`
-ver_4_15=\`dpkg -l | grep linux-image | awk '{print \$2}' | awk -F '-' '{print \$3}' | grep "4.15"\`
-
-if   [[ ! -z "\${ver_4_13}" ]]; then wget --no-check-certificate -qO tcp_tsunami.c https://github.com/Aniverse/BitTorrentClientCollection/raw/master/TCP%20Congestion%20Control/BBR%204.13/tcp_tsunami.c
-elif [[ ! -z "\${ver_4_14}" ]]; then wget --no-check-certificate -qO tcp_tsunami.c https://github.com/Aniverse/BitTorrentClientCollection/raw/master/TCP%20Congestion%20Control/BBR%204.14/tcp_tsunami.c
-elif [[ ! -z "\${ver_4_15}" ]]; then wget --no-check-certificate -qO tcp_tsunami.c https://github.com/Aniverse/BitTorrentClientCollection/raw/master/TCP%20Congestion%20Control/BBR%204.15/tcp_tsunami.c
-elif [[ ! -z "\${ver_4_16}" ]]; then wget --no-check-certificate -qO tcp_tsunami.c https://github.com/Aniverse/BitTorrentClientCollection/raw/master/TCP%20Congestion%20Control/BBR%204.16/tcp_tsunami.c
-elif [[ ! -z "\${ver_4_17}" ]]; then wget --no-check-certificate -qO tcp_tsunami.c https://github.com/Aniverse/BitTorrentClientCollection/raw/master/TCP%20Congestion%20Control/BBR%204.17/tcp_tsunami.c
-elif [[ ! -z "\${ver_4_18}" ]]; then wget --no-check-certificate -qO tcp_tsunami.c https://github.com/Aniverse/BitTorrentClientCollection/raw/master/TCP%20Congestion%20Control/BBR%204.18/tcp_tsunami.c
-else wget --no-check-certificate -qO tcp_tsunami.c https://github.com/Aniverse/BitTorrentClientCollection/raw/master/TCP%20Congestion%20Control/BBR%204.12%20and%20below/tcp_tsunami.c ; fi
-
-echo "obj-m:=tcp_tsunami.o" > Makefile
-make -C /lib/modules/\$(uname -r)/build M=\`pwd\` modules CC=\`which gcc\`
-
-insmod tcp_tsunami.ko
-cp -rf tcp_tsunami.ko /lib/modules/\$(uname -r)/kernel/net/ipv4
-depmod -a
-modprobe tcp_tsunami
-
-rm -f Makefile tcp_tsunami.* .tcp_tsunami.*
+bash <(wget --no-check-certificate -qO https://raw.githubusercontent.com/Aniverse/TrCtrlProToc0l/master/compile_tcp_cc.sh) tsunami
 cp /etc/rc.local.bak /etc/rc.local
 sysctl -p
 EOF
-
 [[ ! -f /etc/rc.local.bak ]] && cp /etc/rc.local /etc/rc.local.bak
-
 sed -i '$d' /etc/rc.local
 echo "bash /etc/autoinstall/ykbbr.sh" >> /etc/rc.local
 echo "exit 0" >> /etc/rc.local ; }
 
-
-
 # 重启后自动安装锐速 ServerSpeeder
-function serverspeeder_autoinstall_after_reboot() {
+function serverspeeder_autoinstall() {
 mkdir -p /etc/autoinstall
 wget --no-check-certificate -qO /tmp/appex.sh "https://raw.githubusercontent.com/0oVicero0/serverSpeeder_Install/master/appex.sh"
 cat > /etc/autoinstall/appexinstall.sh << EOF
@@ -690,7 +661,8 @@ sed -i '$d' /etc/rc.local
 echo "bash /etc/autoinstall/appexinstall.sh" >> /etc/rc.local
 echo "exit 0" >> /etc/rc.local ; }
 
-function lotserver_autoinstall_after_reboot() {
+# 重启后自动安装锐速 LotServer
+function lotserver_autoinstall() {
 mkdir -p /etc/autoinstall
 wget --no-check-certificate -qO /etc/autoinstall/Install.sh https://github.com/Aniverse/lotServer/raw/master/Install.sh
 cat > /etc/autoinstall/appexinstall.sh << EOF
@@ -809,7 +781,7 @@ echo -ne "\n  ${bold}删除源，更新 ...  ${normal}" | tee -a $Outputs ; echo
 function ubuntu_serverspeeder_updategrub() {
 sed -i 's/GRUB_DEFAULT=.*/GRUB_DEFAULT="Advanced options for Ubuntu>Ubuntu, with Linux kernelver"/' /etc/default/grub
 sed -i "s/kernelver/$kernelver/" /etc/default/grub
-_update_grub ; }
+update_grub ; }
 
 
 
@@ -867,8 +839,21 @@ wget --no-check-certificate -qO 2.deb https://github.com/Aniverse/BitTorrentClie
 wget --no-check-certificate -qO 3.deb https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Linux%20Kernel/BBR/linux-image-4.11.12-generic-amd64.deb
 dpkg -i [123].deb >> $Outputs 2>&1 || { echo -e "\n  ${bold}${red}错误${jiacu} 安装 内核 失败！${normal}" ; exit 1 ; }
 rm -rf [123].deb ; echo
-_update_grub ; }
+update_grub ; }
 
+
+
+
+
+# 安装 4.14.91 内核（For BBR Plus）
+# https://github.com/chiakge/Linux-NetSpeed/blob/master/tcp.sh
+function bbr_plus_kernel_4_14_91() {
+echo -ne "\n  ${bold}安装 4.14.91 内核及其头文件 ... ${normal} " | tee -a $Outputs ; echo >> $Outputs
+wget --no-check-certificate -qNO 1.deb http://raw.githubusercontent.com/chiakge/Linux-NetSpeed/master/bbrplus/debian-ubuntu/x64/linux-image-4.14.91.deb
+wget --no-check-certificate -qNO 2.deb http://raw.githubusercontent.com/chiakge/Linux-NetSpeed/master/bbrplus/debian-ubuntu/x64/linux-headers-4.14.91.deb
+dpkg -i [12].deb >> $Outputs 2>&1 || { echo -e "\n  ${bold}${red}错误${jiacu} 安装 内核 失败！${normal}" ; exit 1 ; }
+rm -rf [12].deb ; echo
+update_grub ; }
 
 
 
@@ -922,14 +907,11 @@ which awk  >> $Outputs 2>&1 ; [ $? -ne '0' ] && { echo -e  "\n  ${red}错误${bo
 which gcc  >> $Outputs 2>&1 ; [ $? -ne '0' ] && { echo -ne "\n  ${bold}安装 gcc ...${normal} "     | tee -a $Outputs  ; apt-get install -y gcc  >> $Outputs 2>&1 ; echo | tee -a $Outputs
 which gcc  >> $Outputs 2>&1 ; [ $? -ne '0' ] && { echo -e  "\n  ${red}错误${bold} 安装 gcc 失败！${normal}" | tee -a $Outputs  ; exit 1 ; } ; }
 
-gcc_ok=0 ; gcc_ver=` gcc --version | grep -Eo '[0-9]+\.[0-9]+\.[0-9]+' | head -n1 `
-gcc_ver_1=` echo $gcc_ver | awk -F. '{print $1}' ` ; gcc_ver_2=` echo $gcc_ver | awk -F. '{print $2}' `
-[[ -n $gcc_ver_1 ]] && [[ $gcc_ver_1 -gt 4 ]] && gcc_ok=1
-[[ $gcc_ver_1 == 4 ]] && [[ -n $gcc_ver_2 ]] && [[ $gcc_ver_2 -ge 9 ]] && gcc_ok=1
-[[ $gcc_ok == 0 ]] && { echo -e "\n  ${red}错误${bold} gcc 版本低于 4.9！${normal}" | tee -a $Outputs ; exit 1 ; }
+gcc_ver=$(gcc --version | grep -Eo '[0-9]+\.[0-9]+\.[0-9]+' | head -1)
+version_ge $gcc_ver 4.9 || { echo -e "\n  ${red}错误${bold} gcc 版本低于 4.9！${normal}" | tee -a $Outputs ; exit 1 ; }
 
-[[ ! `dpkg -l | grep build-essential` ]] && { echo -ne "\n  ${bold}安装 build-essential ...${normal} " | tee -a $Outputs  ; apt-get install -y build-essential >> $Outputs 2>&1 ; echo | tee -a $Outputs
-[[ ! `dpkg -l | grep build-essential` ]] && { echo -e  "\n  ${red}错误${bold} 安装 build-essential  失败！${normal}" | tee -a $Outputs ; exit 1 ; } ; } ; }
+dpkg -l | grep build-essential -q || { echo -ne "\n  ${bold}安装 build-essential ...${normal} " | tee -a $Outputs  ; apt-get install -y build-essential >> $Outputs 2>&1 ; echo | tee -a $Outputs
+dpkg -l | grep build-essential -q || { echo -e  "\n  ${red}错误${bold} 安装 build-essential 失败！${normal}" | tee -a $Outputs ; exit 1 ; } ; } ; }
 
 
 
@@ -986,24 +968,26 @@ echo ; }
 
 
 
-# 开启 BBR 或 魔改版 BBR
+# 开启 BBR 或
 function enable_bbr() {
+bbr=$1 ; [[ -z $bbr ]] && bbr=bbr
 sed -i '/net.core.default_qdisc.*/d' /etc/sysctl.conf
 sed -i '/net.ipv4.tcp_congestion_control.*/d' /etc/sysctl.conf
 echo "net.core.default_qdisc = fq" >> /etc/sysctl.conf
-echo "net.ipv4.tcp_congestion_control = $bbrname" >> /etc/sysctl.conf
+echo "net.ipv4.tcp_congestion_control = $bbr" >> /etc/sysctl.conf
 modprobe tcp_$bbrname >> $Outputs 2>&1
-# sysctl -w net.ipv4.tcp_congestion_control=$bbrname >> $Outputs 2>&1
+# sysctl -w net.ipv4.tcp_congestion_control=$bbr >> $Outputs 2>&1
 sysctl -p >> $Outputs 2>&1 ; }
 
 
 
-# 关闭 BBR 或 魔改版 BBR
-function _disable_bbr() {
+# 关闭 BBR
+function disable_bbr() {
+bbr=$1 ; [[ -z $bbr ]] && bbr=bbr
 sed -i '/net.core.default_qdisc.*/d' /etc/sysctl.conf
 sed -i '/net.ipv4.tcp_congestion_control.*/d' /etc/sysctl.conf
 echo "net.ipv4.tcp_congestion_control = cubic" >> /etc/sysctl.conf
-[[ ! $bbrname == bbr ]] && rm /lib/modules/`uname -r`/kernel/net/ipv4/tcp_$bbrname.ko
+# [[ $bbr != bbr ]] && rm /lib/modules/`uname -r`/kernel/net/ipv4/tcp_$bbrname.ko
 sysctl -p >> $Outputs 2>&1 ; }
 
 
@@ -1142,7 +1126,7 @@ rm -f modules.deb ; } ; }
 function _disable_advanced_boot() { sed -i 's/GRUB_DEFAULT=.*/GRUB_DEFAULT=""/' /etc/default/grub ; }
 
 # 更新引导
-function _update_grub() { echo -ne "\n  ${bold}更新引导 ...  ${normal}" | tee -a $Outputs ; echo >> $Outputs
+function update_grub() { echo -ne "\n  ${bold}更新引导 ...  ${normal}" | tee -a $Outputs ; echo >> $Outputs
 { update-grub >> $Outputs 2>&1 ; } && { echo "${green}${bold}完成${normal}" | tee -a $Outputs ; } ; }
 
 # 目前自带更新引导的三个 function：ubuntu 启动选项、删除其他内核、安装 4.11.12 内核
@@ -1174,7 +1158,7 @@ if [ $kernel_total_num > 1 ]; then
 fi
 
 rm -f /log/kernel_tobe_del_list
-_update_grub ; }
+update_grub ; }
 
 
 
@@ -1203,7 +1187,7 @@ if [ $kernel_total_num > 1 ]; then
 fi
 
 rm -f /log/kernel_tobe_del_list
-_update_grub ; }
+update_grub ; }
 
 
 
