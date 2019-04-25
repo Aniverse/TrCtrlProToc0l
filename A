@@ -15,7 +15,7 @@
 # https://teddysun.com/489.html
 
 #################################################################################
-ScriptVersion=2.6.0.alpha4
+ScriptVersion=2.6.0.alpha5
 ScriptDate=2019.04.25
 
 usage_guide() {
@@ -668,7 +668,7 @@ echo "exit 0" >> /etc/rc.local ; }
 # 重启后自动安装锐速 LotServer
 function lotserver_autoinstall() {
 mkdir -p /etc/autoinstall
-wget --no-check-certificate -qO /etc/autoinstall/Install.sh https://github.com/Aniverse/lotServer/raw/master/Install.sh
+wget --no-check-certificate -qO /etc/autoinstall/appexinstall.sh https://github.com/Aniverse/lotServer/raw/master/lotServer.sh
 cat > /etc/autoinstall/appexinstall.sh << EOF
 bash /etc/autoinstall/Install.sh I b
 cp /etc/rc.local.bak /etc/rc.local
@@ -681,10 +681,6 @@ echo "exit 0" >> /etc/rc.local ; }
 
 
 ###################################################################################################################################################################
-
-
-
-
 
 
 
@@ -795,7 +791,7 @@ function serverspeeder_install() { wget --no-check-certificate -qO /tmp/appex.sh
 ps aux | grep -v grep | grep -q appex && echo -e "\n${bold}${green}锐速已在运行 ...${normal}\n" || echo -e "\n${bold}${red}锐速尚未在运行，可能安装失败！${normal}\n" ; }
 
 function lotserver_install() {
-bash <(wget --no-check-certificate -qO- https://github.com/Aniverse/lotServer/raw/master/Install.sh) I b
+bash <(wget --no-check-certificate -qO- https://github.com/Aniverse/lotServer/raw/master/lotServer.sh) I b
 ps aux | grep -v grep | grep -q appex && echo -e "\n${bold}${green}锐速已在运行 ...${normal}\n" || echo -e "\n${bold}${red}锐速尚未在运行，可能安装失败！${normal}\n" ; }
 
 
