@@ -15,7 +15,7 @@
 # https://teddysun.com/489.html
 
 #################################################################################
-ScriptVersion=2.6.0.alpha3
+ScriptVersion=2.6.0.alpha4
 ScriptDate=2019.04.25
 
 usage_guide() {
@@ -179,14 +179,14 @@ echo -e  "  ${green}(01) ${jiacu}安装 原版 BBR "
 echo -e  "  ${green}(02) ${jiacu}安装 魔改 BBR / tsunami "
 echo -e  "  ${green}(03) ${jiacu}安装 魔改 BBR / nanqinlang "
 echo -e  "  ${green}(04) ${jiacu}安装 bbrplus "
-echo -e  "  ${green}(05) ${jiacu}安装 锐速 / LotServer "
-echo -e  "  ${green}(06) ${jiacu}安装 锐速 / ServerSpeeder（适配更高版本内核）"
+echo -e  "  ${green}(05) ${jiacu}安装 锐速 / LotServer（适配更高版本内核） "
+echo -e  "  ${green}(06) ${jiacu}安装 锐速 / ServerSpeeder "
 [[ $DeBUG == 1 ]] &&
 echo -e  "  ${green}(11) ${jiacu}安装 指定内核"
 echo -e  "  ${green}(12) ${jiacu}安装 4.11.12 内核"
 echo -e  "  ${green}(13) ${jiacu}安装 ServerSpeeder 内核（4.4.0-47 或 3.12.1）"
 echo -e  "  ${green}(14) ${jiacu}安装 ServerSpeeder 内核（3.16.0-43 或 3.16.0-4）"
-echo -e  "  ${green}(15) ${jiacu}安装 LotServer 内核（4.15.0-30 或 4.9.0-4）"
+echo -e  "  ${green}(15) ${jiacu}安装   LotServer   内核（4.15.0-30 或 4.9.0-4）"
 echo -e  "  ${green}(16) ${jiacu}安装 4.14.91-bbrplus 内核"
 echo -e  "  ${green}(21) ${jiacu}卸载 BBR "
 echo -e  "  ${green}(22) ${jiacu}卸载 锐速 "
@@ -194,7 +194,7 @@ echo -e  "  ${green}(23) ${jiacu}卸载 多余内核 "
 echo -e  "  ${green}(24) ${jiacu}卸载 指定内核 "
 [[ $DeBUG == 1 ]] && {
 echo -e  "  ${green}(31) ${jiacu}安装 Xanmod "
-echo -e  "  ${green}(32) ${jiacu}安装 Xanmod，删除其他内核 "
+echo -e  "  ${green}(32) ${jiacu}安装 Xanmod，并删除其他内核 "
 echo -e  "  ${green}(33) ${jiacu}安装 liquorix "
 echo -e  "  ${green}(39) ${jiacu}安装 HWE 内核" ; }
 echo -e  "  ${green}(90) ${jiacu}重启 "
@@ -253,20 +253,18 @@ case $response in
                 echo -ne "\n  ${bold}请输入你要 ${baihongse}卸载${jiacu} 的内核版本，其他版本的内核将会被保留：${normal} " ; read -e kernel_version
                 [[ ! ` dpkg -l | grep linux-image | grep "$kernel_version" ` ]] && { echo -e "\n  ${bold}${red}错误${jiacu} 大佬，你压根就没装这个内核吧！${normal}" ; unset kernel_version ; }
             done
-            _delete_kernel ;;
+            delete_kernel ;;
         31) # 安装 xanmod
-            _xanmod_install ;;
+            xanmod_install ;;
         32) # 安装 xanmod，删除其他内核
-            _xanmod_install ; delete_other_kernel ; delete_other_kernel ;;
+            xanmod_install ; delete_other_kernel ; delete_other_kernel ;;
         33) # 安装 liquorix
-            _liquorix_install ;;
+            liquorix_install ;;
         39) # 安装 HWE 内核
             [[ $CODENAME == xenial ]] && apt-get install -y linux-generic-hwe-16.04
             [[ $CODENAME == bionic ]] && apt-get install -y linux-generic-hwe-18.04 ;;
         90) # 重启
             reboot ;;
-        97) # 检查 IP 信息
-            _ip ; _menu ; _read_response ;;
         98) # 启用调试模式
             DeBUG=1 ; _menu ; _read_response ;;
     ""| 99) # 返回
@@ -524,7 +522,7 @@ echo ; }
 
 
 # 安装 xanmod，apt
-function _xanmod_apt_install() {
+function xanmod_apt_install() {
 # wget -q https://dl.xanmod.org/xanmod-repository.deb && dpkg -i xanmod-repository.deb
 echo 'deb http://deb.xanmod.org releases main' | tee /etc/apt/sources.list.d/xanmod-kernel.list
 wget -qO- http://deb.xanmod.org/gpg.key | apt-key add -
@@ -534,16 +532,12 @@ apt install -y linux-xanmod ; }
 
 
 
-
-
-# 安装 xanmod
-function _xanmod_install() {
+#S31# 安装 xanmod
+function xanmod_install() {
 
 echo ; read -ep "  ${bold}输入你要安装的 Xanmod 版本： ${normal}" XanmodVer ; echo -e ""
 
 online_ubuntu_bbr_firmware
-
-# 安装 Xanmod 内核
 # https://sourceforge.net/projects/xanmod/files/releases/
 cd ; mkdir -p deball ; cd deball
 
@@ -579,7 +573,7 @@ elif [[ $XanmodVer == 4.19  ]]; then
      wget --no-check-certificate -q https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/4.19/linux-headers-4.19.12-xanmod7_2.181223_amd64.deb
      echo ; dpkg -i linux-image*.deb ; dpkg -i linux-headers*.deb
 elif [[ $XanmodVer == apt  ]]; then
-     kernel_version=5.0 ; _xanmod_apt_install
+     kernel_version=xanmod ; xanmod_apt_install
 fi
 
 cd ; rm -rf deball
@@ -591,7 +585,7 @@ cd ; rm -rf deball
 
 
 # 安装 liquorix
-function _liquorix_install() {
+function liquorix_install() {
 
 online_ubuntu_bbr_firmware
 
@@ -1144,7 +1138,7 @@ function update_grub() { echo -ne "\n  ${bold}更新引导 ...  ${normal}" | tee
 
 
 # 删除指定内核
-function _delete_kernel() {
+function delete_kernel() {
 echo -e "\n  ${bold}卸载指定内核及其头文件 ... ${normal}\n" | tee -a $Outputs
 
 dpkg -l | grep linux-image   | grep "${kernel_version}" | awk '{print $2}' >  /log/kernel_tobe_del_list
