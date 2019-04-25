@@ -15,7 +15,7 @@
 # https://teddysun.com/489.html
 
 #################################################################################
-ScriptVersion=2.6.1
+ScriptVersion=2.6.3
 ScriptDate=2019.04.25
 
 usage_guide() {
@@ -507,11 +507,13 @@ if   [[ $CODENAME == bionic ]]; then
      kernel_version=4.15.0-30-generic
      apt-get update
      apt-get -y install linux-image-$kernel_version linux-headers-$kernel_version linux-modules-$kernel_version linux-modules-extra-$kernel_version
+     dpkg -l | grep linux-image-$kernel_version -q || { echo -e "\n  ${bold}${red}错误${jiacu} 安装 内核 失败！${normal}" | tee -a $Outputs ; exit 1 ; }
 elif [[ $CODENAME == stretch ]]; then
      echo -e "\n  ${bold}安装 ${green}4.9.0-4${jiacu} 内核 ...${normal} \n"
      kernel_version=4.9.0-4-amd64
      apt-get update
      apt-get -y install linux-image-$kernel_version linux-headers-$kernel_version
+     dpkg -l | grep linux-image-$kernel_version -q || { echo -e "\n  ${bold}${red}错误${jiacu} 安装 内核 失败！${normal}" | tee -a $Outputs ; exit 1 ; }
 else
      echo -e "\n  ${red}注意${jiacu} 本功能只支持 Debian 9／Ubuntu 18.04 ！${normal}"
      exit 1
@@ -995,13 +997,30 @@ sysctl -p >> $Outputs 2>&1 ; }
 
 # 检查 headers
 function check_headers() {
-required_version=$(  uname -r | cut  -d- -f1  )
-[[ ` echo $required_version | grep -E "[2345].[0-9]+.0" ` ]] && required_version=$( uname -r | grep -Eo "[2345].[0-9]+" )
-headers_exits=`  dpkg -l | grep linux-headers | awk '{print $2}' | awk -F '-' '{print $3}' | grep $required_version | wc -l  `
+#required_version=$(uname -r | cut -d- -f1)
+#[[ ` echo $required_version | grep -E "[2345].[0-9]+.0" ` ]] && required_version=$( uname -r | grep -Eo "[2345].[0-9]+" )
+current_kernel_v=$(uname -r | grep -oE "[2345].[0-9]+.[0-9]+|[2345].[0-9]+.[0-9]+-[0-9]+")
+headers_exits=$(dpkg -l | grep linux-headers | grep $current_kernel_v | wc -l)
 if [[ $headers_exits == 0 ]]; then
     echo -e "\n  ${red}警告${jiacu} 没有安装与内核对应的头文件，先尝试安装内核头文件 ...${normal} " | tee -a $Outputs
-    install_required_headers
+    install_lost_headers
 fi ; }
+
+
+
+
+
+# 安装缺少的头文件
+function install_lost_headers() {
+apt-get update >> $Outputs 2>&1
+[[ $(apt-cache policy linux-headers-$current_kernel_v) ]] ||
+echo -e  "\n  ${red}错误${jiacu} 镜像源列表里找不到所需的头文件，请自行解决！${normal} \n" | tee -a $Outputs
+echo -ne "\n  ${bold}安装${green} linux-headers-$current_kernel_v${jiacu} ... ${normal}"   | tee -a $Outputs
+echo >> $Outputs
+apt-get install -y linux-headers-$current_kernel_v >> $Outputs 2>&1  || { echo -e "\n  ${red}错误${jiacu} headers 安装失败！${normal}\n" | tee -a $Outputs ; exit 1 ; }
+echo -e "${bold}${green}DONE${normal}" ; }
+
+
 
 
 
