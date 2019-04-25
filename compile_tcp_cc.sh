@@ -5,10 +5,10 @@
 #
 # bash <(curl -s https://raw.githubusercontent.com/Aniverse/TrCtrlProToc0l/master/compile_tcp_cc.sh) tsunami nanqinlang bbrplus
 script_update=2019.04.25
-script_version=1.0.1
+script_version=1.0.2
 
 tcp_cc=$1
-[[ -n $Outputs ]] && OutputLOG=">> $OutputLOG 2>&1"
+#[[ -n $Outputs ]] && OutputLOG=">> $OutputLOG 2>&1"
 [[ ! $tcp_cc =~ (tsunami|nanqinlang|bbrplus) ]] && echo -e "不支持！" && exit 1
 function version_ge(){ test "$(echo "$@" | tr " " "\n" | sort -rV | head -1)" == "$1" ; }
 filename=tcp_$tcp_cc.c
@@ -24,15 +24,15 @@ cd compile_tcp_cc
 
 for supported_kernel in $supported_list ; do
     [[ $kernel_v2 == $supported_kernel ]] &&
-    wget https://raw.githubusercontent.com/Aniverse/seedbox-files/master/TCP.CC/$supported_kernel/$filename -O $filename --no-check-certificate $OutputLOG
+    wget https://raw.githubusercontent.com/Aniverse/seedbox-files/master/TCP.CC/$supported_kernel/$filename -O $filename --no-check-certificate
 done
 [[ ! -f $filename ]] && echo -e "下载源码失败！" && exit 1
 
 echo "obj-m := tcp_$tcp_cc.o" > Makefile
 mkdir -p /lib/modules/$(uname -r)/build
-make -C /lib/modules/$(uname -r)/build M=$(pwd) modules CC=$(which gcc) $OutputLOG
-cp -rf tcp_$tcp_cc.ko /lib/modules/$(uname -r)/kernel/net/ipv4 $OutputLOG
-insmod /lib/modules/$(uname -r)/kernel/net/ipv4/tcp_$tcp_cc.ko $OutputLOG
+make -C /lib/modules/$(uname -r)/build M=$(pwd) modules CC=$(which gcc)
+cp -rf tcp_$tcp_cc.ko /lib/modules/$(uname -r)/kernel/net/ipv4
+insmod /lib/modules/$(uname -r)/kernel/net/ipv4/tcp_$tcp_cc.ko
 depmod -a $OutputLOG
 
 cd ..

@@ -15,7 +15,7 @@
 # https://teddysun.com/489.html
 
 #################################################################################
-ScriptVersion=2.6.0.alpha5
+ScriptVersion=2.6.1
 ScriptDate=2019.04.25
 
 usage_guide() {
@@ -53,10 +53,11 @@ trap cancel SIGINT
 # Outputs="/dev/null"
 export DEBIAN_FRONTEND=noninteractive
 SETUPDATE=$(date "+%Y.%m.%d.%H:%M:%S")
-SysSupport=0 ; DeBUG=0 ; Outputs="/log/tcp/$SETUPDATE.log"
+export Outputs="/log/tcp/$SETUPDATE.log"
+SysSupport=0 ; DeBUG=0
 [[ $1 == -d ]] && DeBUG=1
 
-KernelBit=` getconf LONG_BIT `
+KernelBit=$(getconf LONG_BIT)
 [[ $KernelBit == 32 ]] && KernelBitVer=i386 ; [[ $KernelBit == 64 ]] && KernelBitVer=amd64
 DISTRO=`  awk -F'[= "]' '/PRETTY_NAME/{print $3}' /etc/os-release | tr 'A-Z' 'a-z'  `
 DISTROU=`  awk -F'[= "]' '/PRETTY_NAME/{print $3}' /etc/os-release  `
@@ -186,7 +187,7 @@ echo -e  "  ${green}(11) ${jiacu}安装 指定内核"
 echo -e  "  ${green}(12) ${jiacu}安装 4.11.12 内核"
 echo -e  "  ${green}(13) ${jiacu}安装 ServerSpeeder 内核（4.4.0-47 或 3.12.1）"
 echo -e  "  ${green}(14) ${jiacu}安装 ServerSpeeder 内核（3.16.0-43 或 3.16.0-4）"
-echo -e  "  ${green}(15) ${jiacu}安装   LotServer   内核（4.15.0-30 或 4.9.0-4）"
+echo -e  "  ${green}(15) ${jiacu}安装 LotServer     内核（4.15.0-30 或 4.9.0-4）"
 echo -e  "  ${green}(16) ${jiacu}安装 4.14.91-bbrplus 内核"
 echo -e  "  ${green}(21) ${jiacu}卸载 BBR "
 echo -e  "  ${green}(22) ${jiacu}卸载 锐速 "
@@ -307,7 +308,7 @@ if [[ $YKKernel == "${green}是${jiacu}" ]]; then
     echo -e "\n  ${bold}理论上当前内核已支持 ${green}Yankee${jiacu} 版魔改 BBR，安装并启用魔改 BBR ...${normal} "
     check_headers
     check_essential
-    bash <(wget --no-check-certificate -qO- https://raw.githubusercontent.com/Aniverse/TrCtrlProToc0l/master/compile_tcp_cc.sh) tsunami
+    bash <(wget --no-check-certificate -qO- https://raw.githubusercontent.com/Aniverse/TrCtrlProToc0l/master/compile_tcp_cc.sh) tsunami >> $Outputs 2>&1
     enable_bbr tsunami
     if [[ ` lsmod | grep tsunami ` ]]; then echo -e "\n  ${bold}已开启 ${green}Yankee 版魔改 BBR${jiacu} ...${normal}\n"
     else echo -e "\n  ${bold}${red}错误 ${green}Yankee 版魔改 BBR${jiacu} 开启失败！${normal}\n" ; exit 1 ; fi
@@ -331,7 +332,7 @@ if [[ $NQLKernel == "${green}是${jiacu}" ]]; then
     echo -e "\n  ${bold}理论上当前内核已支持 ${green}南琴浪${jiacu} 版魔改 BBR，安装并启用魔改 BBR ...${normal} "
     check_headers
     check_essential
-    bash <(wget --no-check-certificate -qO- https://raw.githubusercontent.com/Aniverse/TrCtrlProToc0l/master/compile_tcp_cc.sh) nanqinlang
+    bash <(wget --no-check-certificate -qO- https://raw.githubusercontent.com/Aniverse/TrCtrlProToc0l/master/compile_tcp_cc.sh) nanqinlang >> $Outputs 2>&1
     enable_bbr nanqinlang
     if [[ ` lsmod | grep nanqinlang ` ]]; then echo -e "\n  ${bold}已开启 ${green}南琴浪${jiacu} 版魔改 BBR ...${normal}\n\n"
     else echo -e "\n  ${bold}${red}错误 ${green}南琴浪 版魔改 BBR${jiacu} 开启失败！${normal}\n" ; exit 1 ; fi
@@ -357,7 +358,7 @@ if [[ $BBRPKernel == "${green}是${jiacu}" ]]; then
     echo -e "\n  ${bold}理论上当前内核已支持 ${green}bbrplus${jiacu}，安装并启用魔改 BBR ...${normal} "
     check_headers
     check_essential
-    bash <(wget --no-check-certificate -qO- https://raw.githubusercontent.com/Aniverse/TrCtrlProToc0l/master/compile_tcp_cc.sh) bbrplus
+    bash <(wget --no-check-certificate -qO- https://raw.githubusercontent.com/Aniverse/TrCtrlProToc0l/master/compile_tcp_cc.sh) bbrplus >> $Outputs 2>&1
     enable_bbr bbrplus
     if [[ ` lsmod | grep tsunami ` ]]; then echo -e "\n  ${bold}已开启 ${green}bbrplus${jiacu} ...${normal}\n"
     else echo -e "\n  ${bold}${red}错误 ${green}bbrplus${jiacu} 开启失败！${normal}\n" ; exit 1 ; fi
