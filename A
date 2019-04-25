@@ -13,7 +13,7 @@
 # https://teddysun.com/489.html
 
 #################################################################################
-ScriptVersion=2.6.5
+ScriptVersion=2.6.6
 ScriptDate=2019.04.25
 
 usage_guide() {
@@ -129,9 +129,9 @@ ls /lib/modules/$(uname -r)/kernel/net/ipv4 2>/dev/null | grep -q bbr && bbr_exi
 
 kernel_vvv=$(uname -r | cut -d- -f1)
 if version_ge $kernel_vvv 4.9  ; then BBRKernel="${green}是${jiacu}" ; else BBRKernel="${red}否${jiacu}" ; fi
-if version_ge $kernel_vvv 4.10 && ! version_ge $kernel_vvv 5.0 ; then YKKernel="${green}是${jiacu}"  ; else YKKernel="${red}否${jiacu}" ; fi
-if version_ge $kernel_vvv 4.9.3  && ! version_ge $kernel_vvv 5.0 ; then NQLKernel="${green}是${jiacu}" ; else NQLKernel="${red}否${jiacu}" ; fi
-if version_ge $kernel_vvv 4.14  && ! version_ge $kernel_vvv 5.0 ; then BBRPKernel="${green}是${jiacu}" ; else BBRPKernel="${red}否${jiacu}" ; fi
+if version_ge $kernel_vvv 4.10 && ! version_ge $kernel_vvv 5.1 ; then YKKernel="${green}是${jiacu}"  ; else YKKernel="${red}否${jiacu}" ; fi
+if version_ge $kernel_vvv 4.9.3  && ! version_ge $kernel_vvv 5.1 ; then NQLKernel="${green}是${jiacu}" ; else NQLKernel="${red}否${jiacu}" ; fi
+if version_ge $kernel_vvv 4.14  && ! version_ge $kernel_vvv 5.1 ; then BBRPKernel="${green}是${jiacu}" ; else BBRPKernel="${red}否${jiacu}" ; fi
 
 # 检查 锐速 与 BBR 是否已启用
 [[ ` ps aux | grep appex | grep -v grep ` ]] && SSrunning="${green}是${jiacu}" || SSrunning="${red}否${jiacu}"
@@ -192,6 +192,7 @@ echo -e  "  ${green}(22) ${jiacu}卸载 锐速 "
 echo -e  "  ${green}(23) ${jiacu}卸载 多余内核 "
 echo -e  "  ${green}(24) ${jiacu}卸载 指定内核 "
 [[ $DeBUG == 1 ]] && {
+echo -e  "  ${green}(25) ${jiacu}卸载 所有内核（作死） "
 echo -e  "  ${green}(31) ${jiacu}安装 Xanmod "
 echo -e  "  ${green}(32) ${jiacu}安装 Xanmod，并删除其他内核 "
 echo -e  "  ${green}(33) ${jiacu}安装 liquorix "
@@ -253,6 +254,10 @@ case $response in
                 [[ ! ` dpkg -l | grep linux-image | grep "$kernel_version" ` ]] && { echo -e "\n  ${bold}${red}错误${jiacu} 大佬，你压根就没装这个内核吧！${normal}" ; unset kernel_version ; }
             done
             delete_kernel ;;
+        25) # 卸载 所有内核
+            echo -ne "\n  ${bold}想清楚了？${normal} " ; read
+            kernel_version=10086
+            delete_other_kernel ; delete_other_kernel ;;
         31) # 安装 xanmod
             xanmod_install ;;
         32) # 安装 xanmod，删除其他内核
