@@ -13,7 +13,7 @@
 # https://teddysun.com/489.html
 
 #################################################################################
-ScriptVersion=2.7.2
+ScriptVersion=2.7.3
 ScriptDate=2019.04.26
 
 usage_guide() {
@@ -230,7 +230,7 @@ case $response in
     6 | 06) # 安装 ServerSpeeder
             ss_install ;;
         11) # 安装 最新内核
-            _selected_kernel_install ;;
+            selected_kernel_install ;;
         12) # 安装 4.11.12 内核
             online_ubuntu_bbr_firmware ; bbr_kernel_4_11_12 ;;
         13) # 安装 特定的 ServerSpeeder 内核（4.4.0-47／3.12.1）
@@ -361,7 +361,7 @@ fi ; }
 
 #S4# 安装 BBR Plus
 function bbr_plus_install() {
-if [[ $$running_kernel == "4.14.91-bbrplus" ]]; then
+if [[ $running_kernel == "4.14.91-bbrplus" ]]; then
     enable_bbr bbrplus
     if [[ ` lsmod | grep bbrplus ` ]]; then echo -e "\n  ${bold}已开启 ${green}bbrplus${jiacu} ...${normal}\n"
     else echo -e "\n  ${bold}${red}错误 ${green}bbrplus${jiacu} 开启失败！考虑装 4.14.91 内核试试？${normal}\n" ; exit_1 ; fi
@@ -483,7 +483,7 @@ else echo -e "  ${bold}${red}错误 ${jiacu}你并没有使用本脚本安装 BB
 
 
 # 安装 指定内核（BBR）
-function _selected_kernel_install() {
+function selected_kernel_install() {
 get_version
 install_required
 echo ; }
@@ -1175,7 +1175,7 @@ update_grub ; }
 function enable_rclocal() {
 
 [[ ! -f /etc/rc.local ]] &&
-cat <<EOF >/etc/rc.local
+cat << EOF >/etc/rc.local
 #!/bin/sh -e
 #
 # rc.local
