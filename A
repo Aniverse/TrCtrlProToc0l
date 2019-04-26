@@ -13,7 +13,7 @@
 # https://teddysun.com/489.html
 
 #################################################################################
-ScriptVersion=2.7.4
+ScriptVersion=2.7.5
 ScriptDate=2019.04.26
 
 usage_guide() {
@@ -365,7 +365,7 @@ if [[ $running_kernel == "4.14.91-bbrplus" ]]; then
     enable_bbr bbrplus
     if [[ ` lsmod | grep bbrplus ` ]]; then echo -e "\n  ${bold}已开启 ${green}bbrplus${jiacu} ...${normal}\n"
     else echo -e "\n  ${bold}${red}错误 ${green}bbrplus${jiacu} 开启失败！考虑装 4.14.91 内核试试？${normal}\n" ; exit_1 ; fi
-if [[ $BBRPKernel == "${green}是${jiacu}" ]]; then
+elif [[ $BBRPKernel == "${green}是${jiacu}" ]]; then
     echo -e "\n  ${bold}或许当前内核已支持 ${green}bbrplus${jiacu}，实际上能不能装上我也不知道 ...${normal} "
     check_headers
     check_essential
