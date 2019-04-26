@@ -13,7 +13,7 @@
 # https://teddysun.com/489.html
 
 #################################################################################
-ScriptVersion=2.7.3
+ScriptVersion=2.7.4
 ScriptDate=2019.04.26
 
 usage_guide() {
@@ -297,7 +297,7 @@ function bbr_install() {
 if [[ $BBRKernel == "${green}是${jiacu}" ]]; then
     echo -ne "\n  ${bold}理论上当前内核已支持 ${green}原版 BBR，尝试直接启用 BBR ...${normal} "
     enable_bbr ; echo
-    grep bbr /proc/sys/net/ipv4/tcp_congestion_control -q && echo -e "\n  ${bold}BBR 已启用 ...\n${normal}" || echo -e "\n  ${bold}${red}警告 BBR 可能开启失败！考虑换个内核？${normal}\n"
+    [[ $(cat /proc/sys/net/ipv4/tcp_congestion_control) == bbr ]] && echo -e "\n  ${bold}BBR 已启用 ...\n${normal}" || echo -e "\n  ${bold}${red}警告 BBR 可能开启失败！考虑换个内核？${normal}\n"
 else
     ask_continue2
   # echo -e "  ${bold}当前内核不支持 BBR，先安装 ${green}4.11.12${jiacu} 内核以启用 BBR ...${normal} "
