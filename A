@@ -13,8 +13,8 @@
 # https://teddysun.com/489.html
 
 #################################################################################
-ScriptVersion=2.7.5
-ScriptDate=2019.04.26
+ScriptVersion=2.7.6
+ScriptDate=2019.05.02
 
 usage_guide() {
 bash <(wget -qO- https://github.com/Aniverse/TrCtrlProToc0l/raw/master/A)
@@ -84,8 +84,7 @@ mkdir -p /log/tcp
 # 菜单
 function _menu() { clear ; echo
 
-# 启用 rc.local
-[[ $CODENAME =~ (bionic|stretch) ]] && enable_rclocal
+# [[ $CODENAME =~ (bionic|stretch) ]] && enable_rclocal
 
 # 确保 debconf-get-selections 存在
 for ddd in debconf-set-selections debconf-get-selections ; do
@@ -625,69 +624,50 @@ apt-get install linux-image-liquorix-amd64 linux-headers-liquorix-amd64 -y ; }
 
 # 重启后自动安装 BBR Plus
 function bbr_plus_autoinstall() {
-mkdir -p /etc/autoinstall
-[[ ! -f /etc/rc.local.bak ]] && cp /etc/rc.local /etc/rc.local.bak
-cat > /etc/autoinstall/bbrplus.sh <<EOF
+cat > /etc/TCP-auto-install.sh <<EOF
+#!/bin/bash
 bash <(wget --no-check-certificate -qO- https://raw.githubusercontent.com/Aniverse/TrCtrlProToc0l/master/compile_tcp_cc.sh) bbrplus
-cp /etc/rc.local.bak /etc/rc.local
 sysctl -p
 EOF
-sed -i '$d' /etc/rc.local
-echo "bash /etc/autoinstall/bbrplus.sh" >> /etc/rc.local
-echo "exit 0" >> /etc/rc.local ; }
+auto_install_via_systemd ; }
 
 # 重启后自动安装 南琴浪 版 BBR
 function bbr_nanqinlang_autoinstall() {
-mkdir -p /etc/autoinstall
-[[ ! -f /etc/rc.local.bak ]] && cp /etc/rc.local /etc/rc.local.bak
-cat > /etc/autoinstall/nqlbbr.sh <<EOF
+cat > /etc/TCP-auto-install.sh <<EOF
+#!/bin/bash
 bash <(wget --no-check-certificate -qO- https://raw.githubusercontent.com/Aniverse/TrCtrlProToc0l/master/compile_tcp_cc.sh) nanqinlang
-cp /etc/rc.local.bak /etc/rc.local
 sysctl -p
 EOF
-sed -i '$d' /etc/rc.local
-echo "bash /etc/autoinstall/nqlbbr.sh" >> /etc/rc.local
-echo "exit 0" >> /etc/rc.local ; }
+auto_install_via_systemd ; }
 
 # 重启后自动安装 Yankee 版 BBR
 function bbr_tsunami_autoinstall() {
-mkdir -p /etc/autoinstall
-[[ ! -f /etc/rc.local.bak ]] && cp /etc/rc.local /etc/rc.local.bak
-cat > /etc/autoinstall/ykbbr.sh <<EOF
+cat > /etc/TCP-auto-install.sh <<EOF
+#!/bin/bash
 bash <(wget --no-check-certificate -qO- https://raw.githubusercontent.com/Aniverse/TrCtrlProToc0l/master/compile_tcp_cc.sh) tsunami
-cp /etc/rc.local.bak /etc/rc.local
 sysctl -p
 EOF
-[[ ! -f /etc/rc.local.bak ]] && cp /etc/rc.local /etc/rc.local.bak
-sed -i '$d' /etc/rc.local
-echo "bash /etc/autoinstall/ykbbr.sh" >> /etc/rc.local
-echo "exit 0" >> /etc/rc.local ; }
+auto_install_via_systemd ; }
 
 # 重启后自动安装锐速 ServerSpeeder
 function serverspeeder_autoinstall() {
 mkdir -p /etc/autoinstall
-wget --no-check-certificate -qO /tmp/appex.sh "https://raw.githubusercontent.com/0oVicero0/serverSpeeder_Install/master/appex.sh"
-cat > /etc/autoinstall/appexinstall.sh << EOF
+wget --no-check-certificate -qO /tmp/appex.sh https://raw.githubusercontent.com/0oVicero0/serverSpeeder_Install/master/appex.sh
+cat > /etc/TCP-auto-install.sh <<EOF
+#!/bin/bash
 echo | bash /etc/autoinstall/ 'install'
-cp /etc/rc.local.bak /etc/rc.local
 EOF
-[[ ! -f /etc/rc.local.bak ]] && cp /etc/rc.local /etc/rc.local.bak
-sed -i '$d' /etc/rc.local
-echo "bash /etc/autoinstall/appexinstall.sh" >> /etc/rc.local
-echo "exit 0" >> /etc/rc.local ; }
+auto_install_via_systemd ; }
 
 # 重启后自动安装锐速 LotServer
 function lotserver_autoinstall() {
 mkdir -p /etc/autoinstall
 wget --no-check-certificate -qO /etc/autoinstall/appexinstall.sh https://github.com/Aniverse/lotServer/raw/master/lotServer.sh
-cat > /etc/autoinstall/appexinstall.sh << EOF
-bash /etc/autoinstall/Install.sh I b
-cp /etc/rc.local.bak /etc/rc.local
+cat > /etc/TCP-auto-install.sh <<EOF
+#!/bin/bash
+bash /etc/autoinstall/Install.sh I
 EOF
-[[ ! -f /etc/rc.local.bak ]] && cp /etc/rc.local /etc/rc.local.bak
-sed -i '$d' /etc/rc.local
-echo "bash /etc/autoinstall/appexinstall.sh" >> /etc/rc.local
-echo "exit 0" >> /etc/rc.local ; }
+auto_install_via_systemd ; }
 
 
 
@@ -1195,9 +1175,37 @@ EOF
 chmod +x /etc/rc.local
 systemctl start rc-local ; }
 
+# 启用自动安装（systemd）
+function auto_install_via_systemd() {
+
+cat <<EOF > /etc/systemd/system/tcpauto.service
+[Unit]
+Description=Setup
+After=network.target
+
+[Service]
+Type=oneshot
+ExecStart=/etc/TCP-auto-install.sh
+RemainAfterExit=true
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+cat >> /etc/TCP-auto-install.sh <<EOF 
+bash /etc/TCP-auto-install.sh
+systemctl disable tcpauto.service
+rm -f /etc/systemd/system/tcpauto.service /etc/TCP-auto-install.sh
+sleep 1
+EOF
+
+chmod +x /etc/TCP-auto-install.sh
+
+systemctl daemon-reload
+systemctl enable tcpauto.service ; }
+
 # 询问是否继续（重启版）
 function ask_continue2() { echo -ne "\n  ${bold}输入 ${bailvse}回车${jiacu} 继续，完成后会直接重启；按 ${baihongse}Ctrl+C${jiacu} 退出${normal} " ; read response ; echo ; }
-
 
 
 
