@@ -13,7 +13,7 @@
 # https://teddysun.com/489.html
 
 #################################################################################
-ScriptVersion=2.7.6
+ScriptVersion=2.7.7
 ScriptDate=2019.05.02
 
 usage_guide() {
@@ -118,11 +118,17 @@ tcp_c_name=$tcp_control
 # digit_ver_headers=`dpkg -l | grep linux-headers | awk '{print $2}' | awk -F '-' '{print $3}'`
 
 # 检查理论上内核是否支持锐速
+LSKernel="${red}否${jiacu}"
 SSKernel="${red}否${jiacu}"
-URLKernel='https://raw.githubusercontent.com/Aniverse/lotServer/master/lotServer.log'
-AcceVer=$(wget --no-check-certificate -qO- "$URLKernel" |grep "$KNA/" |grep "/x$KernelBit/" |grep "/$running_kernel/" |awk -F'/' '{print $NF}' |sort -n -k 2 -t '_' |tail -n 1)
-MyKernel=$(wget --no-check-certificate -qO- "$URLKernel" |grep "$KNA/" |grep "/x$KernelBit/" |grep "/$running_kernel/" |grep "$AcceVer" |tail -n 1)
-[[ ! -z "$MyKernel" ]] && SSKernel="${green}是${jiacu}"
+LS_Kernel_url='https://raw.githubusercontent.com/Aniverse/lotServer/master/lotServer.log'
+AcceVer=$(wget --no-check-certificate -qO- "$LS_Kernel_url" |grep "$KNA/" |grep "/x$KernelBit/" |grep "/$running_kernel/" |awk -F'/' '{print $NF}' |sort -n -k 2 -t '_' |tail -n 1)
+MyKernel=$(wget --no-check-certificate -qO- "$LS_Kernel_url" |grep "$KNA/" |grep "/x$KernelBit/" |grep "/$running_kernel/" |grep "$AcceVer" |tail -n 1)
+[[ -n $MyKernel ]] && LSKernel="${green}是${jiacu}"
+unset MyKernel
+SS_Kernel_url='https://raw.githubusercontent.com/0oVicero0/serverSpeeder_kernel/master/serverSpeeder.txt'
+AcceVer=$(wget --no-check-certificate -qO- "$SS_Kernel_url" |grep "$KNA/" |grep "/x$KernelBit/" |grep "/$running_kernel/" |awk -F'/' '{print $NF}' |sort -n -k 2 -t '_' |tail -n 1)
+MyKernel=$(wget --no-check-certificate -qO- "$SS_Kernel_url" |grep "$KNA/" |grep "/x$KernelBit/" |grep "/$running_kernel/" |grep "$AcceVer" |tail -n 1)
+[[ -n $MyKernel ]] && SSKernel="${green}是${jiacu}"
 
 # 检查理论上内核是否支持原版 BBR（内核高于 4.9 也不一定就有 bbr）
 function version_ge(){ test "$(echo "$@" | tr " " "\n" | sort -rV | head -n 1)" == "$1" ; }
@@ -157,11 +163,12 @@ echo -e  "  当前正在使用的 TCP 拥塞控制算法      ${green}$tcp_c_nam
 [[ $DeBUG == 1 ]] &&
 echo -e  "  当前可以使用的 TCP 拥塞控制算法      ${green}$tcp_control_all${jiacu}"
 echo -e  "  当前正在使用的系统内核               ${green}$running_kernel${jiacu}"
-echo -e  "  当前内核是否支持 原版 BBR            $BBRKernel"
+echo -e  "  当前内核是否支持 bbr                 $BBRKernel"
 echo -e  "  当前内核是否支持 bbrplus             $BBRPKernel"
-echo -e  "  当前内核是否支持 Yankee  版魔改 BBR  $YKKernel"
-echo -e  "  当前内核是否支持 南琴浪  版魔改 BBR  $NQLKernel"
-echo -e  "  当前内核是否支持 LotServer / 锐速    $SSKernel"
+echo -e  "  当前内核是否支持 Yankee  版魔改 bbr  $YKKernel"
+echo -e  "  当前内核是否支持 南琴浪  版魔改 bbr  $NQLKernel"
+echo -e  "  当前内核是否支持 ServerSpeeder       $SSKernel"
+echo -e  "  当前内核是否支持 LotServer           $LSKernel"
 echo -e  "  当前 BBR  是否已启用                 $bbrinuse"
 echo -e  "  当前 锐速 是否已启用                 $SSrunning"
 
@@ -390,17 +397,17 @@ fi ; }
 
 #S5# 安装 LotServer
 function ls_install() {
-if [[ $SSKernel == "${green}是${jiacu}" ]]; then
+if [[ $LSKernel == "${green}是${jiacu}" ]]; then
     echo -e "\n  ${bold}理论上当前内核已支持 ${green}锐速${jiacu}，直接安装 ... ${normal} "
     lotserver_install
-elif [[ $SSKernel == "${red}否${jiacu}" ]] && [[ $DISTRO == ubuntu ]]; then
+elif [[ $LSKernel == "${red}否${jiacu}" ]] && [[ $DISTRO == ubuntu ]]; then
     ask_continue2
     ss_kernel_install_v2
     delete_other_kernel
     delete_other_kernel
     lotserver_autoinstall
     [[ ! $DeBUG == 1 ]] && echo -e "\n  ${bold}即将重启系统，重启后会自动安装 ${green}锐速${jiacu} ... ${normal}\n" && reboot
-elif [[ $SSKernel == "${red}否${jiacu}" ]] && [[ $DISTRO == debian ]]; then
+elif [[ $LSKernel == "${red}否${jiacu}" ]] && [[ $DISTRO == debian ]]; then
     ask_continue2
     ss_kernel_install_v2
     delete_other_kernel
