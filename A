@@ -13,7 +13,7 @@
 # https://teddysun.com/489.html
 
 #################################################################################
-ScriptVersion=2.7.9
+ScriptVersion=2.8.0
 ScriptDate=2019.05.03
 
 usage_guide() {
@@ -398,7 +398,7 @@ fi ; }
 #S5# 安装 LotServer
 function ls_install() {
 if [[ $LSKernel == "${green}是${jiacu}" ]]; then
-    echo -e "\n  ${bold}理论上当前内核已支持 ${green}锐速${jiacu}，直接安装 ... ${normal} "
+    echo -e "\n  ${bold}理论上当前内核已支持 ${green}LotServer${jiacu}，直接安装 ... ${normal} \n"
     lotserver_install
 elif [[ $LSKernel == "${red}否${jiacu}" ]] && [[ $DISTRO == ubuntu ]]; then
     ask_continue2
@@ -406,14 +406,14 @@ elif [[ $LSKernel == "${red}否${jiacu}" ]] && [[ $DISTRO == ubuntu ]]; then
     delete_other_kernel
     delete_other_kernel
     lotserver_autoinstall
-    [[ ! $DeBUG == 1 ]] && echo -e "\n  ${bold}即将重启系统，重启后会自动安装 ${green}锐速${jiacu} ... ${normal}\n" && reboot
+    [[ ! $DeBUG == 1 ]] && echo -e "\n  ${bold}即将重启系统，重启后会自动安装 ${green}LotServer${jiacu} ... ${normal}\n" && reboot
 elif [[ $LSKernel == "${red}否${jiacu}" ]] && [[ $DISTRO == debian ]]; then
     ask_continue2
     ss_kernel_install_v2
     delete_other_kernel
     delete_other_kernel
     lotserver_autoinstall
-    [[ ! $DeBUG == 1 ]] && echo -e "\n  ${bold}即将重启系统，重启后会自动安装 ${green}锐速${jiacu} ... ${normal}\n" && reboot
+    [[ ! $DeBUG == 1 ]] && echo -e "\n  ${bold}即将重启系统，重启后会自动安装 ${green}LotServer${jiacu} ... ${normal}\n" && reboot
 fi ; }
 
 
@@ -427,31 +427,31 @@ if [[ $SSKernel == "${green}是${jiacu}" ]]; then
     serverspeeder_install
 elif [[ $SSKernel == "${red}否${jiacu}" ]] && [[ $DISTRO == ubuntu ]] && [[ ! $CODENAME == bionic ]]; then
     ask_continue2
-    echo -ne "  ${bold}当前内核不支持 锐速，安装 ${green}3.16.0-43${jiacu} 内核 ... ${normal} \n"
+    echo -ne "  ${bold}当前内核不支持 ServerSpeeder，安装 ${green}3.16.0-43${jiacu} 内核 ... ${normal} \n"
     export kernelver=3.16.0-43-generic
     ubuntu_serverspeeder_kernel_repo
     delete_other_kernel
     delete_other_kernel
     serverspeeder_autoinstall
-    [[ ! $DeBUG == 1 ]] && echo -e "\n  ${bold}即将重启系统，重启后会自动安装 ${green}锐速${jiacu} ... ${normal}\n" && reboot
+    [[ ! $DeBUG == 1 ]] && echo -e "\n  ${bold}即将重启系统，重启后会自动安装 ${green}ServerSpeeder${jiacu} ... ${normal}\n" && reboot
 elif [[ $SSKernel == "${red}否${jiacu}" ]] && [[ $CODENAME == bionic ]]; then
     ask_continue2
-    echo -ne "  ${bold}当前内核不支持 锐速，安装 ${green}4.4.0-47${jiacu} 内核 ... ${normal} \n"
+    echo -ne "  ${bold}当前内核不支持 ServerSpeeder，安装 ${green}4.4.0-47${jiacu} 内核 ... ${normal} \n"
     kernel_version=4.4.0-47
     ubuntu_ss_kernel_4.4.0-47_apt
     delete_other_kernel
     delete_other_kernel # 可能上一次卸载的时候又给你强行安装一个 4.4.0 最新的内核，所以再删一次
     serverspeeder_autoinstall
-    [[ ! $DeBUG == 1 ]] && echo -e "\n  ${bold}即将重启系统，重启后会自动安装 ${green}锐速${jiacu} ... ${normal}\n" && reboot
+    [[ ! $DeBUG == 1 ]] && echo -e "\n  ${bold}即将重启系统，重启后会自动安装 ${green}ServerSpeeder${jiacu} ... ${normal}\n" && reboot
 elif [[ $SSKernel == "${red}否${jiacu}" ]] && [[ $DISTRO == debian ]]; then
     ask_continue2
-    echo -ne "  ${bold}当前内核不支持 锐速，安装 ${green}3.16.0-4${jiacu} 内核 ... ${normal} \n"
+    echo -ne "  ${bold}当前内核不支持 ServerSpeeder，安装 ${green}3.16.0-4${jiacu} 内核 ... ${normal} \n"
     kernel_version=3.16.0-4
     debian_ssr_kernel_3.16.0-4_apt
     delete_other_kernel
     delete_other_kernel # 可能上一次卸载的时候又给你强行安装一个 3.16.0 最新的内核（目前是 3.16.0-7），所以再删一次
     serverspeeder_autoinstall
-    [[ ! $DeBUG == 1 ]] && echo -e "\n  ${bold}即将重启系统，重启后会自动安装 ${green}锐速${jiacu} ... ${normal}\n" && reboot
+    [[ ! $DeBUG == 1 ]] && echo -e "\n  ${bold}即将重启系统，重启后会自动安装 ${green}ServerSpeeder${jiacu} ... ${normal}\n" && reboot
 fi ; }
 
 
@@ -674,7 +674,7 @@ mkdir -p /etc/autoinstall
 wget --no-check-certificate -q https://github.com/Aniverse/lotServer/raw/master/lotServer.sh -O /etc/autoinstall/ls.sh
 cat > /etc/TCP-auto-install.sh <<EOF
 #!/bin/bash
-bash /etc/autoinstall/ls.sh I
+bash /etc/autoinstall/ls.sh I b
 EOF
 auto_install_via_systemd ; }
 
@@ -1203,19 +1203,17 @@ EOF
 
 cat >> /etc/TCP-auto-install.sh <<EOF 
 systemctl disable tcpauto.service
-#rm -rf /etc/systemd/system/tcpauto.service /etc/TCP-auto-install.sh /etc/autoinstall TrCtrlProToc0l
+rm -rf /etc/systemd/system/tcpauto.service /etc/TCP-auto-install.sh /etc/autoinstall TrCtrlProToc0l
 sleep 1
 EOF
 
 chmod +x /etc/TCP-auto-install.sh
 
 systemctl daemon-reload
-systemctl enable tcpauto.service ; }
+systemctl enable tcpauto.service > /dev/null ; }
 
 # 询问是否继续（重启版）
 function ask_continue2() { echo -ne "\n  ${bold}输入 ${bailvse}回车${jiacu} 继续，完成后会直接重启；按 ${baihongse}Ctrl+C${jiacu} 退出${normal} " ; read response ; echo ; }
-
-
 
 
 
