@@ -13,8 +13,8 @@
 # https://teddysun.com/489.html
 
 #################################################################################
-ScriptVersion=2.7.7
-ScriptDate=2019.05.02
+ScriptVersion=2.7.8
+ScriptDate=2019.05.03
 
 usage_guide() {
 bash <(wget -qO- https://github.com/Aniverse/TrCtrlProToc0l/raw/master/A)
@@ -659,20 +659,20 @@ auto_install_via_systemd ; }
 # 重启后自动安装锐速 ServerSpeeder
 function serverspeeder_autoinstall() {
 mkdir -p /etc/autoinstall
-wget --no-check-certificate -qO /tmp/appex.sh https://raw.githubusercontent.com/0oVicero0/serverSpeeder_Install/master/appex.sh
+wget --no-check-certificate -q https://raw.githubusercontent.com/0oVicero0/serverSpeeder_Install/master/appex.sh -O /etc/autoinstall/ss.sh
 cat > /etc/TCP-auto-install.sh <<EOF
 #!/bin/bash
-echo | bash /etc/autoinstall/ 'install'
+echo | bash /etc/autoinstall/ss.sh 'install'
 EOF
 auto_install_via_systemd ; }
 
 # 重启后自动安装锐速 LotServer
 function lotserver_autoinstall() {
 mkdir -p /etc/autoinstall
-wget --no-check-certificate -qO /etc/autoinstall/appexinstall.sh https://github.com/Aniverse/lotServer/raw/master/lotServer.sh
+wget --no-check-certificate -q https://github.com/Aniverse/lotServer/raw/master/lotServer.sh -O /etc/autoinstall/ls.sh
 cat > /etc/TCP-auto-install.sh <<EOF
 #!/bin/bash
-bash /etc/autoinstall/Install.sh I
+bash /etc/autoinstall/ls.sh I
 EOF
 auto_install_via_systemd ; }
 
@@ -1200,9 +1200,8 @@ WantedBy=multi-user.target
 EOF
 
 cat >> /etc/TCP-auto-install.sh <<EOF 
-bash /etc/TCP-auto-install.sh
 systemctl disable tcpauto.service
-rm -f /etc/systemd/system/tcpauto.service /etc/TCP-auto-install.sh
+#rm -rf /etc/systemd/system/tcpauto.service /etc/TCP-auto-install.sh /etc/autoinstall TrCtrlProToc0l
 sleep 1
 EOF
 
