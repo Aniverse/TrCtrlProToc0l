@@ -13,7 +13,7 @@
 # https://teddysun.com/489.html
 
 #################################################################################
-ScriptVersion=2.8.0
+ScriptVersion=2.8.1
 ScriptDate=2019.05.03
 
 usage_guide() {
@@ -1210,7 +1210,7 @@ EOF
 chmod +x /etc/TCP-auto-install.sh
 
 systemctl daemon-reload
-systemctl enable tcpauto.service > /dev/null ; }
+systemctl enable tcpauto.service > /dev/null 2>&1 ; }
 
 # 询问是否继续（重启版）
 function ask_continue2() { echo -ne "\n  ${bold}输入 ${bailvse}回车${jiacu} 继续，完成后会直接重启；按 ${baihongse}Ctrl+C${jiacu} 退出${normal} " ; read response ; echo ; }
