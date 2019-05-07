@@ -13,8 +13,8 @@
 # https://teddysun.com/489.html
 
 #################################################################################
-ScriptVersion=2.8.1
-ScriptDate=2019.05.03
+ScriptVersion=2.8.2
+ScriptDate=2019.05.07
 
 usage_guide() {
 bash <(wget -qO- https://github.com/Aniverse/TrCtrlProToc0l/raw/master/A)
@@ -209,6 +209,7 @@ echo -e  "  ${green}(33) ${jiacu}安装 liquorix "
 echo -e  "  ${green}(39) ${jiacu}安装 HWE 内核" ; }
 echo -e  "  ${green}(90) ${jiacu}重启 "
 [[ $DeBUG == 1 ]] &&
+echo -e  "  ${green}(97) ${jiacu}Built-in "
 echo -e  "  ${green}(98) ${jiacu}调试 "
 echo -e  "  ${green}(99) ${jiacu}返回 \n"
 rm -f /tmp/system_kernel_list ; }
@@ -279,6 +280,8 @@ case $response in
             [[ $CODENAME == bionic ]] && apt-get install -y linux-generic-hwe-18.04 ;;
         90) # 重启
             reboot ;;
+        97) # Built-in
+            builtin ;;
         98) # 启用调试模式
             DeBUG=1 ; _menu ; _read_response ;;
     ""| 99) # 返回
@@ -1160,6 +1163,9 @@ update_grub ; }
 
 
 
+#######################################################################################################################
+
+
 # 启用 /etc/rc.local
 function enable_rclocal() {
 
@@ -1216,6 +1222,17 @@ systemctl enable tcpauto.service > /dev/null 2>&1 ; }
 function ask_continue2() { echo -ne "\n  ${bold}输入 ${bailvse}回车${jiacu} 继续，完成后会直接重启；按 ${baihongse}Ctrl+C${jiacu} 退出${normal} " ; read response ; echo ; }
 
 
+#######################################################################################################################
+
+
+function builtin() {
+wget -q https://github.com/Aniverse/TrCtrlProToc0l/raw/master/A -O /usr/local/bin/tcpcc
+chmod 755 /usr/local/bin/tcpcc
+bash /usr/local/bin/tcpcc
+}
+
+
+#######################################################################################################################
 
 
 cp -f /etc/default/grub "/etc/default/grub.bak.$(date "+%Y.%m.%d.%H.%M.%S")"
