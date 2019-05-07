@@ -15,7 +15,7 @@
 # https://teddysun.com/489.html
 #
 #################################################################################
-ScriptVersion=2.8.5
+ScriptVersion=2.8.6
 ScriptDate=2019.05.07
 
 usage_guide() {
@@ -43,14 +43,14 @@ function isValidIpAddress() { echo $1 | grep -qE '^[0-9][0-9]?[0-9]?\.[0-9][0-9]
 ### 是否为内网 IPv4 地址 ###
 function isInternalIpAddress() { echo $1 | grep -qE '(192\.168\.((\d{1,2})|(1\d{2})|(2[0-4]\d)|(25[0-5]))\.((\d{1,2})$|(1\d{2})$|(2[0-4]\d)$|(25[0-5])$))|(172\.((1[6-9])|(2\d)|(3[0-1]))\.((\d{1,2})|(1\d{2})|(2[0-4]\d)|(25[0-5]))\.((\d{1,2})$|(1\d{2})$|(2[0-4]\d)$|(25[0-5])$))|(10\.((\d{1,2})|(1\d{2})|(2[0-4]\d)|(25[0-5]))\.((\d{1,2})|(1\d{2})|(2[0-4]\d)|(25[0-5]))\.((\d{1,2})$|(1\d{2})$|(2[0-4]\d)$|(25[0-5])$))' ; }
 
-function exit_1() { cd ; rm -rf TrCtrlProToc0l ; exit 1 ; }
+function exit_1() { rm -rf /etc/TrCtrlProToc0l /tmp/system_kernel_list /log/kernel_tobe_del_list $HOME/1 ; exit 1 ; }
 
 #  -----------------------------------------------------------------------------------
 
-cd ; mkdir -p TrCtrlProToc0l ; cd TrCtrlProToc0l
+mkdir -p /etc/TrCtrlProToc0l /log/tcp ; cd /etc/TrCtrlProToc0l
 
 cancel() { echo -e "${normal}"
-rm -f /tmp/system_kernel_list /log/kernel_tobe_del_list $HOME/1
+rm -rf /tmp/system_kernel_list /log/kernel_tobe_del_list /etc/TrCtrlProToc0l $HOME/1
 exit ; }
 trap cancel SIGINT
 
@@ -81,15 +81,13 @@ CODENAME=`  cat /etc/os-release | grep VERSION= | tr '[A-Z]' '[a-z]' | sed 's/\"
 [[ -z "$(dpkg -l |grep 'grub-')" ]] && echo -e "\n${red}错误${jiacu} 未发现 grub！${normal}" && exit_1
 [[ ! $SysSupport == 1 ]] && echo -e "\n${red}错误${jiacu} 不支持 Debian 8/9、Ubuntu 16.04/18.04 以外的系统！${normal}" && exit_1 ; }
 
-mkdir -p /log/tcp
-
 
 
 
 
 
 # 菜单
-function _menu() { clear ; echo
+function script_menu() { clear ; echo
 
 # [[ $CODENAME =~ (bionic|stretch) ]] && enable_rclocal
 
@@ -228,7 +226,7 @@ rm -f /tmp/system_kernel_list ; }
 
 
 # action
-function _read_response() {
+function read_response() {
 read -ep "  ${yellow}你想做什么？(默认返回) ${normal}" response ; echo -n "${normal}"
 
 case $response in
@@ -293,7 +291,7 @@ case $response in
         97) # Built-in
             builtin ;;
         98) # 启用调试模式
-            DeBUG=1 ; _menu ; _read_response ;;
+            DeBUG=1 ; script_menu ; read_response ;;
     ""| 99) # 返回
             echo ; exit 0 ;;
          *) echo ; exit 0 ;;
@@ -399,7 +397,7 @@ else
     kernel_version=4.14.91
     bbr_plus_kernel_4_14_91
     delete_other_kernel
-  # bbr_plus_autoinstall # 其实那个内核里好像已经带了编译好的……
+  # bbr_plus_autoinstall # 其实那个内核里已经带了编译好的……
     enable_bbr bbrplus
     [[ ! $DeBUG == 1 ]] && echo -e "\n  ${bold}即将重启系统，重启后会自动安装 ${green}bbrplus ... ${normal}\n" && reboot
 fi ; }
@@ -476,7 +474,7 @@ function ss_uninstall() {
 echo -ne "\n  ${bold}${red}警告 ${jiacu}即将开始卸载 ${green}锐速${jiacu}，敲 回车 继续，否则退出${normal} " ; read input
 case $input in
     "" ) echo ;;
-    *  ) echo ; _read_response ;;
+    *  ) echo ; read_response ;;
 esac
 [[ `grep "Advanced options for Ubuntu" /etc/default/grub` ]] && sed -i 's/GRUB_DEFAULT=.*/GRUB_DEFAULT=""/' /etc/default/grub && update-grub >> $Outputs 2>&1
 wget --no-check-certificate -qO /tmp/appex.sh "https://raw.githubusercontent.com/0oVicero0/serverSpeeder_Install/master/appex.sh" && echo | bash /tmp/appex.sh 'uninstall'
@@ -491,11 +489,11 @@ function bbr_uninstall() {
 echo -ne "\n  ${bold}${red}警告 ${jiacu}即将开始卸载 ${green}BBR${jiacu}，敲 回车 继续，否则退出${normal} " ; read input
 case $input in
     "" ) echo ;;
-    *  ) echo ; _read_response ;;
+    *  ) echo ; read_response ;;
 esac
 tcp_control=` sysctl net.ipv4.tcp_available_congestion_control | awk '{print $3}' `
 if [[ $tcp_control =~ ("nanqinlang"|"tsunami"|"bbr"|"bbr_powered") ]]; then bbrname=$tcp_control ; disable_bbr ; echo -e "  ${bold}${red}已卸载 BBR，但安装的内核仍保留${normal}\n"
-else echo -e "  ${bold}${red}错误 ${jiacu}你并没有使用本脚本安装 BBR ...${normal}\n" ; _read_response ; fi ; }
+else echo -e "  ${bold}${red}错误 ${jiacu}你并没有使用本脚本安装 BBR ...${normal}\n" ; read_response ; fi ; }
 
 
 
@@ -646,8 +644,10 @@ apt-get install linux-image-liquorix-amd64 linux-headers-liquorix-amd64 -y ; }
 
 # 重启后自动安装 BBR Plus
 function bbr_plus_autoinstall() {
-cat > /etc/TCP-auto-install.sh <<EOF
+mkdir -p /etc/TrCtrlProToc0l
+cat > /etc/TrCtrlProToc0l/TCP-auto-install.sh <<EOF
 #!/bin/bash
+cd /etc/TrCtrlProToc0l
 bash <(wget --no-check-certificate -qO- https://raw.githubusercontent.com/Aniverse/TrCtrlProToc0l/master/compile_tcp_cc.sh) bbrplus
 sysctl -p
 EOF
@@ -655,8 +655,10 @@ auto_install_via_systemd ; }
 
 # 重启后自动安装 南琴浪 版 BBR
 function bbr_nanqinlang_autoinstall() {
-cat > /etc/TCP-auto-install.sh <<EOF
+mkdir -p /etc/TrCtrlProToc0l
+cat > /etc/TrCtrlProToc0l/TCP-auto-install.sh <<EOF
 #!/bin/bash
+cd /etc/TrCtrlProToc0l
 bash <(wget --no-check-certificate -qO- https://raw.githubusercontent.com/Aniverse/TrCtrlProToc0l/master/compile_tcp_cc.sh) nanqinlang
 sysctl -p
 EOF
@@ -664,8 +666,10 @@ auto_install_via_systemd ; }
 
 # 重启后自动安装 Yankee 版 BBR
 function bbr_tsunami_autoinstall() {
-cat > /etc/TCP-auto-install.sh <<EOF
+mkdir -p /etc/TrCtrlProToc0l
+cat > /etc/TrCtrlProToc0l/TCP-auto-install.sh <<EOF
 #!/bin/bash
+cd /etc/TrCtrlProToc0l
 bash <(wget --no-check-certificate -qO- https://raw.githubusercontent.com/Aniverse/TrCtrlProToc0l/master/compile_tcp_cc.sh) tsunami
 sysctl -p
 EOF
@@ -673,21 +677,21 @@ auto_install_via_systemd ; }
 
 # 重启后自动安装锐速 ServerSpeeder
 function serverspeeder_autoinstall() {
-mkdir -p /etc/autoinstall
-wget --no-check-certificate -q https://raw.githubusercontent.com/0oVicero0/serverSpeeder_Install/master/appex.sh -O /etc/autoinstall/ss.sh
-cat > /etc/TCP-auto-install.sh <<EOF
+mkdir -p /etc/TrCtrlProToc0l
+wget --no-check-certificate -q https://raw.githubusercontent.com/0oVicero0/serverSpeeder_Install/master/appex.sh -O /etc/TrCtrlProToc0l/ss.sh
+cat > /etc/TrCtrlProToc0l/TCP-auto-install.sh <<EOF
 #!/bin/bash
-echo | bash /etc/autoinstall/ss.sh 'install'
+echo | bash /etc/TrCtrlProToc0l/ss.sh 'install'
 EOF
 auto_install_via_systemd ; }
 
 # 重启后自动安装锐速 LotServer
 function lotserver_autoinstall() {
-mkdir -p /etc/autoinstall
-wget --no-check-certificate -q https://github.com/Aniverse/lotServer/raw/master/lotServer.sh -O /etc/autoinstall/ls.sh
-cat > /etc/TCP-auto-install.sh <<EOF
+mkdir -p /etc/TrCtrlProToc0l
+wget --no-check-certificate -q https://github.com/Aniverse/lotServer/raw/master/lotServer.sh -O /etc/TrCtrlProToc0l/ls.sh
+cat > /etc/TrCtrlProToc0l/TCP-auto-install.sh <<EOF
 #!/bin/bash
-bash /etc/autoinstall/ls.sh I b
+bash /etc/TrCtrlProToc0l/ls.sh I b
 EOF
 auto_install_via_systemd ; }
 
@@ -1222,20 +1226,20 @@ After=network.target
 
 [Service]
 Type=oneshot
-ExecStart=/etc/TCP-auto-install.sh
+ExecStart=/etc/TrCtrlProToc0l/TCP-auto-install.sh
 RemainAfterExit=true
 
 [Install]
 WantedBy=multi-user.target
 EOF
 
-cat >> /etc/TCP-auto-install.sh <<EOF 
+cat << EOF >> /etc/TrCtrlProToc0l/TCP-auto-install.sh
 systemctl disable tcpauto.service
-rm -rf /etc/systemd/system/tcpauto.service /etc/TCP-auto-install.sh /etc/autoinstall TrCtrlProToc0l /root/makefile /root/.tcp_* /root/tcp_*
+rm -rf /etc/systemd/system/tcpauto.service /etc/TrCtrlProToc0l
 sleep 1
 EOF
 
-chmod +x /etc/TCP-auto-install.sh
+chmod +x /etc/TrCtrlProToc0l/TCP-auto-install.sh
 
 systemctl daemon-reload
 systemctl enable tcpauto.service > /dev/null 2>&1 ; }
@@ -1258,6 +1262,6 @@ bash /usr/local/bin/tcpcc
 
 
 cp -f /etc/default/grub "/etc/default/grub.bak.$(date "+%Y.%m.%d.%H.%M.%S")"
-_menu
-_read_response
-cd ; rm -rf TrCtrlProToc0l
+script_menu
+read_response
+cancel
