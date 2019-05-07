@@ -15,7 +15,7 @@
 # https://teddysun.com/489.html
 #
 #################################################################################
-ScriptVersion=2.8.4
+ScriptVersion=2.8.5
 ScriptDate=2019.05.07
 
 usage_guide() {
@@ -82,6 +82,11 @@ CODENAME=`  cat /etc/os-release | grep VERSION= | tr '[A-Z]' '[a-z]' | sed 's/\"
 [[ ! $SysSupport == 1 ]] && echo -e "\n${red}错误${jiacu} 不支持 Debian 8/9、Ubuntu 16.04/18.04 以外的系统！${normal}" && exit_1 ; }
 
 mkdir -p /log/tcp
+
+
+
+
+
 
 # 菜单
 function _menu() { clear ; echo
@@ -210,10 +215,10 @@ echo -e  "  ${green}(32) ${jiacu}安装 Xanmod，并删除其他内核 "
 echo -e  "  ${green}(33) ${jiacu}安装 liquorix "
 echo -e  "  ${green}(39) ${jiacu}安装 HWE 内核" ; }
 echo -e  "  ${green}(90) ${jiacu}重启 "
-[[ $DeBUG == 1 ]] &&
+[[ $DeBUG == 1 ]] && {
 echo -e  "  ${green}(96) ${jiacu}切换拥塞控制算法 "
 echo -e  "  ${green}(97) ${jiacu}Built-in "
-echo -e  "  ${green}(98) ${jiacu}调试 "
+echo -e  "  ${green}(98) ${jiacu}调试 " ; }
 echo -e  "  ${green}(99) ${jiacu}返回 \n"
 rm -f /tmp/system_kernel_list ; }
 
