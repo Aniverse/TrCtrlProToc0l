@@ -13,7 +13,7 @@
 # https://teddysun.com/489.html
 
 #################################################################################
-ScriptVersion=2.8.2
+ScriptVersion=2.8.3
 ScriptDate=2019.05.07
 
 usage_guide() {
@@ -209,6 +209,7 @@ echo -e  "  ${green}(33) ${jiacu}安装 liquorix "
 echo -e  "  ${green}(39) ${jiacu}安装 HWE 内核" ; }
 echo -e  "  ${green}(90) ${jiacu}重启 "
 [[ $DeBUG == 1 ]] &&
+echo -e  "  ${green}(96) ${jiacu}切换拥塞控制算法 "
 echo -e  "  ${green}(97) ${jiacu}Built-in "
 echo -e  "  ${green}(98) ${jiacu}调试 "
 echo -e  "  ${green}(99) ${jiacu}返回 \n"
@@ -280,6 +281,8 @@ case $response in
             [[ $CODENAME == bionic ]] && apt-get install -y linux-generic-hwe-18.04 ;;
         90) # 重启
             reboot ;;
+        96) # 切换 TCP 拥塞控制算法
+            switch_cc ;;
         97) # Built-in
             builtin ;;
         98) # 启用调试模式
@@ -938,12 +941,24 @@ sysctl -p >> $Outputs 2>&1 ; }
 
 # 关闭 BBR
 function disable_bbr() {
-bbr=$1 ; [[ -z $bbr ]] && bbr=bbr
 sed -i '/net.core.default_qdisc.*/d' /etc/sysctl.conf
 sed -i '/net.ipv4.tcp_congestion_control.*/d' /etc/sysctl.conf
 echo "net.ipv4.tcp_congestion_control = cubic" >> /etc/sysctl.conf
 # [[ $bbr != bbr ]] && rm /lib/modules/`uname -r`/kernel/net/ipv4/tcp_$bbrname.ko
 sysctl -p >> $Outputs 2>&1 ; }
+
+
+
+# 切换到其他 TCP 加速
+function switch_cc() {
+read -ep "干啥子？ " tcpcc
+sed -i '/net.core.default_qdisc.*/d' /etc/sysctl.conf
+sed -i '/net.ipv4.tcp_congestion_control.*/d' /etc/sysctl.conf
+echo "net.ipv4.tcp_congestion_control = $tcpcc" >> /etc/sysctl.conf
+[[ $tcpcc =~ (bbr|bbrplus|tsunami|nanqinlang|bbr_powered) ]] && echo "net.core.default_qdisc = fq" >> /etc/sysctl.conf
+modprobe tcp_$tcpcc
+sysctl -w net.ipv4.tcp_congestion_control=$tcpcc
+sysctl -p ; }
 
 
 
