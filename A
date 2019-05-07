@@ -3,6 +3,8 @@
 # Author: Aniverse
 # https://github.com/Aniverse/TrCtrlProToc0l
 #
+#################################################################################
+#
 # Thanks to
 # https://github.com/FunctionClub/YankeeBBR
 # https://sometimesnaive.org/article/linux/bash/tcp_nanqinlang
@@ -11,9 +13,9 @@
 # https://www.94ish.me/1635.html
 # http://xiaofd.win/onekey-ruisu.html
 # https://teddysun.com/489.html
-
+#
 #################################################################################
-ScriptVersion=2.8.3
+ScriptVersion=2.8.4
 ScriptDate=2019.05.07
 
 usage_guide() {
@@ -1224,7 +1226,7 @@ EOF
 
 cat >> /etc/TCP-auto-install.sh <<EOF 
 systemctl disable tcpauto.service
-rm -rf /etc/systemd/system/tcpauto.service /etc/TCP-auto-install.sh /etc/autoinstall TrCtrlProToc0l
+rm -rf /etc/systemd/system/tcpauto.service /etc/TCP-auto-install.sh /etc/autoinstall TrCtrlProToc0l /root/makefile /root/.tcp_* /root/tcp_*
 sleep 1
 EOF
 
