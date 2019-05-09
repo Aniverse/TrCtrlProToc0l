@@ -15,8 +15,8 @@
 # https://teddysun.com/489.html
 #
 #################################################################################
-ScriptVersion=2.8.6
-ScriptDate=2019.05.07
+ScriptVersion=2.8.7
+ScriptDate=2019.05.09
 
 usage_guide() {
 bash <(wget -qO- https://github.com/Aniverse/TrCtrlProToc0l/raw/master/A)
@@ -556,12 +556,20 @@ echo ; }
 
 # 安装 xanmod，apt
 function xanmod_apt_install() {
-# wget -q https://dl.xanmod.org/xanmod-repository.deb && dpkg -i xanmod-repository.deb
 echo 'deb http://deb.xanmod.org releases main' | tee /etc/apt/sources.list.d/xanmod-kernel.list
 wget -qO- http://deb.xanmod.org/gpg.key | apt-key add -
 apt-get update
-# apt-get install -y linux-xanmod-$kernel_version intel-microcode iucode-tool
-apt install -y linux-xanmod ; }
+apt-get install -y linux-xanmod ; }
+
+
+
+# 安装 xanmod，apt，lts
+function xanmod_apt_install_lts() {
+wget https://dl.xanmod.org/xanmod-repository.deb -O xanmod-repository.deb -4
+dpkg -i xanmod-repository.deb
+apt-get update
+apt-get install -y linux-firmware intel-microcode iucode-tool
+apt-get install -y linux-xanmod-lts ; }
 
 
 
@@ -572,40 +580,43 @@ echo ; read -ep "  ${bold}输入你要安装的 Xanmod 版本： ${normal}" Xanm
 
 online_ubuntu_bbr_firmware
 # https://sourceforge.net/projects/xanmod/files/releases/
+# https://xanmod.org/
 
+# 我觉得下次可以改成 根据 kernel_version 来 wget（包名需要修改）
 if   [[ $XanmodVer == 4.12 ]]; then
      kernel_version=4.12.14
-     wget --no-check-certificate -q https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/4.12/linux-image-4.12.14-xanmod15_1.170920_amd64.deb
-     wget --no-check-certificate -q https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/4.12/linux-headers-4.12.14-xanmod15_1.170920_amd64.deb
-     echo ; dpkg -i linux-image*.deb ; dpkg -i linux-headers*.deb
+     wget https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/4.12/linux-image-4.12.14-xanmod15_1.170920_amd64.deb
+     wget https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/4.12/linux-headers-4.12.14-xanmod15_1.170920_amd64.deb
+     dpkg -i linux-image*.deb ; dpkg -i linux-headers*.deb
 elif [[ $XanmodVer == 4.15 ]]; then
      kernel_version=4.15.13
-     wget --no-check-certificate -q https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/4.15/linux-image-4.15.13-xanmod12_1.180325_amd64.deb
-     wget --no-check-certificate -q https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/4.15/linux-headers-4.15.13-xanmod12_1.180325_amd64.deb
-     echo ; dpkg -i linux-image*.deb ; dpkg -i linux-headers*.deb
+     wget https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/4.15/linux-image-4.15.13-xanmod12_1.180325_amd64.deb
+     wget https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/4.15/linux-headers-4.15.13-xanmod12_1.180325_amd64.deb
+     dpkg -i linux-image*.deb ; dpkg -i linux-headers*.deb
 elif [[ $XanmodVer == 4.16 ]]; then
      kernel_version=4.16.12
-     wget --no-check-certificate -q https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/4.16/linux-image-4.16.12-xanmod11_2.180526_amd64.deb
-     wget --no-check-certificate -q https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/4.16/linux-headers-4.16.12-xanmod11_2.180526_amd64.deb
-     echo ; dpkg -i linux-image*.deb ; dpkg -i linux-headers*.deb
+     wget https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/4.16/linux-image-4.16.12-xanmod11_2.180526_amd64.deb
+     wget https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/4.16/linux-headers-4.16.12-xanmod11_2.180526_amd64.deb
+     dpkg -i linux-image*.deb ; dpkg -i linux-headers*.deb
 elif [[ $XanmodVer == 4.17 ]]; then
      kernel_version=4.17.14
-     wget --no-check-certificate -q https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/4.17/linux-image-4.17.14-xanmod9_1.180810_amd64.deb
-     wget --no-check-certificate -q https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/4.17/linux-headers-4.17.14-xanmod9_1.180810_amd64.deb
-     echo ; dpkg -i linux-image*.deb ; dpkg -i linux-headers*.deb
+     wget https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/4.17/linux-image-4.17.14-xanmod9_1.180810_amd64.deb
+     wget https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/4.17/linux-headers-4.17.14-xanmod9_1.180810_amd64.deb
+     dpkg -i linux-image*.deb ; dpkg -i linux-headers*.deb
 elif [[ $XanmodVer == 4.18  ]]; then
      kernel_version=4.18.16
-     wget --no-check-certificate -q https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/4.18/linux-image-4.18.16-xanmod9_1.181020_amd64.deb
-     wget --no-check-certificate -q https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/4.18/linux-headers-4.18.16-xanmod9_1.181020_amd64.deb
-     echo ; dpkg -i linux-image*.deb ; dpkg -i linux-headers*.deb
-elif [[ $XanmodVer == 4.19  ]]; then
-# 啥时候有空更新下
-     kernel_version=4.19.12
-     wget --no-check-certificate -q https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/4.19/linux-image-4.19.12-xanmod7_2.181223_amd64.deb
-     wget --no-check-certificate -q https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/4.19/linux-headers-4.19.12-xanmod7_2.181223_amd64.deb
-     echo ; dpkg -i linux-image*.deb ; dpkg -i linux-headers*.deb
+     wget https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/4.18/linux-image-4.18.16-xanmod9_1.181020_amd64.deb
+     wget https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/4.18/linux-headers-4.18.16-xanmod9_1.181020_amd64.deb
+     dpkg -i linux-image*.deb ; dpkg -i linux-headers*.deb
+# 4.19 是 LTS，以后再说
+elif [[ $XanmodVer == 4.20  ]]; then
+     # 还没加上
+     kernel_version=4.20.8
+     xanmod_dpkg_install # 这个 function 以后再说
 elif [[ $XanmodVer == apt  ]]; then
      kernel_version=xanmod ; xanmod_apt_install
+elif [[ $XanmodVer == lts  ]]; then
+     kernel_version=xanmod ; xanmod_apt_install_lts
 fi
 
 }
