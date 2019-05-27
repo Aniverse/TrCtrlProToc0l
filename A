@@ -84,9 +84,9 @@ CODENAME=`  cat /etc/os-release | grep VERSION= | tr '[A-Z]' '[a-z]' | sed 's/\"
 
 function emmm() { clear
 echo -e  "  ${bold}如果脚本出了问题，可以输入这条命令查看日志：${red}cat $Outputs${jiacu}"
-read -ep "  知道了没？   " input
+read -ep "  知道了没？   ${cyan}" input
 [[ $input != "知道了" ]] && {
-echo -e "  ${bold}那等你什么时候知道了再说吧${normal}"
+echo -e "\n  ${bold}${red}你如果不知道的话那我也不知道脚本要怎么运行了……${normal}"
 exit 1 ; }
 }
 
