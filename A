@@ -15,7 +15,7 @@
 # https://teddysun.com/489.html
 #
 #################################################################################
-ScriptVersion=2.9.3
+ScriptVersion=2.9.4
 ScriptDate=2019.05.27
 
 usage_guide() {
@@ -88,10 +88,10 @@ function emmm() { clear
 echo -e  "  ${bold}如果脚本出了问题，可以输入这条命令查看日志：${red}cat $Outputs${jiacu}"
 read -ep "  知道了没？   ${cyan}" input
 [[ $input != "知道了" ]] && {
-echo -e "\n  ${bold}你如果不知道的话那我也不知道脚本要怎么运行了……
-  然而你可以出门右转： ${yellow}${underline}bash <(wget -qO- https://github.com/chiakge/Linux-NetSpeed/raw/master/tcp.sh)${reset_underline}${normal}
-  ${bold}那就不关我事了${normal}"
-exit 1 ; }
+echo -e "\n  ${jiacu}你如果不知道的话那我也不知道脚本要怎么运行了 …… 我什么也不知道
+  不过你可以选择出门右转： ${yellow}${underline}bash <(wget -qO- https://github.com/chiakge/Linux-NetSpeed/raw/master/tcp.sh)${reset_underline}${normal}
+  ${bold}那就不关我事了${normal}\n"
+exit_1 ; }
 }
 
 
