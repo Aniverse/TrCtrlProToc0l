@@ -15,7 +15,7 @@
 # https://teddysun.com/489.html
 #
 #################################################################################
-ScriptVersion=2.8.8
+ScriptVersion=2.8.9
 ScriptDate=2019.05.27
 
 usage_guide() {
@@ -83,8 +83,8 @@ CODENAME=`  cat /etc/os-release | grep VERSION= | tr '[A-Z]' '[a-z]' | sed 's/\"
 
 
 function emmm() { clear
-echo -e  "  如果脚本出了问题，可以输入这条命令查看日志：${red}cat $Outputs${jiacu}"
-read -ep "  知道了没？" input
+echo -e  "  ${bold}如果脚本出了问题，可以输入这条命令查看日志：${red}cat $Outputs${jiacu}"
+read -ep "  知道了没？  " input
 [[ $input != "知道了" ]] && exit 1
 }
 
