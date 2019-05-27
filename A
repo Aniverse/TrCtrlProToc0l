@@ -15,7 +15,7 @@
 # https://teddysun.com/489.html
 #
 #################################################################################
-ScriptVersion=2.9.2
+ScriptVersion=2.9.3
 ScriptDate=2019.05.27
 
 usage_guide() {
@@ -59,7 +59,8 @@ export DEBIAN_FRONTEND=noninteractive
 SETUPDATE=$(date "+%Y.%m.%d.%H:%M:%S")
 export Outputs="/log/tcp/$SETUPDATE.log"
 SysSupport=0 ; DeBUG=0
-[[ $1 == -d ]] && DeBUG=1
+[[ $1 == -d ]] && DeBUG=1 && skip_emmm=1
+[[ $1 == -s ]] && skip_emmm=1
 
 KernelBit=$(getconf LONG_BIT)
 [[ $KernelBit == 32 ]] && KernelBitVer=i386 ; [[ $KernelBit == 64 ]] && KernelBitVer=amd64
@@ -82,13 +83,14 @@ CODENAME=`  cat /etc/os-release | grep VERSION= | tr '[A-Z]' '[a-z]' | sed 's/\"
 [[ ! $SysSupport == 1 ]] && echo -e "\n${red}错误${jiacu} 不支持 Debian 8/9/10、Ubuntu 16.04/18.04 以外的系统！${normal}" && exit_1 ; }
 
 
+
 function emmm() { clear
 echo -e  "  ${bold}如果脚本出了问题，可以输入这条命令查看日志：${red}cat $Outputs${jiacu}"
 read -ep "  知道了没？   ${cyan}" input
 [[ $input != "知道了" ]] && {
-echo -e "\n  ${bold}${red}你如果不知道的话那我也不知道脚本要怎么运行了……
-不过你可以出门右转： ${yellow}${underline}bash <(wget -qO- https://github.com/chiakge/Linux-NetSpeed/raw/master/tcp.sh)${reset_underline}${normal}
-${bold}那就不关我事了${normal}"
+echo -e "\n  ${bold}你如果不知道的话那我也不知道脚本要怎么运行了……
+  然而你可以出门右转： ${yellow}${underline}bash <(wget -qO- https://github.com/chiakge/Linux-NetSpeed/raw/master/tcp.sh)${reset_underline}${normal}
+  ${bold}那就不关我事了${normal}"
 exit 1 ; }
 }
 
@@ -1280,7 +1282,7 @@ bash /usr/local/bin/tcpcc
 
 #######################################################################################################################
 
-emmm
+[[ $skip_emmm != 1 ]] && emmm
 cp -f /etc/default/grub "/etc/default/grub.bak.$(date "+%Y.%m.%d.%H.%M.%S")"
 script_menu
 read_response
