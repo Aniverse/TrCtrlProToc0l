@@ -15,8 +15,8 @@
 # https://teddysun.com/489.html
 #
 #################################################################################
-ScriptVersion=2.8.7
-ScriptDate=2019.05.09
+ScriptVersion=2.8.8
+ScriptDate=2019.05.27
 
 usage_guide() {
 bash <(wget -qO- https://github.com/Aniverse/TrCtrlProToc0l/raw/master/A)
@@ -68,7 +68,7 @@ DISTROU=`  awk -F'[= "]' '/PRETTY_NAME/{print $3}' /etc/os-release  `
 CODENAME=`  cat /etc/os-release | grep VERSION= | tr '[A-Z]' '[a-z]' | sed 's/\"\|(\|)\|[0-9.,]\|version\|lts//g' | awk '{print $2}'  `
 [[ $DISTRO == ubuntu ]] && osversion=`  grep Ubuntu /etc/issue | head -1 | grep -oE  "[0-9.]+"  `
 [[ $DISTRO == debian ]] && osversion=`  cat /etc/debian_version  `
-[[ $CODENAME =~ ("xenial"|"bionic"|"jessie"|"stretch") ]] && SysSupport=1
+[[ $CODENAME =~ (xenial|bionic|jessie|stretch|buster) ]] && SysSupport=1
 
 #  -----------------------------------------------------------------------------------
 
@@ -79,10 +79,14 @@ CODENAME=`  cat /etc/os-release | grep VERSION= | tr '[A-Z]' '[a-z]' | sed 's/\"
 # Xen-PV 也不支持，不过就不作检测了……
 [[ ! $KernelBit == 64 ]] && echo -e "\n${red}错误${jiacu} 不支持非 64 位系统！${normal}" && exit_1
 [[ -z "$(dpkg -l |grep 'grub-')" ]] && echo -e "\n${red}错误${jiacu} 未发现 grub！${normal}" && exit_1
-[[ ! $SysSupport == 1 ]] && echo -e "\n${red}错误${jiacu} 不支持 Debian 8/9、Ubuntu 16.04/18.04 以外的系统！${normal}" && exit_1 ; }
+[[ ! $SysSupport == 1 ]] && echo -e "\n${red}错误${jiacu} 不支持 Debian 8/9/10、Ubuntu 16.04/18.04 以外的系统！${normal}" && exit_1 ; }
 
 
-
+function emmm() { clear
+echo -e  "  如果脚本出了问题，可以输入这条命令查看日志：${red}cat $Outputs${jiacu}"
+read -ep "  知道了没？" input
+[[ $input != "知道了" ]] && exit 1
+}
 
 
 
@@ -182,7 +186,7 @@ cat -n /tmp/system_kernel_list | sed 's/\t/ /g' | sed "s/ linux-/) ${green}linux
 echo -e  "\n  ${jiacu}当前脚本版本：$ScriptVersion        脚本更新时间：$ScriptDate"
 [[ $DeBUG == 1 ]] && echo -e  "\n  当前脚本已处于调试模式"
 echo -e  "\n  ${yellow}${bold}使用本脚本前请先阅读本脚本 GitHub 上的 README；作者水平菜，不保证脚本不会翻车${jiacu}\n"
-echo -e  "  如果运行时出错退出，可以输入这条命令查看日志：${red}cat $Outputs${jiacu}"
+echo -e  "  如果脚本出了问题，可以输入这条命令查看日志：${red}cat $Outputs${jiacu}"
 echo -e  "\n  如需报错请务必附上日志${jiacu}\n"
 
 [[ ! $( dpkg -l | grep $(uname -r) ) ]] && echo -e "\n  ${bold}${red}注意${jiacu} 系统中似乎检测不到你当前的内核，你可能正在使用来自 netboot 的内核。\n       这种情况下本脚本的功能不一定能正常工作！\n"
@@ -441,6 +445,7 @@ elif [[ $SSKernel == "${red}否${jiacu}" ]] && [[ $DISTRO == ubuntu ]] && [[ ! $
     echo -ne "  ${bold}当前内核不支持 ServerSpeeder，安装 ${green}3.16.0-43${jiacu} 内核 ... ${normal} \n"
     export kernelver=3.16.0-43-generic
     ubuntu_serverspeeder_kernel_repo
+    export kernel_version=3.16.0-43-generic
     delete_other_kernel
     delete_other_kernel
     serverspeeder_autoinstall
@@ -1271,7 +1276,7 @@ bash /usr/local/bin/tcpcc
 
 #######################################################################################################################
 
-
+emmm
 cp -f /etc/default/grub "/etc/default/grub.bak.$(date "+%Y.%m.%d.%H.%M.%S")"
 script_menu
 read_response
