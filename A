@@ -15,8 +15,8 @@
 # https://teddysun.com/489.html
 #
 #################################################################################
-ScriptVersion=2.9.4
-ScriptDate=2019.05.27
+ScriptVersion=2.9.5
+ScriptDate=2019.05.30
 
 usage_guide() {
 bash <(wget -qO- https://github.com/Aniverse/TrCtrlProToc0l/raw/master/A)
@@ -1282,7 +1282,7 @@ bash /usr/local/bin/tcpcc
 
 #######################################################################################################################
 
-[[ $skip_emmm != 1 ]] && emmm
+#[[ $skip_emmm != 1 ]] && emmm
 cp -f /etc/default/grub "/etc/default/grub.bak.$(date "+%Y.%m.%d.%H.%M.%S")"
 script_menu
 read_response
