@@ -9,13 +9,13 @@
 # https://github.com/FunctionClub/YankeeBBR
 # https://sometimesnaive.org/article/linux/bash/tcp_nanqinlang
 # https://moeclub.org/2017/06/06/249/
-# https://moeclub.org/2017/03/08/14/
+# https://moeclub.org/2017/03/09/14/
 # https://www.94ish.me/1635.html
 # http://xiaofd.win/onekey-ruisu.html
 # https://teddysun.com/489.html
 #
 #################################################################################
-ScriptVersion=2.9.6
+ScriptVersion=2.9.7
 ScriptDate=2019.06.01
 
 usage_guide() {
@@ -716,7 +716,7 @@ mkdir -p /etc/TrCtrlProToc0l
 wget --no-check-certificate -q https://github.com/Aniverse/lotServer/raw/master/lotServer.sh -O /etc/TrCtrlProToc0l/ls.sh
 cat > /etc/TrCtrlProToc0l/TCP-auto-install.sh <<EOF
 #!/bin/bash
-bash /etc/TrCtrlProToc0l/ls.sh I b
+bash /etc/TrCtrlProToc0l/ls.sh install
 EOF
 auto_install_via_systemd ; }
 
@@ -837,7 +837,7 @@ function serverspeeder_install() { wget --no-check-certificate -qO /tmp/appex.sh
 ps aux | grep -v grep | grep -q appex && echo -e "\n${bold}${green}锐速已在运行 ...${normal}\n" || echo -e "\n${bold}${red}锐速尚未在运行，可能安装失败！${normal}\n" ; }
 
 function lotserver_install() {
-bash <(wget --no-check-certificate -qO- https://github.com/Aniverse/lotServer/raw/master/lotServer.sh) I b
+bash <(wget --no-check-certificate -qO- https://github.com/Aniverse/lotServer/raw/master/lotServer.sh) install
 ps aux | grep -v grep | grep -q appex && echo -e "\n${bold}${green}锐速已在运行 ...${normal}\n" || echo -e "\n${bold}${red}锐速尚未在运行，可能安装失败！${normal}\n" ; }
 
 
