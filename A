@@ -15,7 +15,7 @@
 # https://teddysun.com/489.html
 #
 #################################################################################
-ScriptVersion=2.9.8
+ScriptVersion=2.9.9
 ScriptDate=2019.06.14
 
 usage_guide() {
@@ -572,6 +572,7 @@ echo ; }
 function xanmod_apt_install() {
 echo 'deb http://deb.xanmod.org releases main' | tee /etc/apt/sources.list.d/xanmod-kernel.list
 wget -qO- http://deb.xanmod.org/gpg.key | apt-key add -
+kernel_version=5.1
 apt-get update
 apt-get install -y linux-xanmod ; }
 
@@ -581,24 +582,41 @@ apt-get install -y linux-xanmod ; }
 function xanmod_apt_install_lts() {
 wget https://dl.xanmod.org/xanmod-repository.deb -O xanmod-repository.deb -4
 dpkg -i xanmod-repository.deb
-#apt-get install -y gnupg
-#apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 86F7D09EE734E623
+# apt-get install -y gnupg
+# apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 86F7D09EE734E623
+kernel_version=4.19
 apt-get update
 apt-get install -y linux-firmware intel-microcode iucode-tool
 apt-get install -y linux-xanmod-lts ; }
 
 
 
+function xanmod_dpkg_install() {
+kernel_version=4.12.14-xanmod15
+kernel_version=4.14.90-xanmod54
+kernel_version=4.15.13-xanmod12
+kernel_version=4.16.12-xanmod11
+kernel_version=4.17.14-xanmod9
+kernel_version=4.18.16-xanmod9
+kernel_version=4.20.12-xanmod7
+kernel_version=5.0.13-xanmod8
+wget https://github.com/Aniverse/inexistence/raw/files/linux.kernel/xanmod/linux-headers-$kernel_version.deb
+wget https://github.com/Aniverse/inexistence/raw/files/linux.kernel/xanmod/linux-image-$kernel_version.deb
+dpkg -i linux-image-$kernel_version.deb 
+dpkg -i linux-headers-$kernel_version.deb
+}
+
+
+
 #S31# 安装 xanmod
 function xanmod_install() {
 
-echo ; read -ep "  ${bold}输入你要安装的 Xanmod 版本： ${normal}" XanmodVer ; echo -e ""
+echo ; read -ep "  ${bold}输入你要安装的 Xanmod 版本： ${normal}" XanmodVer ; echo
 
 online_ubuntu_bbr_firmware
 # https://sourceforge.net/projects/xanmod/files/releases/
 # https://xanmod.org/
 
-# 我觉得下次可以改成 根据 kernel_version 来 wget（包名需要修改）
 if   [[ $XanmodVer == 4.12 ]]; then
      kernel_version=4.12.14
      wget https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/4.12/linux-image-4.12.14-xanmod15_1.170920_amd64.deb
@@ -619,19 +637,18 @@ elif [[ $XanmodVer == 4.17 ]]; then
      wget https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/4.17/linux-image-4.17.14-xanmod9_1.180810_amd64.deb
      wget https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/4.17/linux-headers-4.17.14-xanmod9_1.180810_amd64.deb
      dpkg -i linux-image*.deb ; dpkg -i linux-headers*.deb
-elif [[ $XanmodVer == 4.18  ]]; then
+elif [[ $XanmodVer == 4.18 ]]; then
      kernel_version=4.18.16
      wget https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/4.18/linux-image-4.18.16-xanmod9_1.181020_amd64.deb
      wget https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/4.18/linux-headers-4.18.16-xanmod9_1.181020_amd64.deb
      dpkg -i linux-image*.deb ; dpkg -i linux-headers*.deb
 # 4.19 是 LTS，以后再说
-elif [[ $XanmodVer == 4.20  ]]; then
-     # 还没加上
-     kernel_version=4.20.8
-     xanmod_dpkg_install # 这个 function 以后再说
-elif [[ $XanmodVer == apt  ]]; then
+elif [[ $XanmodVer == 4.20 ]]; then # 还没加上
+     kernel_version=4.20.12-xanmod7
+     xanmod_dpkg_install
+elif [[ $XanmodVer == apt ]]; then
      kernel_version=xanmod ; xanmod_apt_install
-elif [[ $XanmodVer == lts  ]]; then
+elif [[ $XanmodVer == lts ]]; then
      kernel_version=xanmod ; xanmod_apt_install_lts
 fi
 
