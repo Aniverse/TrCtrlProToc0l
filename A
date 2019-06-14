@@ -15,8 +15,8 @@
 # https://teddysun.com/489.html
 #
 #################################################################################
-ScriptVersion=2.9.7
-ScriptDate=2019.06.01
+ScriptVersion=2.9.8
+ScriptDate=2019.06.14
 
 usage_guide() {
 bash <(wget -qO- https://github.com/Aniverse/TrCtrlProToc0l/raw/master/A)
@@ -581,6 +581,8 @@ apt-get install -y linux-xanmod ; }
 function xanmod_apt_install_lts() {
 wget https://dl.xanmod.org/xanmod-repository.deb -O xanmod-repository.deb -4
 dpkg -i xanmod-repository.deb
+#apt-get install -y gnupg
+#apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 86F7D09EE734E623
 apt-get update
 apt-get install -y linux-firmware intel-microcode iucode-tool
 apt-get install -y linux-xanmod-lts ; }
@@ -944,20 +946,19 @@ else
     [[ ! `dpkg -l | grep libssl1.0.0` ]] && { echo -e  "\n$  ${red}错误${bold} 安装 libssl1.0.0 失败！${normal}" | tee -a $Outputs ; exit_1 ; } ; }
 fi
 
-which make >> $Outputs 2>&1 ; [ $? -ne '0' ] && { echo -ne "\n  ${bold}安装 make ...${normal} "    | tee -a $Outputs  ; apt-get install -y make >> $Outputs 2>&1 ; echo | tee -a $Outputs
-which make >> $Outputs 2>&1 ; [ $? -ne '0' ] && { echo -e  "\n  ${red}错误${bold} 安装 make 失败！${normal}" | tee -a $Outputs ; exit_1 ; } ; }
+# which make >> $Outputs 2>&1 ; [ $? -ne '0' ] && { echo -ne "\n  ${bold}安装 make ...${normal} "    | tee -a $Outputs  ; apt-get install -y make >> $Outputs 2>&1 ; echo | tee -a $Outputs
+# which make >> $Outputs 2>&1 ; [ $? -ne '0' ] && { echo -e  "\n  ${red}错误${bold} 安装 make 失败！${normal}" | tee -a $Outputs ; exit_1 ; } ; }
+# which gcc  >> $Outputs 2>&1 ; [ $? -ne '0' ] && { echo -ne "\n  ${bold}安装 gcc ...${normal} "     | tee -a $Outputs  ; apt-get install -y gcc  >> $Outputs 2>&1 ; echo | tee -a $Outputs
+# which gcc  >> $Outputs 2>&1 ; [ $? -ne '0' ] && { echo -e  "\n  ${red}错误${bold} 安装 gcc 失败！${normal}" | tee -a $Outputs  ; exit_1 ; } ; }
 
 which awk  >> $Outputs 2>&1 ; [ $? -ne '0' ] && { echo -ne "\n  ${bold}安装 awk ...${normal} "     | tee -a $Outputs  ; apt-get install -y gawk >> $Outputs 2>&1 ; echo | tee -a $Outputs
 which awk  >> $Outputs 2>&1 ; [ $? -ne '0' ] && { echo -e  "\n  ${red}错误${bold} 安装 awk 失败！${normal}" | tee -a $Outputs  ; exit_1 ; } ; }
 
-which gcc  >> $Outputs 2>&1 ; [ $? -ne '0' ] && { echo -ne "\n  ${bold}安装 gcc ...${normal} "     | tee -a $Outputs  ; apt-get install -y gcc  >> $Outputs 2>&1 ; echo | tee -a $Outputs
-which gcc  >> $Outputs 2>&1 ; [ $? -ne '0' ] && { echo -e  "\n  ${red}错误${bold} 安装 gcc 失败！${normal}" | tee -a $Outputs  ; exit_1 ; } ; }
+dpkg -l | grep build-essential -q || { echo -ne "\n  ${bold}安装 build-essential ...${normal} " | tee -a $Outputs  ; apt-get install -y build-essential >> $Outputs 2>&1 ; echo | tee -a $Outputs
+dpkg -l | grep build-essential -q || { echo -e  "\n  ${red}错误${bold} 安装 build-essential 失败！${normal}" | tee -a $Outputs ; exit_1 ; } ; }
 
 gcc_ver=$(gcc --version | grep -Eo '[0-9]+\.[0-9]+\.[0-9]+' | head -1)
-version_ge $gcc_ver 4.9 || { echo -e "\n  ${red}错误${bold} gcc 版本低于 4.9！${normal}" | tee -a $Outputs ; exit_1 ; }
-
-dpkg -l | grep build-essential -q || { echo -ne "\n  ${bold}安装 build-essential ...${normal} " | tee -a $Outputs  ; apt-get install -y build-essential >> $Outputs 2>&1 ; echo | tee -a $Outputs
-dpkg -l | grep build-essential -q || { echo -e  "\n  ${red}错误${bold} 安装 build-essential 失败！${normal}" | tee -a $Outputs ; exit_1 ; } ; } ; }
+version_ge $gcc_ver 4.9 || { echo -e "\n  ${red}错误${bold} gcc 版本低于 4.9！${normal}" | tee -a $Outputs ; exit_1 ; } ; }
 
 
 
