@@ -15,7 +15,7 @@
 # https://teddysun.com/489.html
 #
 #################################################################################
-ScriptVersion=3.0.1
+ScriptVersion=3.0.2
 ScriptDate=2019.06.30
 
 usage_guide() {
@@ -222,7 +222,7 @@ echo -e  "  ${green}(25) ${jiacu}卸载 所有内核（作死） "
 echo -e  "  ${green}(31) ${jiacu}安装 Xanmod "
 echo -e  "  ${green}(32) ${jiacu}安装 Xanmod，并删除其他内核 "
 echo -e  "  ${green}(33) ${jiacu}安装 liquorix "
-#echo -e  "  ${green}(39) ${jiacu}安装 HWE 内核"
+echo -e  "  ${green}(39) ${jiacu}安装 HWE 内核（Ubuntu 专用）"
 }
 echo -e  "  ${green}(41) ${jiacu}安装 锐速 / LotServer （MoeClub 脚本）"
 echo -e  "  ${green}(90) ${jiacu}重启 "
@@ -299,12 +299,12 @@ case $response in
         39) # 安装 HWE 内核
             [[ $CODENAME == xenial ]] && apt-get install -y linux-generic-hwe-16.04
             [[ $CODENAME == bionic ]] && apt-get install -y linux-generic-hwe-18.04 ;;
+        41) # MoeClub 脚本安装锐速
+            echo | bash <(wget -qO- https://github.com/MoeClub/lotServer/raw/master/Install.sh) install ;;
         90) # 重启
             reboot ;;
         96) # 切换 TCP 拥塞控制算法
             switch_cc ;;
-        97) # Built-in
-             ;;
         98) # 启用调试模式
             DeBUG=1 ; script_menu ; read_response ;;
     ""| 99) # 返回
