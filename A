@@ -15,8 +15,8 @@
 # https://teddysun.com/489.html
 #
 #################################################################################
-ScriptVersion=3.0.0
-ScriptDate=2019.06.14
+ScriptVersion=3.0.1
+ScriptDate=2019.06.30
 
 usage_guide() {
 bash <(wget -qO- https://github.com/Aniverse/TrCtrlProToc0l/raw/master/A)
@@ -203,7 +203,7 @@ echo -e  "  ${green}(01) ${jiacu}安装 原版 BBR "
 echo -e  "  ${green}(02) ${jiacu}安装 魔改 BBR / tsunami "
 echo -e  "  ${green}(03) ${jiacu}安装 魔改 BBR / nanqinlang "
 echo -e  "  ${green}(04) ${jiacu}安装 bbrplus "
-echo -e  "  ${green}(05) ${jiacu}安装 锐速 / LotServer（适配更高版本内核） "
+echo -e  "  ${green}(05) ${jiacu}安装 锐速 / LotServer "
 echo -e  "  ${green}(06) ${jiacu}安装 锐速 / ServerSpeeder "
 [[ $DeBUG == 1 ]] &&
 echo -e  "  ${green}(11) ${jiacu}安装 指定内核"
@@ -222,12 +222,14 @@ echo -e  "  ${green}(25) ${jiacu}卸载 所有内核（作死） "
 echo -e  "  ${green}(31) ${jiacu}安装 Xanmod "
 echo -e  "  ${green}(32) ${jiacu}安装 Xanmod，并删除其他内核 "
 echo -e  "  ${green}(33) ${jiacu}安装 liquorix "
-echo -e  "  ${green}(39) ${jiacu}安装 HWE 内核" ; }
+#echo -e  "  ${green}(39) ${jiacu}安装 HWE 内核"
+}
+echo -e  "  ${green}(41) ${jiacu}安装 锐速 / LotServer （MoeClub 脚本）"
 echo -e  "  ${green}(90) ${jiacu}重启 "
 [[ $DeBUG == 1 ]] && {
 echo -e  "  ${green}(96) ${jiacu}切换拥塞控制算法 "
-echo -e  "  ${green}(97) ${jiacu}Built-in "
-echo -e  "  ${green}(98) ${jiacu}调试 " ; }
+echo -e  "  ${green}(98) ${jiacu}调试 "
+}
 echo -e  "  ${green}(99) ${jiacu}返回 \n"
 rm -f /tmp/system_kernel_list ; }
 
@@ -302,7 +304,7 @@ case $response in
         96) # 切换 TCP 拥塞控制算法
             switch_cc ;;
         97) # Built-in
-            builtin ;;
+             ;;
         98) # 启用调试模式
             DeBUG=1 ; script_menu ; read_response ;;
     ""| 99) # 返回
@@ -1370,9 +1372,9 @@ function ask_continue2() { echo -ne "\n  ${bold}输入 ${bailvse}回车${jiacu} 
 
 
 function builtin() {
-wget -q https://github.com/Aniverse/TrCtrlProToc0l/raw/master/A -O /usr/local/bin/tcpcc
+[[ ! -x /usr/local/bin/tcpcc ]] &&
+wget -q https://github.com/Aniverse/TrCtrlProToc0l/raw/master/A -O /usr/local/bin/tcpcc &&
 chmod 755 /usr/local/bin/tcpcc
-bash /usr/local/bin/tcpcc
 }
 
 
@@ -1380,6 +1382,7 @@ bash /usr/local/bin/tcpcc
 
 #[[ $skip_emmm != 1 ]] && emmm
 cp -f /etc/default/grub "/etc/default/grub.bak.$(date "+%Y.%m.%d.%H.%M.%S")"
+builtin
 script_menu
 read_response
 cancel
