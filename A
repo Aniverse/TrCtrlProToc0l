@@ -15,7 +15,7 @@
 # https://teddysun.com/489.html
 #
 #################################################################################
-ScriptVersion=3.0.2
+ScriptVersion=3.0.3
 ScriptDate=2019.06.30
 
 usage_guide() {
@@ -212,7 +212,7 @@ echo -e  "  ${green}(13) ${jiacu}安装 ServerSpeeder 内核（4.4.0-47  或 3.1
 echo -e  "  ${green}(14) ${jiacu}安装 ServerSpeeder 内核（3.16.0-43 或 3.16.0-4）"
 echo -e  "  ${green}(15) ${jiacu}安装 LotServer     内核（4.15.0-30 或 4.9.0-4）"
 echo -e  "  ${green}(16) ${jiacu}安装 LotServer     内核（MoeClub 脚本）"
-echo -e  "  ${green}(17) ${jiacu}安装 4.14.91-bbrplus 内核"
+echo -e  "  ${green}(17) ${jiacu}安装 4.14.129-bbrplus 内核"
 echo -e  "  ${green}(21) ${jiacu}卸载 BBR "
 echo -e  "  ${green}(22) ${jiacu}卸载 锐速 "
 echo -e  "  ${green}(23) ${jiacu}卸载 多余内核 "
@@ -269,7 +269,7 @@ case $response in
         16) # 安装 LotServer 支持的内核（支持 Ubuntu 14.04/16.04/18.04，Debian 7/8/9）
             Debian_Kernel.sh ;;
         17) # 安装 bbrplus 内核
-            bbr_plus_kernel_4_14_91 ;;
+            bbr_plus_kernel_4_14 ;;
         21) # 卸载 BBR
             bbr_uninstall ;;
         22) # 卸载 锐速
@@ -393,10 +393,10 @@ fi ; }
 
 #S4# 安装 BBR Plus
 function bbr_plus_install() {
-if [[ $running_kernel == "4.14.91-bbrplus" ]]; then
+if [[ $running_kernel == "4.14.129-bbrplus" ]]; then
     enable_bbr bbrplus
     if [[ ` lsmod | grep bbrplus ` ]]; then echo -e "\n  ${bold}已开启 ${green}bbrplus${jiacu} ...${normal}\n"
-    else echo -e "\n  ${bold}${red}错误 ${green}bbrplus${jiacu} 开启失败！考虑装 4.14.91 内核试试？${normal}\n" ; exit_1 ; fi
+    else echo -e "\n  ${bold}${red}错误 ${green}bbrplus${jiacu} 开启失败！考虑装 4.14.129 内核试试？${normal}\n" ; exit_1 ; fi
 elif [[ $BBRPKernel == "${green}是${jiacu}" ]]; then
     echo -e "\n  ${bold}或许当前内核已支持 ${green}bbrplus${jiacu}，实际上能不能装上我也不知道 ...${normal} "
     check_headers
@@ -404,13 +404,13 @@ elif [[ $BBRPKernel == "${green}是${jiacu}" ]]; then
     bash <(wget --no-check-certificate -qO- https://raw.githubusercontent.com/Aniverse/TrCtrlProToc0l/master/compile_tcp_cc.sh) bbrplus >> $Outputs 2>&1
     enable_bbr bbrplus
     if [[ ` lsmod | grep bbrplus ` ]]; then echo -e "\n  ${bold}已开启 ${green}bbrplus${jiacu} ...${normal}\n"
-    else echo -e "\n  ${bold}${red}错误 ${green}bbrplus${jiacu} 开启失败！考虑装 4.14.91 内核试试？${normal}\n" ; exit_1 ; fi
+    else echo -e "\n  ${bold}${red}错误 ${green}bbrplus${jiacu} 开启失败！考虑装 4.14.129 内核试试？${normal}\n" ; exit_1 ; fi
 else
     ask_continue2
     online_ubuntu_bbr_firmware
     check_essential
-    kernel_version=4.14.91
-    bbr_plus_kernel_4_14_91
+    kernel_version=4.14.129
+    bbr_plus_kernel_4_14
     delete_other_kernel
   # bbr_plus_autoinstall # 其实那个内核里已经带了编译好的……
     enable_bbr bbrplus
@@ -987,14 +987,15 @@ update_grub ; }
 
 
 
-# 安装 4.14.91 内核（For BBR Plus）
+# 安装 4.14-bbrplus 内核（For BBR Plus）
 # https://github.com/chiakge/Linux-NetSpeed/blob/master/tcp.sh
-function bbr_plus_kernel_4_14_91() {
-echo -ne "\n  ${bold}安装 4.14.91 内核及其头文件 ... ${normal} " | tee -a $Outputs ; echo >> $Outputs
-wget --no-check-certificate -qNO 1.deb http://raw.githubusercontent.com/chiakge/Linux-NetSpeed/master/bbrplus/debian-ubuntu/x64/linux-image-4.14.91.deb
-wget --no-check-certificate -qNO 2.deb http://raw.githubusercontent.com/chiakge/Linux-NetSpeed/master/bbrplus/debian-ubuntu/x64/linux-headers-4.14.91.deb
-dpkg -i [12].deb >> $Outputs 2>&1 || { echo -e "\n  ${bold}${red}错误${jiacu} 安装 内核 失败！${normal}" ; exit_1 ; }
-rm -rf [12].deb ; echo
+function bbr_plus_kernel_4_14() {
+echo -ne "\n  ${bold}安装 4.14.129 内核及其头文件 ... ${normal} " | tee -a $Outputs ; echo >> $Outputs
+wget --no-check-certificate -qNO linux-image-4.14.129.deb   https://github.com/cx9208/Linux-NetSpeed/raw/master/bbrplus/debian-ubuntu/x64/linux-image-4.14.129-bbrplus.deb
+wget --no-check-certificate -qNO linux-headers-4.14.129.deb https://github.com/cx9208/Linux-NetSpeed/raw/master/bbrplus/debian-ubuntu/x64/linux-headers-4.14.129-bbrplus.deb
+dpkg -i linux-image-4.14.129.deb >> $Outputs 2>&1 || { echo -e "\n  ${bold}${red}错误${jiacu} 安装 内核 失败！${normal}" ; exit_1 ; }
+dpkg -i linux-headers-4.14.129.deb >> $Outputs 2>&1 || { echo -e "\n  ${bold}${red}错误${jiacu} 安装 内核 失败！${normal}" ; exit_1 ; }
+rm -rf linux-*-4.14.129.deb ; echo
 update_grub ; }
 
 
