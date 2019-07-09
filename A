@@ -15,8 +15,8 @@
 # https://teddysun.com/489.html
 #
 #################################################################################
-ScriptVersion=3.0.3
-ScriptDate=2019.06.30
+ScriptVersion=3.0.4
+ScriptDate=2019.07.09
 
 usage_guide() {
 bash <(wget -qO- https://github.com/Aniverse/TrCtrlProToc0l/raw/master/A)
@@ -153,9 +153,10 @@ ls /lib/modules/$(uname -r)/kernel/net/ipv4 2>/dev/null | grep -q bbr && bbr_exi
 
 kernel_vvv=$(uname -r | cut -d- -f1)
 if version_ge $kernel_vvv 4.9  ; then BBRKernel="${green}是${jiacu}" ; else BBRKernel="${red}否${jiacu}" ; fi
-if version_ge $kernel_vvv 4.9.3 && ! version_ge $kernel_vvv 5.1 ; then YKKernel="${green}是${jiacu}"  ; else YKKernel="${red}否${jiacu}" ; fi
-if version_ge $kernel_vvv 4.9.3  && ! version_ge $kernel_vvv 5.1 ; then NQLKernel="${green}是${jiacu}" ; else NQLKernel="${red}否${jiacu}" ; fi
-if version_ge $kernel_vvv 4.14  && ! version_ge $kernel_vvv 5.1 ; then BBRPKernel="${green}是${jiacu}" ; else BBRPKernel="${red}否${jiacu}" ; fi
+if version_ge $kernel_vvv 4.9.3 && ! version_ge $kernel_vvv 5.3 ; then YKKernel="${green}是${jiacu}"  ; else YKKernel="${red}否${jiacu}" ; fi
+if version_ge $kernel_vvv 4.9.3  && ! version_ge $kernel_vvv 5.3 ; then NQLKernel="${green}是${jiacu}" ; else NQLKernel="${red}否${jiacu}" ; fi
+if version_ge $kernel_vvv 4.14  && ! version_ge $kernel_vvv 5.1 ; then BBRPKernel="${green}是${jiacu}"
+elif version_ge $kernel_vvv 5.1 ; then BBRPKernel="${green}无需 bbrplus${jiacu}" ; else BBRPKernel="${red}否${jiacu}" ; fi
 
 # 检查 锐速 与 BBR 是否已启用
 [[ ` ps aux | grep appex | grep -v grep ` ]] && SSrunning="${green}是${jiacu}" || SSrunning="${red}否${jiacu}"
@@ -649,7 +650,7 @@ apt-get autoremove -y
 function xanmod_apt_install() {
 echo 'deb http://deb.xanmod.org releases main' | tee /etc/apt/sources.list.d/xanmod-kernel.list
 wget -qO- http://deb.xanmod.org/gpg.key | apt-key add -
-kernel_version=5.1
+kernel_version=5.2
 apt-get update
 apt-get install -y linux-xanmod ; }
 
@@ -669,14 +670,6 @@ apt-get install -y linux-xanmod-lts ; }
 
 
 function xanmod_dpkg_install() {
-kernel_version=4.12.14-xanmod15
-kernel_version=4.14.90-xanmod54
-kernel_version=4.15.13-xanmod12
-kernel_version=4.16.12-xanmod11
-kernel_version=4.17.14-xanmod9
-kernel_version=4.18.16-xanmod9
-kernel_version=4.20.12-xanmod7
-kernel_version=5.0.13-xanmod8
 wget https://github.com/Aniverse/inexistence/raw/files/linux.kernel/xanmod/linux-headers-$kernel_version.deb
 wget https://github.com/Aniverse/inexistence/raw/files/linux.kernel/xanmod/linux-image-$kernel_version.deb
 dpkg -i linux-image-$kernel_version.deb 
@@ -695,35 +688,37 @@ online_ubuntu_bbr_firmware
 # https://xanmod.org/
 
 if   [[ $XanmodVer == 4.12 ]]; then
-     kernel_version=4.12.14
-     wget https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/4.12/linux-image-4.12.14-xanmod15_1.170920_amd64.deb
-     wget https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/4.12/linux-headers-4.12.14-xanmod15_1.170920_amd64.deb
-     dpkg -i linux-image*.deb ; dpkg -i linux-headers*.deb
+     kernel_version=4.12.14-xanmod15
+     xanmod_dpkg_install
+elif [[ $XanmodVer == 4.14 ]]; then # To be added
+     kernel_version=4.14.90-xanmod54
+     xanmod_dpkg_install
 elif [[ $XanmodVer == 4.15 ]]; then
-     kernel_version=4.15.13
-     wget https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/4.15/linux-image-4.15.13-xanmod12_1.180325_amd64.deb
-     wget https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/4.15/linux-headers-4.15.13-xanmod12_1.180325_amd64.deb
-     dpkg -i linux-image*.deb ; dpkg -i linux-headers*.deb
+     kernel_version=4.15.13-xanmod12
+     xanmod_dpkg_install
 elif [[ $XanmodVer == 4.16 ]]; then
-     kernel_version=4.16.12
-     wget https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/4.16/linux-image-4.16.12-xanmod11_2.180526_amd64.deb
-     wget https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/4.16/linux-headers-4.16.12-xanmod11_2.180526_amd64.deb
-     dpkg -i linux-image*.deb ; dpkg -i linux-headers*.deb
+     kernel_version=4.16.12-xanmod11
+     xanmod_dpkg_install
 elif [[ $XanmodVer == 4.17 ]]; then
-     kernel_version=4.17.14
-     wget https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/4.17/linux-image-4.17.14-xanmod9_1.180810_amd64.deb
-     wget https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/4.17/linux-headers-4.17.14-xanmod9_1.180810_amd64.deb
-     dpkg -i linux-image*.deb ; dpkg -i linux-headers*.deb
+     kernel_version=4.17.14-xanmod9
+     xanmod_dpkg_install
 elif [[ $XanmodVer == 4.18 ]]; then
-     kernel_version=4.18.16
-     wget https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/4.18/linux-image-4.18.16-xanmod9_1.181020_amd64.deb
-     wget https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Xanmod/4.18/linux-headers-4.18.16-xanmod9_1.181020_amd64.deb
-     dpkg -i linux-image*.deb ; dpkg -i linux-headers*.deb
-# 4.19 是 LTS，以后再说
-elif [[ $XanmodVer == 4.20 ]]; then # 还没加上
+     kernel_version=4.18.16-xanmod9
+     xanmod_dpkg_install
+elif [[ $XanmodVer == 4.19 ]]; then # 4.19 是 LTS，以后再说
+     echo -e "Use lts instead" ; exit 1 
+     kernel_version=4.19.57-xanmod29
+     xanmod_dpkg_install
+elif [[ $XanmodVer == 4.20 ]]; then
      kernel_version=4.20.12-xanmod7
      xanmod_dpkg_install
-elif [[ $XanmodVer == apt ]]; then
+elif [[ $XanmodVer == 5.0 ]]; then
+     kernel_version=5.0.13-xanmod8
+     xanmod_dpkg_install
+elif [[ $XanmodVer == 5.1 ]]; then # To be added
+     kernel_version=5.1.16-xanmod10
+     xanmod_dpkg_install
+elif [[ $XanmodVer == apt ]]; then # Current 5.2.0
      kernel_version=xanmod ; xanmod_apt_install
 elif [[ $XanmodVer == lts ]]; then
      kernel_version=xanmod ; xanmod_apt_install_lts
