@@ -15,8 +15,8 @@
 # https://teddysun.com/489.html
 #
 #################################################################################
-ScriptVersion=3.0.4
-ScriptDate=2019.07.09
+ScriptVersion=3.0.6
+ScriptDate=2019.07.16
 
 usage_guide() {
 bash <(wget -qO- https://github.com/Aniverse/TrCtrlProToc0l/raw/master/A)
@@ -508,9 +508,12 @@ case $input in
     "" ) echo ;;
     *  ) echo ; read_response ;;
 esac
-tcp_control=` sysctl net.ipv4.tcp_available_congestion_control | awk '{print $3}' `
-if [[ $tcp_control =~ ("nanqinlang"|"tsunami"|"bbr"|"bbr_powered") ]]; then bbrname=$tcp_control ; disable_bbr ; echo -e "  ${bold}${red}已卸载 BBR，但安装的内核仍保留${normal}\n"
-else echo -e "  ${bold}${red}错误 ${jiacu}你并没有使用本脚本安装 BBR ...${normal}\n" ; read_response ; fi ; }
+if [[ $tcp_control =~ (nanqinlang|tsunami|bbr|bbr_powered|bbrplus) ]]; then
+    bbrname=$tcp_control ; disable_bbr ; echo -e "  ${bold}${red}已卸载 BBR，但安装的内核仍保留${normal}\n"
+else
+    echo -e "  ${bold}${red}错误 ${jiacu}你并没有使用本脚本安装 BBR ...${normal}\n"
+    read_response
+fi ; }
 
 
 
@@ -573,7 +576,7 @@ echo ; }
 
 #S16# MoeClub 版换 LotServer 内核脚本
 function Debian_Kernel.sh() {
-# bash <(wget -qO- https://moeclub.org/attachment/LinuxShell/Debian_Kernel.sh)
+# bash <( wget -qO- https://moeclub.org/attachment/LinuxShell/Debian_Kernel.sh )
 
 deb_issue="$(cat /etc/issue)"
 deb_relese="$(echo $deb_issue |grep -io 'Ubuntu\|Debian' |sed -r 's/(.*)/\L\1/')"
