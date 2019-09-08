@@ -15,7 +15,7 @@
 # https://teddysun.com/489.html
 #
 #################################################################################
-ScriptVersion=3.0.9
+ScriptVersion=3.1.0
 ScriptDate=2019.09.08
 
 usage_guide() {
@@ -814,7 +814,7 @@ wget --no-check-certificate -q https://raw.githubusercontent.com/0oVicero0/serve
 cat > /etc/TrCtrlProToc0l/TCP-auto-install.sh <<EOF
 #!/bin/bash
 sleep 10
-echo | bash /etc/TrCtrlProToc0l/ss.sh 'install'
+echo | bash /etc/TrCtrlProToc0l/ss.sh install
 EOF
 auto_install_via_systemd ; }
 
@@ -1376,7 +1376,13 @@ EOF
 chmod +x /etc/TrCtrlProToc0l/TCP-auto-install.sh
 
 systemctl daemon-reload
-systemctl enable tcpauto.service > /dev/null 2>&1 ; }
+systemctl enable tcpauto.service >> $Outputs 2>&1
+
+# debug
+echo -e "\ncat /etc/TrCtrlProToc0l/TCP-auto-install.sh\n" >> $Outputs
+ls /etc/TrCtrlProToc0l >> $Outputs 2>&1
+cat /etc/TrCtrlProToc0l/TCP-auto-install.sh >> $Outputs 2>&1
+}
 
 # 询问是否继续（重启版）
 function ask_continue2() { echo -ne "\n  ${bold}输入 ${bailvse}回车${jiacu} 继续，完成后会直接重启；按 ${baihongse}Ctrl+C${jiacu} 退出${normal} " ; read response ; echo ; }
