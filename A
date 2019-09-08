@@ -15,7 +15,7 @@
 # https://teddysun.com/489.html
 #
 #################################################################################
-ScriptVersion=3.0.7
+ScriptVersion=3.0.8
 ScriptDate=2019.09.08
 
 usage_guide() {
@@ -551,21 +551,35 @@ echo ; }
 #S14# 安装 特定锐速内核（New）
 function ss_kernel_install_v2() {
 if   [[ $CODENAME == bionic ]]; then
-     echo -e "\n  ${bold}安装 ${green}4.15.0-30${jiacu} 内核 ...${normal} \n"
-     kernel_version=4.15.0-30-generic
-     apt-get update
-     apt-get -y install linux-image-$kernel_version linux-headers-$kernel_version linux-modules-$kernel_version linux-modules-extra-$kernel_version
-     kernel_version=4.15.0-30
-     dpkg -l | grep linux-image-$kernel_version -q || { echo -e "\n  ${bold}${red}错误${jiacu} 安装 内核 失败！${normal}" | tee -a $Outputs ; exit_1 ; }
+    echo -e "\n  ${bold}安装 ${green}4.15.0-30${jiacu} 内核 ...${normal} \n"
+    kernel_version=4.15.0-30-generic
+    apt-get update >> $Outputs 2>&1
+    apt-get -y install linux-image-$kernel_version linux-headers-$kernel_version linux-modules-$kernel_version linux-modules-extra-$kernel_version
+    kernel_version=4.15.0-30
+    dpkg -l | grep linux-image-$kernel_version -q || { echo -e "\n  ${bold}${red}错误${jiacu} 安装 内核 失败！${normal}" | tee -a $Outputs ; exit_1 ; }
 elif [[ $CODENAME == stretch ]]; then
-     echo -e "\n  ${bold}安装 ${green}4.9.0-4${jiacu} 内核 ...${normal} \n"
-     kernel_version=4.9.0-4-amd64
-     apt-get update
-     apt-get -y install linux-image-$kernel_version linux-headers-$kernel_version
-     kernel_version=4.9.0-4
-     dpkg -l | grep linux-image-$kernel_version -q || { echo -e "\n  ${bold}${red}错误${jiacu} 安装 内核 失败！${normal}" | tee -a $Outputs ; exit_1 ; }
+    echo -e "\n  ${bold}安装 ${green}4.9.0-4${jiacu} 内核 ...${normal} \n"
+    kernel_version=4.9.0-4-amd64
+    apt-get update >> $Outputs 2>&1
+    apt-get -y install linux-image-$kernel_version linux-headers-$kernel_version >> $Outputs 2>&1
+    kernel_version=4.9.0-4
+    dpkg -l | grep linux-image-$kernel_version -q || { echo -e "\n  ${bold}${red}错误${jiacu} 安装 内核 失败！${normal}" | tee -a $Outputs ; exit_1 ; }
+elif [[ $CODENAME == buster ]]; then
+    if ! grep "debian stretch main" /etc/apt/sources.list -q; then
+        echo "deb http://deb.debian.org/debian stretch main" >> /etc/apt/sources.list
+        echo 'Acquire::Check-Valid-Until 0;' > /etc/apt/apt.conf.d/10-no-check-valid-until
+        echo -ne "\n  ${bold}添加源，更新 ...  ${normal}" | tee -a $Outputs ; echo >> $Outputs
+        apt-get update >> $Outputs 2>&1
+    fi
+    echo -e "\n  ${bold}安装 ${green}4.9.0-4${jiacu} 内核 ...${normal} \n"
+    kernel_version=4.9.0-4-amd64
+    apt-get update >> $Outputs 2>&1
+    apt-get -y install linux-image-$kernel_version linux-headers-$kernel_version >> $Outputs 2>&1
+    kernel_version=4.9.0-4
+    dpkg -l | grep linux-image-$kernel_version -q || { echo -e "\n  ${bold}${red}错误${jiacu} 安装 内核 失败！${normal}" | tee -a $Outputs ; exit_1 ; }
+    sed -i '$d' /etc/apt/sources.list
 else
-     echo -e "\n  ${red}注意${jiacu} 本功能只支持 Debian 9／Ubuntu 18.04 ！${normal}"
+     echo -e "\n  ${red}注意${jiacu} 本功能只支持 Debian 9／10／Ubuntu 18.04 ！${normal}"
      exit_1
 fi
 echo ; }
