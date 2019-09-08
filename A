@@ -15,8 +15,8 @@
 # https://teddysun.com/489.html
 #
 #################################################################################
-ScriptVersion=3.0.6
-ScriptDate=2019.07.16
+ScriptVersion=3.0.7
+ScriptDate=2019.09.08
 
 usage_guide() {
 bash <(wget -qO- https://github.com/Aniverse/TrCtrlProToc0l/raw/master/A)
@@ -511,7 +511,7 @@ esac
 if [[ $tcp_control =~ (nanqinlang|tsunami|bbr|bbr_powered|bbrplus) ]]; then
     bbrname=$tcp_control ; disable_bbr ; echo -e "  ${bold}${red}已卸载 BBR，但安装的内核仍保留${normal}\n"
 else
-    echo -e "  ${bold}${red}错误 ${jiacu}你并没有使用本脚本安装 BBR ...${normal}\n"
+    echo -e "  ${bold}${red}错误 ${jiacu}我看你好像没装 bbr 吧？ ...${normal}\n"
     read_response
 fi ; }
 
@@ -800,6 +800,7 @@ mkdir -p /etc/TrCtrlProToc0l
 wget --no-check-certificate -q https://raw.githubusercontent.com/0oVicero0/serverSpeeder_Install/master/appex.sh -O /etc/TrCtrlProToc0l/ss.sh
 cat > /etc/TrCtrlProToc0l/TCP-auto-install.sh <<EOF
 #!/bin/bash
+sleep 10
 echo | bash /etc/TrCtrlProToc0l/ss.sh 'install'
 EOF
 auto_install_via_systemd ; }
@@ -810,6 +811,7 @@ mkdir -p /etc/TrCtrlProToc0l
 wget --no-check-certificate -q https://github.com/Aniverse/lotServer/raw/master/lotServer.sh -O /etc/TrCtrlProToc0l/ls.sh
 cat > /etc/TrCtrlProToc0l/TCP-auto-install.sh <<EOF
 #!/bin/bash
+sleep 10
 bash /etc/TrCtrlProToc0l/ls.sh install
 EOF
 auto_install_via_systemd ; }
