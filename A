@@ -15,7 +15,7 @@
 # https://teddysun.com/489.html
 #
 #################################################################################
-ScriptVersion=3.1.1
+ScriptVersion=3.1.2
 ScriptDate=2019.12.19
 
 usage_guide() {
@@ -259,7 +259,8 @@ case $response in
         11) # 安装 最新内核
             selected_kernel_install ;;
         12) # 安装 4.11.12 内核
-            online_ubuntu_bbr_firmware ; bbr_kernel_4_11_12 ;;
+            # online_ubuntu_bbr_firmware
+			bbr_kernel_4_11_12 ;;
         13) # 安装 特定的 ServerSpeeder 内核（4.4.0-47／3.12.1）
             ss_kernel_install ;;
         14) # 安装 ServerSpeeder 内核（3.16.0-43／3.16.0-4）
@@ -334,7 +335,7 @@ if [[ $BBRKernel == "${green}是${jiacu}" ]]; then
 else
     ask_continue2
   # echo -e "  ${bold}当前内核不支持 BBR，先安装 ${green}4.11.12${jiacu} 内核以启用 BBR ...${normal} "
-    online_ubuntu_bbr_firmware
+  # online_ubuntu_bbr_firmware
     bbr_kernel_4_11_12
     enable_bbr
     [[ ! $DeBUG == 1 ]] && echo -ne "\n  ${bold}即将重启系统，重启后 ${green}BBR${jiacu} 将会启动 ... ${normal}\n" && reboot
@@ -355,7 +356,7 @@ if [[ $YKKernel == "${green}是${jiacu}" ]]; then
 else
     ask_continue2
   # echo -e "  ${bold}当前内核不支持 ${green}Yankee${jiacu} 版魔改 BBR，先安装 ${green}4.11.12${jiacu} 内核 ...${normal} "
-    online_ubuntu_bbr_firmware
+  # online_ubuntu_bbr_firmware
     check_essential
     bbr_kernel_4_11_12
     kernel_version=4.11.12 && delete_other_kernel
@@ -379,7 +380,7 @@ if [[ $NQLKernel == "${green}是${jiacu}" ]]; then
 else
     ask_continue2
   # echo -e "  ${bold}当前内核不支持 ${green}南琴浪${jiacu} 版魔改 BBR，先安装 ${green}4.11.12${jiacu} 内核 ...${normal} "
-    online_ubuntu_bbr_firmware
+  # online_ubuntu_bbr_firmware
     check_essential
     bbr_kernel_4_11_12
     kernel_version=4.11.12 && delete_other_kernel
@@ -408,7 +409,7 @@ elif [[ $BBRPKernel == "${green}是${jiacu}" ]]; then
     else echo -e "\n  ${bold}${red}错误 ${green}bbrplus${jiacu} 开启失败！考虑装 4.14.129 内核试试？${normal}\n" ; exit_1 ; fi
 else
     ask_continue2
-    online_ubuntu_bbr_firmware
+  # online_ubuntu_bbr_firmware
     check_essential
     kernel_version=4.14.129
     bbr_plus_kernel_4_14
@@ -699,7 +700,7 @@ function xanmod_install() {
 
 echo ; read -ep "  ${bold}输入你要安装的 Xanmod 版本： ${normal}" XanmodVer ; echo
 
-online_ubuntu_bbr_firmware
+# online_ubuntu_bbr_firmware
 # https://sourceforge.net/projects/xanmod/files/releases/
 # https://xanmod.org/
 
@@ -749,7 +750,7 @@ fi
 # 安装 liquorix
 function liquorix_install() {
 
-online_ubuntu_bbr_firmware
+# online_ubuntu_bbr_firmware
 
 if   [[ $DISTRO == ubuntu ]]; then
      [[ ! `command -v add-apt-repository`  ]] && apt-get install -y software-properties-common
