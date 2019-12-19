@@ -15,7 +15,7 @@
 # https://teddysun.com/489.html
 #
 #################################################################################
-ScriptVersion=3.1.2
+ScriptVersion=3.1.3
 ScriptDate=2019.12.19
 
 usage_guide() {
@@ -750,23 +750,29 @@ fi
 # 安装 liquorix
 function liquorix_install() {
 
+# https://liquorix.net/#install
 # online_ubuntu_bbr_firmware
 
 if   [[ $DISTRO == ubuntu ]]; then
      [[ ! `command -v add-apt-repository`  ]] && apt-get install -y software-properties-common
-     add-apt-repository ppa:damentz/liquorix
+     add-apt-repository -y ppa:damentz/liquorix
 elif [[ $DISTRO == debian ]]; then
      [[ ! $(command -v curl)  ]] && apt-get install -y curl
      [ $(dpkg-query -W -f='${Status}' apt-transport-https 2>/dev/null | grep -c "ok installed") -eq 0 ] && apt-get install -y apt-transport-https
-     echo "deb http://liquorix.net/debian sid main
-deb-src http://liquorix.net/debian sid main" > /etc/apt/sources.list.d/liquorix.list
+     echo "
+deb http://liquorix.net/debian $CODENAME main
+deb-src http://liquorix.net/debian $CODENAME main
+# deb http://mirror.unit193.net/liquorix $CODENAME main
+# deb-src http://mirror.unit193.net/liquorix $CODENAME main
+# deb http://liquorix.net/debian sid main
+# deb-src http://liquorix.net/debian sid main" > /etc/apt/sources.list.d/liquorix.list
      curl https://liquorix.net/linux-liquorix.pub | apt-key add -
 fi
 
 apt-get update
-apt-get install linux-image-liquorix-amd64 linux-headers-liquorix-amd64 -y ; }
+apt-get install -y --allow-unauthenticated linux-image-liquorix-amd64 linux-headers-liquorix-amd64 ; }
 
-
+# 
 
 
 
