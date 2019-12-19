@@ -15,8 +15,8 @@
 # https://teddysun.com/489.html
 #
 #################################################################################
-ScriptVersion=3.1.0
-ScriptDate=2019.09.08
+ScriptVersion=3.1.1
+ScriptDate=2019.12.19
 
 usage_guide() {
 bash <(wget -qO- https://github.com/Aniverse/TrCtrlProToc0l/raw/master/A)
@@ -665,10 +665,10 @@ apt-get autoremove -y
 # 安装 xanmod，apt
 function xanmod_apt_install() {
 echo 'deb http://deb.xanmod.org releases main' | tee /etc/apt/sources.list.d/xanmod-kernel.list
-wget -qO- http://deb.xanmod.org/gpg.key | apt-key add -
-kernel_version=5.2
+wget -4 -qO - https://dl.xanmod.org/gpg.key | apt-key add -
+kernel_version=5.4
 apt-get update
-apt-get install -y linux-xanmod ; }
+apt-get install -y --allow-unauthenticated linux-xanmod ; }
 
 
 
@@ -680,8 +680,8 @@ dpkg -i xanmod-repository.deb
 # apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 86F7D09EE734E623
 kernel_version=4.19
 apt-get update
-apt-get install -y linux-firmware intel-microcode iucode-tool
-apt-get install -y linux-xanmod-lts ; }
+apt-get install -y --allow-unauthenticated linux-firmware intel-microcode iucode-tool
+apt-get install -y --allow-unauthenticated linux-xanmod-lts ; }
 
 
 
