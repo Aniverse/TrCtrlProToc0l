@@ -15,8 +15,8 @@
 # https://teddysun.com/489.html
 #
 #################################################################################
-ScriptVersion=3.1.3
-ScriptDate=2019.12.19
+ScriptVersion=3.1.4
+ScriptDate=2020.01.01
 
 usage_guide() {
 bash <(wget -qO- https://github.com/Aniverse/TrCtrlProToc0l/raw/master/A)
@@ -549,6 +549,22 @@ echo ; }
 
 
 
+
+function ss_kernel_install_stretch_add_repo() {
+    echo 'Acquire::Check-Valid-Until 0;' > /etc/apt/apt.conf.d/10-no-check-valid-until
+    cat << EOF > /etc/apt/sources.list.d/stretch.old.list 
+deb http://snapshot.debian.org/archive/debian/20171224T175424Z/ stretch main non-free contrib
+deb http://snapshot.debian.org/archive/debian-security/20171224T175424Z/ stretch/updates main non-free contrib
+deb-src http://snapshot.debian.org/archive/debian/20171224T175424Z/ stretch main non-free contrib
+deb-src http://snapshot.debian.org/archive/debian-security/20171224T175424Z/ stretch/updates main non-free contrib
+EOF
+}
+
+
+
+
+
+
 #S14# 安装 特定锐速内核（New）
 function ss_kernel_install_v2() {
 if   [[ $CODENAME == bionic ]]; then
@@ -561,17 +577,14 @@ if   [[ $CODENAME == bionic ]]; then
 elif [[ $CODENAME == stretch ]]; then
     echo -e "\n  ${bold}安装 ${green}4.9.0-4${jiacu} 内核 ...${normal} \n"
     kernel_version=4.9.0-4-amd64
+    ss_kernel_install_stretch_add_repo
     apt-get update >> $Outputs 2>&1
     apt-get -y install linux-image-$kernel_version linux-headers-$kernel_version >> $Outputs 2>&1
     kernel_version=4.9.0-4
     dpkg -l | grep linux-image-$kernel_version -q || { echo -e "\n  ${bold}${red}错误${jiacu} 安装 内核 失败！${normal}" | tee -a $Outputs ; exit_1 ; }
 elif [[ $CODENAME == buster ]]; then
-    if ! grep "deb http://deb.debian.org/debian-security stretch/updates main" /etc/apt/sources.list -q; then
-        echo "deb http://deb.debian.org/debian stretch main" >> /etc/apt/sources.list
-        echo "deb http://deb.debian.org/debian-security stretch/updates main" >> /etc/apt/sources.list
-        echo -ne "\n  ${bold}添加源，更新 ...  ${normal}" | tee -a $Outputs ; echo >> $Outputs
-        apt-get update >> $Outputs 2>&1
-    fi
+    ss_kernel_install_stretch_add_repo
+    apt-get update >> $Outputs 2>&1
     echo -e "\n  ${bold}安装 ${green}4.9.0-4${jiacu} 内核 ...${normal} \n"
     kernel_version=4.9.0-4-amd64
     apt-get -y --no-install-recommends install linux-image-$kernel_version linux-headers-$kernel_version >> $Outputs 2>&1
