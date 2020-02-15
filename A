@@ -997,6 +997,16 @@ fi ; }
 
 # 安装 4.11.12 的内核（For BBR）
 function bbr_kernel_4_11_12() {
+[[ $CODENAME == buster ]] && { 
+echo -ne "\n  ${bold}需要安装相关依赖以安装内核，先更新系统源 ...${normal} " | tee -a $Outputs
+echo >> $Outputs
+apt-get update >> $Outputs 2>&1
+echo | tee -a $Outputs
+echo -ne "\n  ${bold}修复可能存在的依赖问题 ...${normal} " | tee -a $Outputs
+echo >> $Outputs
+apt-get install -f -y >> $Outputs 2>&1
+echo | tee -a $Outputs
+apt-get install -y multiarch-support >> $Outputs 2>&1 ; }
 if [[ $CODENAME =~ (stretch|buster) ]]; then
     [[ ! `dpkg -l | grep libssl1.0.0` ]] && {
     echo -ne "\n  ${bold}安装 libssl1.0.0 ...${normal} " | tee -a $Outputs
@@ -1052,7 +1062,8 @@ apt-get update >> $Outputs 2>&1
 echo | tee -a $Outputs
 echo -ne "\n  ${bold}修复可能存在的依赖问题 ...${normal} " | tee -a $Outputs
 apt-get install -f -y >> $Outputs 2>&1
-echo | tee -a $Outputs ; }
+echo | tee -a $Outputs
+apt-get install -y multiarch-support >> $Outputs 2>&1 ; }
 
 [[ ! `dpkg -l | grep libelf-dev` ]] && { echo -ne "\n  ${bold}安装 libelf-dev ...${normal} " | tee -a $Outputs ; apt-get install -y libelf1 libelf-dev >> $Outputs 2>&1 ; echo | tee -a $Outputs
 [[ ! `dpkg -l | grep libelf-dev` ]] && { echo -e  "\n  ${red}错误${bold} 安装 libelf-dev 失败！${normal}" | tee -a $Outputs ; exit_1 ; } ; }
@@ -1182,9 +1193,10 @@ echo | tee -a $Outputs
 echo -ne "\n  ${bold}修复可能存在的依赖问题 ...${normal} " | tee -a $Outputs
 echo >> $Outputs
 apt-get install -f -y >> $Outputs 2>&1
-echo | tee -a $Outputs ; }
+echo | tee -a $Outputs
+[[ $CODENAME == buster ]] && apt-get install -y multiarch-support >> $Outputs 2>&1 ; }
 
-if [[ $CODENAME == stretch ]]; then
+if [[ $CODENAME =~ (stretch|buster) ]]; then
     [[ ! `dpkg -l | grep libssl1.0.0` ]] && {
     echo -ne "\n  ${bold}安装 libssl1.0.0 ...${normal} " | tee -a $Outputs
     echo >> $Outputs
