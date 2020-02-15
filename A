@@ -997,6 +997,7 @@ fi ; }
 
 # 安装 4.11.12 的内核（For BBR）
 function bbr_kernel_4_11_12() {
+[[ $CODENAME == buster ]] && apt-get install -y multiarch-support
 if [[ $CODENAME =~ (stretch|buster) ]]; then
     [[ ! `dpkg -l | grep libssl1.0.0` ]] && {
     echo -ne "\n  ${bold}安装 libssl1.0.0 ...${normal} " | tee -a $Outputs
@@ -1184,7 +1185,8 @@ echo >> $Outputs
 apt-get install -f -y >> $Outputs 2>&1
 echo | tee -a $Outputs ; }
 
-if [[ $CODENAME == stretch ]]; then
+[[ $CODENAME == buster ]] && apt-get install -y multiarch-support
+if [[ $CODENAME =~ (stretch|buster) ]]; then
     [[ ! `dpkg -l | grep libssl1.0.0` ]] && {
     echo -ne "\n  ${bold}安装 libssl1.0.0 ...${normal} " | tee -a $Outputs
     echo >> $Outputs
