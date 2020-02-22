@@ -15,10 +15,11 @@
 # https://teddysun.com/489.html
 #
 #################################################################################
-ScriptVersion=3.1.4
-ScriptDate=2020.01.01
+ScriptVersion=3.1.5
+ScriptDate=2020.01.20
 
 usage_guide() {
+bash <(wget -qO- https://git.io/AccTCP)
 bash <(wget -qO- https://github.com/Aniverse/TrCtrlProToc0l/raw/master/A)
 bash <(curl -s https://raw.githubusercontent.com/Aniverse/TrCtrlProToc0l/master/A)
 }
@@ -962,12 +963,17 @@ update_grub ; }
 
 
 # 内核匹配的情况下安装锐速
-function serverspeeder_install() { wget --no-check-certificate -qO /tmp/appex.sh "https://raw.githubusercontent.com/0oVicero0/serverSpeeder_Install/master/appex.sh" && echo | bash /tmp/appex.sh 'install'
-ps aux | grep -v grep | grep -q appex && echo -e "\n${bold}${green}锐速已在运行 ...${normal}\n" || echo -e "\n${bold}${red}锐速尚未在运行，可能安装失败！${normal}\n" ; }
+function serverspeeder_install() {
+    ifconfig >/dev/null 2>&1
+    [ $? -gt '1' ] && apt-get install -y net-tools
+    wget --no-check-certificate -qO /tmp/appex.sh "https://raw.githubusercontent.com/0oVicero0/serverSpeeder_Install/master/appex.sh" && echo | bash /tmp/appex.sh 'install'
+    ps aux | grep -v grep | grep -q appex && echo -e "\n${bold}${green}锐速已在运行 ...${normal}\n" || echo -e "\n${bold}${red}锐速尚未在运行，可能安装失败！${normal}\n"
+}
 
 function lotserver_install() {
-bash <(wget --no-check-certificate -qO- https://github.com/Aniverse/lotServer/raw/master/lotServer.sh) install
-ps aux | grep -v grep | grep -q appex && echo -e "\n${bold}${green}锐速已在运行 ...${normal}\n" || echo -e "\n${bold}${red}锐速尚未在运行，可能安装失败！${normal}\n" ; }
+    bash <(wget --no-check-certificate -qO- https://github.com/Aniverse/lotServer/raw/master/lotServer.sh) install
+    ps aux | grep -v grep | grep -q appex && echo -e "\n${bold}${green}锐速已在运行 ...${normal}\n" || echo -e "\n${bold}${red}锐速尚未在运行，可能安装失败！${normal}\n"
+}
 
 
 
