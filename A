@@ -15,8 +15,8 @@
 # https://teddysun.com/489.html
 #
 #################################################################################
-ScriptVersion=3.1.5
-ScriptDate=2020.01.20
+ScriptVersion=3.1.6
+ScriptDate=2020.01.22
 
 usage_guide() {
 bash <(wget -qO- https://git.io/AccTCP)
@@ -47,6 +47,8 @@ function isInternalIpAddress() { echo $1 | grep -qE '(192\.168\.((\d{1,2})|(1\d{
 function exit_1() { rm -rf /etc/TrCtrlProToc0l /tmp/system_kernel_list /log/kernel_tobe_del_list $HOME/1 ; exit 1 ; }
 
 #  -----------------------------------------------------------------------------------
+
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:$PATH
 
 mkdir -p /etc/TrCtrlProToc0l /log/tcp ; cd /etc/TrCtrlProToc0l
 
@@ -681,8 +683,9 @@ apt-get autoremove -y
 function xanmod_apt_install() {
 echo 'deb http://deb.xanmod.org releases main' | tee /etc/apt/sources.list.d/xanmod-kernel.list
 wget -4 -qO - https://dl.xanmod.org/gpg.key | apt-key add -
-kernel_version=5.4
+kernel_version=5.5
 apt-get update
+apt-get install -y --allow-unauthenticated linux-firmware intel-microcode iucode-tool
 apt-get install -y --allow-unauthenticated linux-xanmod ; }
 
 
