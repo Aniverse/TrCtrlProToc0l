@@ -15,7 +15,7 @@
 # https://teddysun.com/489.html
 #
 #################################################################################
-ScriptVersion=3.2.1
+ScriptVersion=3.2.3
 ScriptDate=2020.03.18
 
 usage_guide() {
@@ -604,75 +604,73 @@ echo ; }
 
 
 
-#S16# MoeClub 版换 LotServer 内核脚本
-function Debian_Kernel.sh() {
+#S16# 换 LotServer 内核脚本（MoeClub 版）
 # bash <( wget -qO- https://moeclub.org/attachment/LinuxShell/Debian_Kernel.sh )
+function Debian_Kernel.sh() {
+    deb_issue="$(cat /etc/issue)"
+    deb_relese="$(echo $deb_issue |grep -io 'Ubuntu\|Debian' |sed -r 's/(.*)/\L\1/')"
+    os_ver="$(dpkg --print-architecture)"
+    [ -n "$os_ver" ] || exit 1
 
-deb_issue="$(cat /etc/issue)"
-deb_relese="$(echo $deb_issue |grep -io 'Ubuntu\|Debian' |sed -r 's/(.*)/\L\1/')"
-os_ver="$(dpkg --print-architecture)"
-[ -n "$os_ver" ] || exit 1
+    if [ "$deb_relese" == 'ubuntu' ]; then
+        deb_ver="$(echo $deb_issue |grep -o '[0-9]*\.[0-9]*' |head -n1)"
+        if [ "$deb_ver" == "14.04" ]; then
+            item="3.16.0-77-generic" && ver='trusty'
+        elif [ "$deb_ver" == "16.04" ]; then
+            item="4.8.0-36-generic" && ver='xenial'
+        elif [ "$deb_ver" == "18.04" ]; then
+            item="4.15.0-30-generic" && ver='bionic'
+        else
+            exit 1
+        fi
+        url='archive.ubuntu.com'
+        urls='security.ubuntu.com'
+    elif [ "$deb_relese" == 'debian' ]; then
+        deb_ver="$(echo $deb_issue |grep -o '[0-9]*' |head -n1)"
+        if [ "$deb_ver" == "7" ]; then
+            item="3.2.0-4-${os_ver}" && ver='wheezy' && url='archive.debian.org' && urls='archive.debian.org'
+        elif [ "$deb_ver" == "8" ]; then
+            item="3.16.0-4-${os_ver}" && ver='jessie' && url='archive.debian.org' && urls='deb.debian.org'
+        elif [ "$deb_ver" == "9" ]; then
+            item="4.9.0-4-${os_ver}" && ver='stretch' && url='deb.debian.org' && urls='deb.debian.org'
+        else
+            exit 1
+        fi
+    else
+        exit 1
+    fi
 
-if [ "$deb_relese" == 'ubuntu' ]; then
-  deb_ver="$(echo $deb_issue |grep -o '[0-9]*\.[0-9]*' |head -n1)"
-  if [ "$deb_ver" == "14.04" ]; then
-    item="3.16.0-77-generic" && ver='trusty'
-  elif [ "$deb_ver" == "16.04" ]; then
-    item="4.8.0-36-generic" && ver='xenial'
-  elif [ "$deb_ver" == "18.04" ]; then
-    item="4.15.0-30-generic" && ver='bionic'
-  else
-    exit 1
-  fi
-  url='archive.ubuntu.com'
-  urls='security.ubuntu.com'
-elif [ "$deb_relese" == 'debian' ]; then
-  deb_ver="$(echo $deb_issue |grep -o '[0-9]*' |head -n1)"
-  if [ "$deb_ver" == "7" ]; then
-    item="3.2.0-4-${os_ver}" && ver='wheezy' && url='archive.debian.org' && urls='archive.debian.org'
-  elif [ "$deb_ver" == "8" ]; then
-    item="3.16.0-4-${os_ver}" && ver='jessie' && url='archive.debian.org' && urls='deb.debian.org'
-  elif [ "$deb_ver" == "9" ]; then
-    item="4.9.0-4-${os_ver}" && ver='stretch' && url='deb.debian.org' && urls='deb.debian.org'
-  else
-    exit 1
-  fi
-else
-  exit 1
-fi
+    [ -n "$item" ] && [ -n "$urls" ] && [ -n "$url" ] && [ -n "$ver" ] || exit 1
 
-[ -n "$item" ] && [ -n "$urls" ] && [ -n "$url" ] && [ -n "$ver" ] || exit 1
+    if [ "$deb_relese" == 'ubuntu' ]; then
+        echo "deb http://${url}/${deb_relese} ${ver} main restricted universe multiverse" >/etc/apt/sources.list
+        echo "deb http://${url}/${deb_relese} ${ver}-updates main restricted universe multiverse" >>/etc/apt/sources.list
+        echo "deb http://${url}/${deb_relese} ${ver}-backports main restricted universe multiverse" >>/etc/apt/sources.list
+        echo "deb http://${urls}/${deb_relese} ${ver}-security main restricted universe multiverse" >>/etc/apt/sources.list
+    elif [ "$deb_relese" == 'debian' ]; then
+        echo "deb http://${url}/${deb_relese} ${ver} main" >/etc/apt/sources.list
+        echo "deb-src http://${url}/${deb_relese} ${ver} main" >>/etc/apt/sources.list
+        echo "deb http://${urls}/${deb_relese}-security ${ver}/updates main" >>/etc/apt/sources.list
+        echo "deb-src http://${urls}/${deb_relese}-security ${ver}/updates main" >>/etc/apt/sources.list
+    fi
 
-if [ "$deb_relese" == 'ubuntu' ]; then
-  echo "deb http://${url}/${deb_relese} ${ver} main restricted universe multiverse" >/etc/apt/sources.list
-  echo "deb http://${url}/${deb_relese} ${ver}-updates main restricted universe multiverse" >>/etc/apt/sources.list
-  echo "deb http://${url}/${deb_relese} ${ver}-backports main restricted universe multiverse" >>/etc/apt/sources.list
-  echo "deb http://${urls}/${deb_relese} ${ver}-security main restricted universe multiverse" >>/etc/apt/sources.list
-elif [ "$deb_relese" == 'debian' ]; then
-  echo "deb http://${url}/${deb_relese} ${ver} main" >/etc/apt/sources.list
-  echo "deb-src http://${url}/${deb_relese} ${ver} main" >>/etc/apt/sources.list
-  echo "deb http://${urls}/${deb_relese}-security ${ver}/updates main" >>/etc/apt/sources.list
-  echo "deb-src http://${urls}/${deb_relese}-security ${ver}/updates main" >>/etc/apt/sources.list
-fi
-
-apt-get update
-apt-get install --no-install-recommends -y linux-image-${item} linux-headers-${item} # 这里加个 headers
-while true; do
-  List_Kernel="$(dpkg -l |grep 'linux-image\|linux-modules\|linux-generic\|linux-headers' |grep -v "$item")"
-  Num_Kernel="$(echo "$List_Kernel" |sed '/^$/d' |wc -l)"
-  [ "$Num_Kernel" -eq "0" ] && break
-  for kernel in `echo "$List_Kernel" |awk '{print $2}'`
-    do
-      if [ -f "/var/lib/dpkg/info/${kernel}.prerm" ]; then
-        sed -i 's/linux-check-removal/#linux-check-removal/' "/var/lib/dpkg/info/${kernel}.prerm"
-        sed -i 's/uname -r/echo purge/' "/var/lib/dpkg/info/${kernel}.prerm"
-      fi
-      dpkg --force-depends --purge "$kernel"
-    done
-  done
-apt-get autoremove -y
-[ -d '/var/lib/apt/lists' ] && find /var/lib/apt/lists -type f -delete
-
+    apt-get update
+    apt-get install --no-install-recommends -y linux-image-${item} linux-headers-${item} # 这里加个 headers
+    while true; do
+        List_Kernel="$(dpkg -l |grep 'linux-image\|linux-modules\|linux-generic\|linux-headers' |grep -v "$item")"
+        Num_Kernel="$(echo "$List_Kernel" |sed '/^$/d' |wc -l)"
+        [ "$Num_Kernel" -eq "0" ] && break
+        for kernel in `echo "$List_Kernel" |awk '{print $2}'`
+            do
+                if [ -f "/var/lib/dpkg/info/${kernel}.prerm" ]; then
+                    sed -i 's/linux-check-removal/#linux-check-removal/' "/var/lib/dpkg/info/${kernel}.prerm"
+                    sed -i 's/uname -r/echo purge/' "/var/lib/dpkg/info/${kernel}.prerm"
+                fi
+                dpkg --force-depends --purge "$kernel"
+            done
+        done
+    apt-get autoremove -y
+    [ -d '/var/lib/apt/lists' ] && find /var/lib/apt/lists -type f -delete
 }
 
 
@@ -681,83 +679,89 @@ apt-get autoremove -y
 
 # 安装 xanmod，apt
 function xanmod_apt_install() {
-echo 'deb http://deb.xanmod.org releases main' | tee /etc/apt/sources.list.d/xanmod-kernel.list
-wget -4 -qO - https://dl.xanmod.org/gpg.key | apt-key add -
-kernel_version=5.5
-apt-get update
-apt-get install -y --allow-unauthenticated linux-firmware intel-microcode iucode-tool
-apt-get install -y --allow-unauthenticated linux-xanmod ; }
-
-
-
-# 安装 xanmod，apt，rt
-function xanmod_apt_install_rt() {
-wget https://dl.xanmod.org/xanmod-repository.deb -O xanmod-repository.deb -4
-dpkg -i xanmod-repository.deb
-# apt-get install -y gnupg
-# apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 86F7D09EE734E623
-kernel_version=4.19
-apt-get update
-apt-get install -y --allow-unauthenticated linux-firmware intel-microcode iucode-tool
-apt-get install -y --allow-unauthenticated linux-xanmod-rt ; }
-
-
-
-function xanmod_dpkg_install() {
-wget https://github.com/Aniverse/inexistence/raw/files/linux.kernel/xanmod/linux-headers-$kernel_version.deb
-wget https://github.com/Aniverse/inexistence/raw/files/linux.kernel/xanmod/linux-image-$kernel_version.deb
-dpkg -i linux-image-$kernel_version.deb 
-dpkg -i linux-headers-$kernel_version.deb
+    echo 'deb http://deb.xanmod.org releases main' | tee /etc/apt/sources.list.d/xanmod-kernel.list
+    wget -4 -qO - https://dl.xanmod.org/gpg.key | apt-key add -
+    apt-get update
+    apt-get install -y --allow-unauthenticated linux-firmware intel-microcode iucode-tool
 }
 
 
 
+function xanmod_dpkg_install() {
+    wget https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Linux.Kernel/Xanmod/linux-headers-$kernel_version.deb
+    wget https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Linux.Kernel/Xanmod/linux--image-$kernel_version.deb
+    dpkg -i linux-image-$kernel_version.deb 
+    dpkg -i linux-headers-$kernel_version.deb
+}
+
+
 #S31# 安装 xanmod
 function xanmod_install() {
+    echo ; read -ep "  ${bold}输入你要安装的 Xanmod 版本： ${normal}" XanmodVer ; echo
+    
+    # online_ubuntu_bbr_firmware
+    # https://sourceforge.net/projects/xanmod/files/releases/
+    # https://xanmod.org/
 
-echo ; read -ep "  ${bold}输入你要安装的 Xanmod 版本： ${normal}" XanmodVer ; echo
-
-# online_ubuntu_bbr_firmware
-# https://sourceforge.net/projects/xanmod/files/releases/
-# https://xanmod.org/
-
-if   [[ $XanmodVer == 4.12 ]]; then
-     kernel_version=4.12.14-xanmod15
-     xanmod_dpkg_install
-elif [[ $XanmodVer == 4.14 ]]; then # To be added
-     kernel_version=4.14.90-xanmod54
-     xanmod_dpkg_install
-elif [[ $XanmodVer == 4.15 ]]; then
-     kernel_version=4.15.13-xanmod12
-     xanmod_dpkg_install
-elif [[ $XanmodVer == 4.16 ]]; then
-     kernel_version=4.16.12-xanmod11
-     xanmod_dpkg_install
-elif [[ $XanmodVer == 4.17 ]]; then
-     kernel_version=4.17.14-xanmod9
-     xanmod_dpkg_install
-elif [[ $XanmodVer == 4.18 ]]; then
-     kernel_version=4.18.16-xanmod9
-     xanmod_dpkg_install
-elif [[ $XanmodVer == 4.19 ]]; then # 4.19 是 LTS，以后再说
-     echo -e "Use lts instead" ; exit 1 
-     kernel_version=4.19.57-xanmod29
-     xanmod_dpkg_install
-elif [[ $XanmodVer == 4.20 ]]; then
-     kernel_version=4.20.12-xanmod7
-     xanmod_dpkg_install
-elif [[ $XanmodVer == 5.0 ]]; then
-     kernel_version=5.0.13-xanmod8
-     xanmod_dpkg_install
-elif [[ $XanmodVer == 5.1 ]]; then # To be added
-     kernel_version=5.1.16-xanmod10
-     xanmod_dpkg_install
-elif [[ $XanmodVer == apt ]]; then # Current 5.5
-     kernel_version=xanmod ; xanmod_apt_install
-elif [[ $XanmodVer == rt ]]; then
-     kernel_version=xanmod ; xanmod_apt_install_rt
-fi
-
+    if   [[ $XanmodVer == 4.12 ]]; then # 2017-09-20
+        kernel_version=4.12.14-xanmod15
+        xanmod_dpkg_install
+    elif [[ $XanmodVer == 4.14 ]]; then # 2018-12-22
+        kernel_version=4.14.90-xanmod54
+        xanmod_dpkg_install
+    elif [[ $XanmodVer == 4.15 ]]; then # 2018-03-25
+        kernel_version=4.15.13-xanmod12
+        xanmod_dpkg_install
+    elif [[ $XanmodVer == 4.16 ]]; then # 2018-05-28
+        kernel_version=4.16.12-xanmod11
+        xanmod_dpkg_install
+    elif [[ $XanmodVer == 4.17 ]]; then # 2018-08-10
+        kernel_version=4.17.14-xanmod9
+        xanmod_dpkg_install
+    elif [[ $XanmodVer == 4.18 ]]; then # 2018-10-20
+        kernel_version=4.18.16-xanmod9
+        xanmod_dpkg_install
+    elif [[ $XanmodVer == 4.19 ]]; then # 2018-12-24
+        kernel_version=4.19.102-xanmod49
+        xanmod_dpkg_install
+    elif [[ $XanmodVer == 4.20 ]]; then # 2019-02-03
+        kernel_version=4.20.12-xanmod7
+        xanmod_dpkg_install
+    elif [[ $XanmodVer == 5.0 ]]; then # 2019-05-05
+        kernel_version=5.0.13-xanmod8
+        xanmod_dpkg_install
+    elif [[ $XanmodVer == 5.1 ]]; then # 2019-07-03
+        kernel_version=5.1.16-xanmod10
+        xanmod_dpkg_install
+    elif [[ $XanmodVer == 5.2 ]]; then # 2019-09-16
+        kernel_version=5.2.15-xanmod11
+        xanmod_dpkg_install
+    elif [[ $XanmodVer == 5.3 ]]; then # 2019-11-25
+        kernel_version=5.3.13-xanmod9
+        xanmod_dpkg_install
+    elif [[ $XanmodVer == 5.4 ]]; then # Use LTS
+        kernel_version=5.4.10086
+        xanmod_dpkg_install
+    elif [[ $XanmodVer == 5.5 ]]; then # Use current
+        kernel_version=5.5.XXXX
+        xanmod_dpkg_install
+    elif [[ $XanmodVer == 5.6 ]]; then # Not yet
+        kernel_version=5.6.XXXX
+        xanmod_dpkg_install
+    elif [[ $XanmodVer == apt ]]; then # Current 5.5
+        # kernel_version=xanmod
+        xanmod_apt_install
+        kernel_version=5.5
+        apt-get install -y --allow-unauthenticated linux-xanmod
+    elif [[ $XanmodVer == lts ]]; then # Current 5.4
+        xanmod_apt_install
+        kernel_version=5.5
+        apt-get install -y --allow-unauthenticated linux-xanmod-lts
+    elif [[ $XanmodVer == rt ]]; then  # Current 5.4
+        xanmod_apt_install
+        kernel_version=5.5
+        apt-get install -y --allow-unauthenticated linux-xanmod-rt
+    fi
 }
 
 
