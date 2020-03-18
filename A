@@ -15,7 +15,7 @@
 # https://teddysun.com/489.html
 #
 #################################################################################
-ScriptVersion=3.2.0
+ScriptVersion=3.2.1
 ScriptDate=2020.03.18
 
 usage_guide() {
@@ -1019,7 +1019,7 @@ apt-get install -y multiarch-support >> $Outputs 2>&1 ; }
 if [[ $CODENAME =~ (stretch|buster) ]]; then
     [[ ! `dpkg -l | grep libssl1.0.0` ]] && {
     echo -ne "\n  ${bold}安装 libssl1.0.0 ...${normal} " | tee -a $Outputs
-    wget --no-check-certificate https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Deb%20Package/Jessie/libssl1.0.0_1.0.1t-1+deb8u7_amd64.deb -O libssl1.0.deb >> $Outputs 2>&1
+    wget --no-check-certificate https://sourceforge.net/projects/aboxx/files/deb/libssl1.0.0_1.0.1t-1%2Bdeb8u7_amd64.deb/download -O libssl1.0.deb >> $Outputs 2>&1
     dpkg -i libssl1.0.deb >> $Outputs 2>&1
     rm -f libssl1.0.deb ; echo | tee -a $Outputs
     [[ ! `dpkg -l | grep libssl1.0.0` ]] && { echo -e "\n  ${red}错误${bold} 安装 libssl1.0.0 失败！${normal}" | tee -a $Outputs ; exit_1 ; } ; }
@@ -1080,7 +1080,7 @@ apt-get install -y multiarch-support >> $Outputs 2>&1 ; }
 if [[ $CODENAME =~ (stretch|buster) ]]; then
     [[ ! `dpkg -l | grep libssl1.0.0` ]] && {
     echo -ne "\n  ${bold}安装 libssl1.0.0 ...${normal} " | tee -a $Outputs
-    wget --no-check-certificate https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Deb%20Package/Jessie/libssl1.0.0_1.0.1t-1+deb8u7_amd64.deb -O libssl1.0.deb >> $Outputs 2>&1
+    wget --no-check-certificate https://sourceforge.net/projects/aboxx/files/deb/libssl1.0.0_1.0.1t-1%2Bdeb8u7_amd64.deb/download -O libssl1.0.deb >> $Outputs 2>&1
     dpkg -i libssl1.0.deb >> $Outputs 2>&1
     rm -f libssl1.0.deb ; echo | tee -a $Outputs
   # echo -e "\ndeb http://ftp.hk.debian.org/debian jessie main\c" >> /etc/apt/sources.list
@@ -1209,7 +1209,7 @@ if [[ $CODENAME =~ (stretch|buster) ]]; then
     [[ ! `dpkg -l | grep libssl1.0.0` ]] && {
     echo -ne "\n  ${bold}安装 libssl1.0.0 ...${normal} " | tee -a $Outputs
     echo >> $Outputs
-    wget --no-check-certificate https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Deb%20Package/Jessie/libssl1.0.0_1.0.1t-1+deb8u7_amd64.deb -O libssl1.0.deb >> $Outputs 2>&1
+    wget --no-check-certificate https://sourceforge.net/projects/aboxx/files/deb/libssl1.0.0_1.0.1t-1%2Bdeb8u7_amd64.deb/download -O libssl1.0.deb >> $Outputs 2>&1
     dpkg -i libssl1.0.deb >> $Outputs 2>&1
     rm -f libssl1.0.deb ; echo
     [[ ! `dpkg -l | grep libssl1.0.0` ]] && { echo -e "\n  ${red}错误${bold} 安装 libssl1.0.0 失败！${normal}" | tee -a $Outputs ; exit_1 ; } ; }
