@@ -15,8 +15,8 @@
 # https://teddysun.com/489.html
 #
 #################################################################################
-ScriptVersion=3.1.6
-ScriptDate=2020.01.22
+ScriptVersion=3.1.9
+ScriptDate=2020.03.09
 
 usage_guide() {
 bash <(wget -qO- https://git.io/AccTCP)
@@ -73,6 +73,7 @@ CODENAME=`  cat /etc/os-release | grep VERSION= | tr '[A-Z]' '[a-z]' | sed 's/\"
 [[ $DISTRO == ubuntu ]] && osversion=`  grep Ubuntu /etc/issue | head -1 | grep -oE  "[0-9.]+"  `
 [[ $DISTRO == debian ]] && osversion=`  cat /etc/debian_version  `
 [[ $CODENAME =~ (xenial|bionic|jessie|stretch|buster) ]] && SysSupport=1
+function version_ge(){ test "$(echo "$@" | tr " " "\n" | sort -rV | head -n 1)" == "$1" ; }
 
 #  -----------------------------------------------------------------------------------
 
@@ -149,7 +150,6 @@ MyKernel=$(wget --no-check-certificate -qO- "$SS_Kernel_url" |grep "$KNA/" |grep
 [[ -n $MyKernel ]] && SSKernel="${green}是${jiacu}"
 
 # 检查理论上内核是否支持原版 BBR（内核高于 4.9 也不一定就有 bbr）
-function version_ge(){ test "$(echo "$@" | tr " " "\n" | sort -rV | head -n 1)" == "$1" ; }
 # 2018.10.23 这个以后再拿去判断，现在懒得动了
 # 2019.04.25 也有的内核里这里没有 bbr
 ls /lib/modules/$(uname -r)/kernel/net/ipv4 2>/dev/null | grep -q bbr && bbr_exist=yes || bbr_exist=no
@@ -157,7 +157,7 @@ ls /lib/modules/$(uname -r)/kernel/net/ipv4 2>/dev/null | grep -q bbr && bbr_exi
 kernel_vvv=$(uname -r | cut -d- -f1)
 if version_ge $kernel_vvv 4.9  ; then BBRKernel="${green}是${jiacu}" ; else BBRKernel="${red}否${jiacu}" ; fi
 if version_ge $kernel_vvv 4.9.3 && ! version_ge $kernel_vvv 5.3 ; then YKKernel="${green}是${jiacu}"  ; else YKKernel="${red}否${jiacu}" ; fi
-if version_ge $kernel_vvv 4.9.3  && ! version_ge $kernel_vvv 5.3 ; then NQLKernel="${green}是${jiacu}" ; else NQLKernel="${red}否${jiacu}" ; fi
+if version_ge $kernel_vvv 4.9.3 && ! version_ge $kernel_vvv 5.3 ; then NQLKernel="${green}是${jiacu}" ; else NQLKernel="${red}否${jiacu}" ; fi
 if version_ge $kernel_vvv 4.14  && ! version_ge $kernel_vvv 5.1 ; then BBRPKernel="${green}是${jiacu}"
 elif version_ge $kernel_vvv 5.1 ; then BBRPKernel="${green}无需 bbrplus${jiacu}" ; else BBRPKernel="${red}否${jiacu}" ; fi
 
@@ -690,8 +690,8 @@ apt-get install -y --allow-unauthenticated linux-xanmod ; }
 
 
 
-# 安装 xanmod，apt，lts
-function xanmod_apt_install_lts() {
+# 安装 xanmod，apt，rt
+function xanmod_apt_install_rt() {
 wget https://dl.xanmod.org/xanmod-repository.deb -O xanmod-repository.deb -4
 dpkg -i xanmod-repository.deb
 # apt-get install -y gnupg
@@ -699,7 +699,7 @@ dpkg -i xanmod-repository.deb
 kernel_version=4.19
 apt-get update
 apt-get install -y --allow-unauthenticated linux-firmware intel-microcode iucode-tool
-apt-get install -y --allow-unauthenticated linux-xanmod-lts ; }
+apt-get install -y --allow-unauthenticated linux-xanmod-rt ; }
 
 
 
@@ -752,10 +752,10 @@ elif [[ $XanmodVer == 5.0 ]]; then
 elif [[ $XanmodVer == 5.1 ]]; then # To be added
      kernel_version=5.1.16-xanmod10
      xanmod_dpkg_install
-elif [[ $XanmodVer == apt ]]; then # Current 5.2.0
+elif [[ $XanmodVer == apt ]]; then # Current 5.5
      kernel_version=xanmod ; xanmod_apt_install
-elif [[ $XanmodVer == lts ]]; then
-     kernel_version=xanmod ; xanmod_apt_install_lts
+elif [[ $XanmodVer == rt ]]; then
+     kernel_version=xanmod ; xanmod_apt_install_rt
 fi
 
 }
