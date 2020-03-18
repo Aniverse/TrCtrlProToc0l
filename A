@@ -15,7 +15,7 @@
 # https://teddysun.com/489.html
 #
 #################################################################################
-ScriptVersion=3.2.3
+ScriptVersion=3.2.4
 ScriptDate=2020.03.18
 
 usage_guide() {
@@ -689,9 +689,10 @@ function xanmod_apt_install() {
 
 function xanmod_dpkg_install() {
     wget https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Linux.Kernel/Xanmod/linux-headers-$kernel_version.deb
-    wget https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Linux.Kernel/Xanmod/linux--image-$kernel_version.deb
+    wget https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Linux.Kernel/Xanmod/linux-image-$kernel_version.deb
     dpkg -i linux-image-$kernel_version.deb 
     dpkg -i linux-headers-$kernel_version.deb
+    rm -rf linux-image-$kernel_version.deb linux-headers-$kernel_version.deb
 }
 
 
