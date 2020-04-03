@@ -15,8 +15,8 @@
 # https://teddysun.com/489.html
 #
 #################################################################################
-ScriptVersion=3.2.5
-ScriptDate=2020.03.21
+ScriptVersion=3.2.6
+ScriptDate=2020.04.03
 
 usage_guide() {
 bash <(wget -qO- https://git.io/AccTCP)
@@ -1374,9 +1374,8 @@ update_grub ; }
 
 # 启用 /etc/rc.local
 function enable_rclocal() {
-
-[[ ! -f /etc/rc.local ]] &&
-cat << EOF >/etc/rc.local
+    if [[ ! -f /etc/rc.local ]]; then
+        cat << EOF >/etc/rc.local
 #!/bin/sh -e
 #
 # rc.local
@@ -1392,42 +1391,45 @@ cat << EOF >/etc/rc.local
 
 exit 0
 EOF
+    fi
+    chmod +x /etc/rc.local
+    systemctl start rc-local
+}
 
-chmod +x /etc/rc.local
-systemctl start rc-local ; }
 
 # 启用自动安装（systemd）
 function auto_install_via_systemd() {
-
-cat <<EOF > /etc/systemd/system/tcpauto.service
+    cat << EOF > /etc/systemd/system/tcpauto.service
 [Unit]
 Description=Setup
 After=network.target
 
 [Service]
 Type=oneshot
+ExecStartPre=$(which ls) -lA /etc/TrCtrlProToc0l
 ExecStart=/etc/TrCtrlProToc0l/TCP-auto-install.sh
 RemainAfterExit=true
 
 [Install]
 WantedBy=multi-user.target
 EOF
-
-cat << EOF >> /etc/TrCtrlProToc0l/TCP-auto-install.sh
+    cat << EOF >> /etc/TrCtrlProToc0l/TCP-auto-install.sh
 systemctl disable tcpauto.service
 rm -rf /etc/systemd/system/tcpauto.service /etc/TrCtrlProToc0l
 sleep 1
 EOF
-
-chmod +x /etc/TrCtrlProToc0l/TCP-auto-install.sh
-
-systemctl daemon-reload
-systemctl enable tcpauto.service >> $Outputs 2>&1
-
-# debug
-echo -e "\ncat /etc/TrCtrlProToc0l/TCP-auto-install.sh\n" >> $Outputs
-ls /etc/TrCtrlProToc0l >> $Outputs 2>&1
-cat /etc/TrCtrlProToc0l/TCP-auto-install.sh >> $Outputs 2>&1
+    chmod +x /etc/TrCtrlProToc0l/TCP-auto-install.sh
+    systemctl daemon-reload
+    systemctl enable tcpauto.service >> $Outputs 2>&1
+    # debug
+    printf "%-100s\n" "-" | sed 's/\s/-/g' >> $Outputs
+    echo -e "\nls -lA /etc/TrCtrlProToc0l\n" >> $Outputs
+    ls -lA /etc/TrCtrlProToc0l >> $Outputs 2>&1
+    printf "%-100s\n" "-" | sed 's/\s/-/g' >> $Outputs
+    echo -e "\ncat /etc/TrCtrlProToc0l/TCP-auto-install.sh\n" >> $Outputs
+    printf "%-100s\n" "-" | sed 's/\s/-/g' >> $Outputs
+    cat /etc/TrCtrlProToc0l/TCP-auto-install.sh >> $Outputs 2>&1
+    printf "%-100s\n" "-" | sed 's/\s/-/g' >> $Outputs
 }
 
 # 询问是否继续（重启版）
@@ -1438,9 +1440,10 @@ function ask_continue2() { echo -ne "\n  ${bold}输入 ${bailvse}回车${jiacu} 
 
 
 function builtin() {
-[[ ! -x /usr/local/bin/tcpcc ]] &&
-wget -q https://github.com/Aniverse/TrCtrlProToc0l/raw/master/A -O /usr/local/bin/tcpcc &&
-chmod 755 /usr/local/bin/tcpcc
+    if [[ ! -x /usr/local/bin/tcpcc ]]; then
+        wget -q https://github.com/Aniverse/TrCtrlProToc0l/raw/master/A -O /usr/local/bin/tcpcc &&
+        chmod 755 /usr/local/bin/tcpcc
+    fi
 }
 
 
