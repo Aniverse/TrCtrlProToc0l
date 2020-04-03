@@ -15,7 +15,7 @@
 # https://teddysun.com/489.html
 #
 #################################################################################
-ScriptVersion=3.2.6
+ScriptVersion=3.2.7
 ScriptDate=2020.04.03
 
 usage_guide() {
@@ -1406,7 +1406,6 @@ After=network.target
 
 [Service]
 Type=oneshot
-ExecStartPre=$(which ls) -lA /etc/TrCtrlProToc0l
 ExecStart=/etc/TrCtrlProToc0l/TCP-auto-install.sh
 RemainAfterExit=true
 
@@ -1424,6 +1423,7 @@ EOF
     # debug
     printf "%-100s\n" "-" | sed 's/\s/-/g' >> $Outputs
     echo -e "\nls -lA /etc/TrCtrlProToc0l\n" >> $Outputs
+    printf "%-100s\n" "-" | sed 's/\s/-/g' >> $Outputs
     ls -lA /etc/TrCtrlProToc0l >> $Outputs 2>&1
     printf "%-100s\n" "-" | sed 's/\s/-/g' >> $Outputs
     echo -e "\ncat /etc/TrCtrlProToc0l/TCP-auto-install.sh\n" >> $Outputs
