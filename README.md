@@ -12,7 +12,8 @@ bash <(curl -Ls https://git.io/AccTCP)
 or
 
 ```shell
-bash -c "$(wget --no-check-certificate -qO- https://github.com/Aniverse/TrCtrlProToc0l/raw/master/A)"
+wget --no-check-certificate -q https://github.com/Aniverse/TrCtrlProToc0l/raw/master/A
+bash A
 ```
 
 
@@ -21,24 +22,21 @@ bash -c "$(wget --no-check-certificate -qO- https://github.com/Aniverse/TrCtrlPr
 
 - **尽可能地减少交互，尽可能地傻瓜化**  
 
-  本脚本把重启后要执行的操作（安装锐速、编译魔改 bbr）放到一个临时的脚本中，并用 systemd 实现开机自动执行脚本，实现了当前运行内核无法直接安装锐速／bbr 的情况下更换内核重启后自动安装 锐速 / 魔改BBR，无需再次运行脚本    
+本脚本把重启后要执行的操作（安装锐速、编译魔改 bbr）放到一个临时的脚本中，并用 systemd 实现开机自动执行脚本，实现了当前运行内核无法直接安装锐速／bbr 的情况下更换内核重启后自动安装 锐速 / 魔改BBR，无需再次运行脚本  
 
-  此外，移除当前正在使用的内核时会碰到 `abort removing running kernel` 的 对话框，以及 Digital Ocean VPS 安装新内核时可能会出现 `what would you like to do about menu.list` 的对话框，本脚本使用了 `debconf-set-selections` 来避免这个交互   
+此外，移除当前正在使用的内核时会碰到 `abort removing running kernel` 的 对话框，以及 Digital Ocean VPS 安装新内核时可能会出现 `what would you like to do about menu.list` 的对话框，本脚本使用了 `debconf-set-selections` 来避免这个交互   
 
-  更进一步的无交互体验（比如说你连选项都不想输入的话）也可以做到，比如：
+更进一步的无交互体验（比如说你连选项都不想输入的话）也可以做到，比如：
 
-  ```
-  bash <(curl https://git.io/AccTCP) << EOF
-  5
-  
-  EOF
-  ```
+```
+echo 5 | bash <(curl -Ls https://git.io/AccTCP)
+```
 
-  这样子就是直接安装 LotServer，复制粘贴后不会有任何需要额外操作的地方，（换内核→删除其他内核→重启→重启后自动装锐速）这四个操作脚本会自动完成   
+这个命令就是直接执行脚本的选项 5，也就是安装 LotServer，复制粘贴后不会有任何需要额外操作的地方，（换内核→删除其他内核→重启→重启后自动装锐速）这四个操作脚本会自动完成   
 
 - **一键安装，一键切换** 
 
-  本脚本可以安装、卸载 锐速（ServerSpeeder 和 LotServer）、原版 bbr、Yankee 版魔改 bbr、南琴浪版魔改 bbr、bbrplus，并支持在以上任意的加速方案中一键切换  
+本脚本可以安装、卸载 锐速（ServerSpeeder 和 LotServer）、原版 bbr、Yankee 版魔改 bbr、南琴浪版魔改 bbr、bbrplus，并支持在以上任意的加速方案中一键切换  
 
 - **最新的内核适配**  
 
@@ -48,10 +46,10 @@ bash -c "$(wget --no-check-certificate -qO- https://github.com/Aniverse/TrCtrlPr
 
 - **不支持 CentOS**  
 
-  本脚本作为 `inexistence` 中 `mingling` 的延伸，我认没打算去适配原本 `inexistence` 就不支持的系统  
-  本来这类脚本也有很多，如有需要你可以去用那些适配范围更广的脚本  
+本脚本作为 `inexistence` 中 `mingling` 的延伸，我认没打算去适配原本 `inexistence` 就不支持的系统  
+本来这类脚本也有很多，如有需要你可以去用那些适配范围更广的脚本  
 
-  非 LTS 的 Ubuntu 系统（比如 Ubuntu 19.10）和比较老旧的系统（比如 Debian 7 和 Ubuntu 14.04）也不受支持
+非 LTS 的 Ubuntu 系统（比如 Ubuntu 19.10）和比较老旧的系统（比如 Debian 7 和 Ubuntu 14.04）也不受支持
 
 ## Known Issues
 
