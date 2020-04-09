@@ -15,13 +15,14 @@
 # https://teddysun.com/489.html
 #
 #################################################################################
-ScriptVersion=3.2.7
-ScriptDate=2020.04.03
+ScriptVersion=3.2.8
+ScriptDate=2020.04.09
 
 usage_guide() {
 bash <(wget -qO- https://git.io/AccTCP)
 bash <(wget -qO- https://github.com/Aniverse/TrCtrlProToc0l/raw/master/A)
 bash <(curl -s https://raw.githubusercontent.com/Aniverse/TrCtrlProToc0l/master/A)
+s=tcpcc;rm -f $s;nano $s       ;echo 5|bash tcpcc
 }
 #################################################################################
 
@@ -744,7 +745,7 @@ function xanmod_install() {
         kernel_version=5.4.10086
         xanmod_dpkg_install
     elif [[ $XanmodVer == 5.5 ]]; then # Use current
-        kernel_version=5.5.XXXX
+        kernel_version=5.5.15
         xanmod_dpkg_install
     elif [[ $XanmodVer == 5.6 ]]; then # Not yet
         kernel_version=5.6.XXXX
@@ -756,7 +757,7 @@ function xanmod_install() {
         apt-get install -y --allow-unauthenticated linux-xanmod
     elif [[ $XanmodVer == lts ]]; then # Current 5.4
         xanmod_apt_install
-        kernel_version=5.5
+        kernel_version=5.4
         apt-get install -y --allow-unauthenticated linux-xanmod-lts
     elif [[ $XanmodVer == rt ]]; then  # Current 5.4
         xanmod_apt_install
@@ -805,8 +806,8 @@ apt-get install -y --allow-unauthenticated linux-image-liquorix-amd64 linux-head
 
 # 重启后自动安装 BBR Plus
 function bbr_plus_autoinstall() {
-mkdir -p /etc/TrCtrlProToc0l
-cat > /etc/TrCtrlProToc0l/TCP-auto-install.sh <<EOF
+mkdir -p /root/TrCtrlProToc0l
+cat > /root/TrCtrlProToc0l/TCP-auto-install.sh <<EOF
 #!/bin/bash
 cd /etc/TrCtrlProToc0l
 bash <(wget --no-check-certificate -qO- https://raw.githubusercontent.com/Aniverse/TrCtrlProToc0l/master/compile_tcp_cc.sh) bbrplus
@@ -816,8 +817,8 @@ auto_install_via_systemd ; }
 
 # 重启后自动安装 南琴浪 版 BBR
 function bbr_nanqinlang_autoinstall() {
-mkdir -p /etc/TrCtrlProToc0l
-cat > /etc/TrCtrlProToc0l/TCP-auto-install.sh <<EOF
+mkdir -p /root/TrCtrlProToc0l
+cat > /root/TrCtrlProToc0l/TCP-auto-install.sh <<EOF
 #!/bin/bash
 cd /etc/TrCtrlProToc0l
 bash <(wget --no-check-certificate -qO- https://raw.githubusercontent.com/Aniverse/TrCtrlProToc0l/master/compile_tcp_cc.sh) nanqinlang
@@ -827,8 +828,8 @@ auto_install_via_systemd ; }
 
 # 重启后自动安装 Yankee 版 BBR
 function bbr_tsunami_autoinstall() {
-mkdir -p /etc/TrCtrlProToc0l
-cat > /etc/TrCtrlProToc0l/TCP-auto-install.sh <<EOF
+mkdir -p /root/TrCtrlProToc0l
+cat > /root/TrCtrlProToc0l/TCP-auto-install.sh <<EOF
 #!/bin/bash
 cd /etc/TrCtrlProToc0l
 bash <(wget --no-check-certificate -qO- https://raw.githubusercontent.com/Aniverse/TrCtrlProToc0l/master/compile_tcp_cc.sh) tsunami
@@ -838,23 +839,23 @@ auto_install_via_systemd ; }
 
 # 重启后自动安装锐速 ServerSpeeder
 function serverspeeder_autoinstall() {
-mkdir -p /etc/TrCtrlProToc0l
-wget --no-check-certificate -q https://raw.githubusercontent.com/0oVicero0/serverSpeeder_Install/master/appex.sh -O /etc/TrCtrlProToc0l/ss.sh
-cat > /etc/TrCtrlProToc0l/TCP-auto-install.sh <<EOF
+mkdir -p /root/TrCtrlProToc0l
+wget --no-check-certificate -q https://raw.githubusercontent.com/0oVicero0/serverSpeeder_Install/master/appex.sh -O /root/TrCtrlProToc0l/ss.sh
+cat > /root/TrCtrlProToc0l/TCP-auto-install.sh <<EOF
 #!/bin/bash
 sleep 10
-echo | bash /etc/TrCtrlProToc0l/ss.sh install
+echo | bash /root/TrCtrlProToc0l/ss.sh install
 EOF
 auto_install_via_systemd ; }
 
 # 重启后自动安装锐速 LotServer
 function lotserver_autoinstall() {
-mkdir -p /etc/TrCtrlProToc0l
-wget --no-check-certificate -q https://github.com/Aniverse/lotServer/raw/master/lotServer.sh -O /etc/TrCtrlProToc0l/ls.sh
-cat > /etc/TrCtrlProToc0l/TCP-auto-install.sh <<EOF
+mkdir -p /root/TrCtrlProToc0l
+wget --no-check-certificate -q https://github.com/Aniverse/lotServer/raw/master/lotServer.sh -O /root/TrCtrlProToc0l/ls.sh
+cat > /root/TrCtrlProToc0l/TCP-auto-install.sh <<EOF
 #!/bin/bash
 sleep 10
-bash /etc/TrCtrlProToc0l/ls.sh install
+bash /root/TrCtrlProToc0l/ls.sh install
 EOF
 auto_install_via_systemd ; }
 
@@ -1406,29 +1407,29 @@ After=network.target
 
 [Service]
 Type=oneshot
-ExecStart=/etc/TrCtrlProToc0l/TCP-auto-install.sh
+ExecStart=/root/TrCtrlProToc0l/TCP-auto-install.sh
 RemainAfterExit=true
 
 [Install]
 WantedBy=multi-user.target
 EOF
-    cat << EOF >> /etc/TrCtrlProToc0l/TCP-auto-install.sh
+    cat << EOF >> /root/TrCtrlProToc0l/TCP-auto-install.sh
 systemctl disable tcpauto.service
 rm -rf /etc/systemd/system/tcpauto.service /etc/TrCtrlProToc0l
 sleep 1
 EOF
-    chmod +x /etc/TrCtrlProToc0l/TCP-auto-install.sh
+    chmod +x /root/TrCtrlProToc0l/TCP-auto-install.sh
     systemctl daemon-reload
     systemctl enable tcpauto.service >> $Outputs 2>&1
     # debug
     printf "%-100s\n" "-" | sed 's/\s/-/g' >> $Outputs
-    echo -e "\nls -lA /etc/TrCtrlProToc0l\n" >> $Outputs
+    echo -e "\nls -lA /root/TrCtrlProToc0l\n" >> $Outputs
     printf "%-100s\n" "-" | sed 's/\s/-/g' >> $Outputs
-    ls -lA /etc/TrCtrlProToc0l >> $Outputs 2>&1
+    ls -lA /root/TrCtrlProToc0l >> $Outputs 2>&1
     printf "%-100s\n" "-" | sed 's/\s/-/g' >> $Outputs
-    echo -e "\ncat /etc/TrCtrlProToc0l/TCP-auto-install.sh\n" >> $Outputs
+    echo -e "\ncat /root/TrCtrlProToc0l/TCP-auto-install.sh\n" >> $Outputs
     printf "%-100s\n" "-" | sed 's/\s/-/g' >> $Outputs
-    cat /etc/TrCtrlProToc0l/TCP-auto-install.sh >> $Outputs 2>&1
+    cat /root/TrCtrlProToc0l/TCP-auto-install.sh >> $Outputs 2>&1
     printf "%-100s\n" "-" | sed 's/\s/-/g' >> $Outputs
 }
 
