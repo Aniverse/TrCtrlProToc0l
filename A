@@ -22,7 +22,7 @@ usage_guide() {
 bash <(wget -qO- https://git.io/AccTCP)
 bash <(wget -qO- https://github.com/Aniverse/TrCtrlProToc0l/raw/master/A)
 bash <(curl -s https://raw.githubusercontent.com/Aniverse/TrCtrlProToc0l/master/A)
-s=tcpcc;rm -f $s;nano $s       ;echo 5|bash tcpcc
+s=tcpcc;rm -f $s;nano $s       ;echo 5|  bash tcpcc
 }
 #################################################################################
 
@@ -63,8 +63,7 @@ export DEBIAN_FRONTEND=noninteractive
 SETUPDATE=$(date "+%Y.%m.%d.%H:%M:%S")
 export Outputs="/log/tcp/$SETUPDATE.log"
 SysSupport=0 ; DeBUG=0
-[[ $1 == -d ]] && DeBUG=1 && skip_emmm=1
-[[ $1 == -s ]] && skip_emmm=1
+[[ $1 == -d ]] && DeBUG=1
 
 KernelBit=$(getconf LONG_BIT)
 [[ $KernelBit == 32 ]] && KernelBitVer=i386 ; [[ $KernelBit == 64 ]] && KernelBitVer=amd64
@@ -87,17 +86,6 @@ function version_ge(){ test "$(echo "$@" | tr " " "\n" | sort -rV | head -n 1)" 
 [[ -z "$(dpkg -l |grep 'grub-')" ]] && echo -e "\n${red}错误${jiacu} 未发现 grub！${normal}" && exit_1
 [[ ! $SysSupport == 1 ]] && echo -e "\n${red}错误${jiacu} 不支持 Debian 8/9/10、Ubuntu 16.04/18.04 以外的系统！${normal}" && exit_1 ; }
 
-
-
-function emmm() { clear
-echo -e  "  ${bold}如果脚本出了问题，可以输入这条命令查看日志：${red}cat $Outputs${jiacu}"
-read -ep "  知道了没？   ${cyan}" input
-[[ $input != "知道了" ]] && {
-echo -e "\n  ${jiacu}你如果不知道的话那我也不知道脚本要怎么运行了 …… 我什么也不知道
-  不过你可以选择出门右转： ${yellow}${underline}bash <(wget -qO- https://github.com/chiakge/Linux-NetSpeed/raw/master/tcp.sh)${reset_underline}${normal}
-  ${bold}那就不关我事了${normal}\n"
-exit_1 ; }
-}
 
 
 
@@ -679,7 +667,7 @@ function Debian_Kernel.sh() {
 
 
 # 安装 xanmod，apt
-function xanmod_apt_install() {
+function xanmod_apt_install_preparation() {
     echo 'deb http://deb.xanmod.org releases main' | tee /etc/apt/sources.list.d/xanmod-kernel.list
     wget -4 -qO - https://dl.xanmod.org/gpg.key | apt-key add -
     apt-get update
@@ -741,28 +729,27 @@ function xanmod_install() {
     elif [[ $XanmodVer == 5.3 ]]; then # 2019-11-25
         kernel_version=5.3.13-xanmod9
         xanmod_dpkg_install
-    elif [[ $XanmodVer == 5.4 ]]; then # Use LTS
-        kernel_version=5.4.10086
-        xanmod_dpkg_install
+
+    # Use LTS instead of 5.4
+
     elif [[ $XanmodVer == 5.5 ]]; then # Use current
-        kernel_version=5.5.15
+        kernel_version=5.5.15-xanmod1
         xanmod_dpkg_install
-    elif [[ $XanmodVer == 5.6 ]]; then # Not yet
-        kernel_version=5.6.XXXX
-        xanmod_dpkg_install
+
+    # Use edge instead of 5.6
+
     elif [[ $XanmodVer == apt ]]; then # Current 5.5
-        # kernel_version=xanmod
-        xanmod_apt_install
+        xanmod_apt_install_preparation
         kernel_version=5.5
         apt-get install -y --allow-unauthenticated linux-xanmod
     elif [[ $XanmodVer == lts ]]; then # Current 5.4
-        xanmod_apt_install
+        xanmod_apt_install_preparation
         kernel_version=5.4
         apt-get install -y --allow-unauthenticated linux-xanmod-lts
-    elif [[ $XanmodVer == rt ]]; then  # Current 5.4
-        xanmod_apt_install
-        kernel_version=5.5
-        apt-get install -y --allow-unauthenticated linux-xanmod-rt
+    elif [[ $XanmodVer == edge ]]; then  # Current 5.6
+        xanmod_apt_install_preparation
+        kernel_version=5.6
+        apt-get install -y --allow-unauthenticated linux-xanmod-edge
     fi
 }
 
@@ -770,32 +757,28 @@ function xanmod_install() {
 
 
 
-# 安装 liquorix
-function liquorix_install() {
-
+#S33# 安装 liquorix
 # https://liquorix.net/#install
-# online_ubuntu_bbr_firmware
-
-if   [[ $DISTRO == ubuntu ]]; then
-     [[ ! `command -v add-apt-repository`  ]] && apt-get install -y software-properties-common
-     add-apt-repository -y ppa:damentz/liquorix
-elif [[ $DISTRO == debian ]]; then
-     [[ ! $(command -v curl)  ]] && apt-get install -y curl
-     [ $(dpkg-query -W -f='${Status}' apt-transport-https 2>/dev/null | grep -c "ok installed") -eq 0 ] && apt-get install -y apt-transport-https
-     echo "
+function liquorix_install() {
+    if [[ $DISTRO == ubuntu ]]; then
+        [[ ! `command -v add-apt-repository`  ]] && apt-get install -y software-properties-common
+        add-apt-repository -y ppa:damentz/liquorix
+    elif [[ $DISTRO == debian ]]; then
+        [[ ! $(command -v curl)  ]] && apt-get install -y curl
+        [ $(dpkg-query -W -f='${Status}' apt-transport-https 2>/dev/null | grep -c "ok installed") -eq 0 ] && apt-get install -y apt-transport-https
+        echo "
 deb http://liquorix.net/debian $CODENAME main
 deb-src http://liquorix.net/debian $CODENAME main
 # deb http://mirror.unit193.net/liquorix $CODENAME main
 # deb-src http://mirror.unit193.net/liquorix $CODENAME main
 # deb http://liquorix.net/debian sid main
 # deb-src http://liquorix.net/debian sid main" > /etc/apt/sources.list.d/liquorix.list
-     curl https://liquorix.net/linux-liquorix.pub | apt-key add -
-fi
+         curl https://liquorix.net/linux-liquorix.pub | apt-key add -
+    fi
+    apt-get update
+    apt-get install -y --allow-unauthenticated linux-image-liquorix-amd64 linux-headers-liquorix-amd64
+}
 
-apt-get update
-apt-get install -y --allow-unauthenticated linux-image-liquorix-amd64 linux-headers-liquorix-amd64 ; }
-
-# 
 
 
 
@@ -1450,7 +1433,6 @@ function builtin() {
 
 #######################################################################################################################
 
-#[[ $skip_emmm != 1 ]] && emmm
 cp -f /etc/default/grub "/etc/default/grub.bak.$(date "+%Y.%m.%d.%H.%M.%S")"
 builtin
 script_menu
