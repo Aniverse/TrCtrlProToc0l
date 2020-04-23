@@ -15,7 +15,7 @@
 # https://teddysun.com/489.html
 #
 #################################################################################
-ScriptVersion=3.3.0
+ScriptVersion=3.3.1
 ScriptDate=2020.04.23
 
 usage_guide() {
@@ -113,7 +113,7 @@ lbit=$( getconf LONG_BIT )
 # dpkg -l | grep "$running_kernel"
 
 tcp_c_name=$tcp_control
-[[ $tcp_control == cubic ]] && tcp_c_name="cubic (系统默认算法)(是否开启锐速与此项无关)"
+[[ $tcp_control == cubic ]] && tcp_c_name="cubic (系统默认算法)"
 [[ $tcp_control == bbr ]] && tcp_c_name="bbr (原版 BBR)"
 [[ $tcp_control == bbr_powered ]] && tcp_c_name="bbr_powered (用 Vicer 脚本安装的 Yankee 版魔改 BBR)"
 [[ $tcp_control == tsunami ]] && tcp_c_name="tsunami (Yankee 版魔改 BBR)"
@@ -136,6 +136,7 @@ SS_Kernel_url='https://github.com/Aniverse/ServerSpeeder/raw/master/serverSpeede
 AcceVer=$(wget --no-check-certificate -qO- "$SS_Kernel_url" |grep "$KNA/" |grep "/x$KernelBit/" |grep "/$running_kernel/" |awk -F'/' '{print $NF}' |sort -n -k 2 -t '_' |tail -n 1)
 MyKernel=$(wget --no-check-certificate -qO- "$SS_Kernel_url" |grep "$KNA/" |grep "/x$KernelBit/" |grep "/$running_kernel/" |grep "$AcceVer" |tail -n 1)
 [[ -n $MyKernel ]] && SSKernel="${green}是${jiacu}"
+[[ $LSKernel == "${green}是${jiacu}" || $SSKernel == "${green}是${jiacu}" ]] && tcp_c_name_suffix=" (是否开启锐速与此项无关)"
 
 # 检查理论上内核是否支持原版 BBR（内核高于 4.9 也不一定就有 bbr）
 # 2018.10.23 这个以后再拿去判断，现在懒得动了
@@ -167,7 +168,7 @@ dpkg -l | grep generic-hwe   | awk '{print $2}' >> /tmp/system_kernel_list
 echo -e  " ${baizise}${bold}                                   El Psy Congroo!                                   ${normal} "
 echo -e  "  ${bold}"
 echo -e  "  当前操作系统                         ${green}$DISTROU $osversion $CODENAME (x$lbit)${jiacu}"
-echo -e  "  当前正在使用的 TCP 拥塞控制算法      ${green}$tcp_c_name${jiacu}"
+echo -e  "  当前正在使用的 TCP 拥塞控制算法      ${green}$tcp_c_name$tcp_c_name_suffix${jiacu}"
 [[ $DeBUG == 1 ]] &&
 echo -e  "  当前可以使用的 TCP 拥塞控制算法      ${green}$tcp_control_all${jiacu}"
 echo -e  "  当前正在使用的系统内核               ${green}$running_kernel${jiacu}"
