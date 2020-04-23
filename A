@@ -15,8 +15,8 @@
 # https://teddysun.com/489.html
 #
 #################################################################################
-ScriptVersion=3.2.8
-ScriptDate=2020.04.09
+ScriptVersion=3.3.0
+ScriptDate=2020.04.23
 
 usage_guide() {
 bash <(wget -qO- https://git.io/AccTCP)
@@ -132,7 +132,7 @@ AcceVer=$(wget --no-check-certificate -qO- "$LS_Kernel_url" |grep "$KNA/" |grep 
 MyKernel=$(wget --no-check-certificate -qO- "$LS_Kernel_url" |grep "$KNA/" |grep "/x$KernelBit/" |grep "/$running_kernel/" |grep "$AcceVer" |tail -n 1)
 [[ -n $MyKernel ]] && LSKernel="${green}是${jiacu}"
 unset MyKernel
-SS_Kernel_url='https://raw.githubusercontent.com/0oVicero0/serverSpeeder_kernel/master/serverSpeeder.txt'
+SS_Kernel_url='https://github.com/Aniverse/ServerSpeeder/raw/master/serverSpeeder.txt'
 AcceVer=$(wget --no-check-certificate -qO- "$SS_Kernel_url" |grep "$KNA/" |grep "/x$KernelBit/" |grep "/$running_kernel/" |awk -F'/' '{print $NF}' |sort -n -k 2 -t '_' |tail -n 1)
 MyKernel=$(wget --no-check-certificate -qO- "$SS_Kernel_url" |grep "$KNA/" |grep "/x$KernelBit/" |grep "/$running_kernel/" |grep "$AcceVer" |tail -n 1)
 [[ -n $MyKernel ]] && SSKernel="${green}是${jiacu}"
@@ -823,7 +823,7 @@ auto_install_via_systemd ; }
 # 重启后自动安装锐速 ServerSpeeder
 function serverspeeder_autoinstall() {
 mkdir -p /root/TrCtrlProToc0l
-wget --no-check-certificate -q https://raw.githubusercontent.com/0oVicero0/serverSpeeder_Install/master/appex.sh -O /root/TrCtrlProToc0l/ss.sh
+wget --no-check-certificate -q https://github.com/Aniverse/ServerSpeeder/raw/master/install.sh -O /root/TrCtrlProToc0l/ss.sh
 cat > /root/TrCtrlProToc0l/TCP-auto-install.sh <<EOF
 #!/bin/bash
 sleep 10
@@ -956,9 +956,10 @@ update_grub ; }
 
 # 内核匹配的情况下安装锐速
 function serverspeeder_install() {
-    ifconfig >/dev/null 2>&1
+    ifconfig > /dev/null 2>&1
     [ $? -gt '1' ] && apt-get install -y net-tools
-    wget --no-check-certificate -qO /tmp/appex.sh "https://raw.githubusercontent.com/0oVicero0/serverSpeeder_Install/master/appex.sh" && echo | bash /tmp/appex.sh 'install'
+    # wget --no-check-certificate -qO /tmp/appex.sh https://github.com/Aniverse/ServerSpeeder/raw/master/install.sh && echo | bash /tmp/appex.sh 'install'
+    bash <(wget --no-check-certificate -qO- https://github.com/Aniverse/ServerSpeeder/raw/master/install.sh) install
     ps aux | grep -v grep | grep -q appex && echo -e "\n${bold}${green}锐速已在运行 ...${normal}\n" || echo -e "\n${bold}${red}锐速尚未在运行，可能安装失败！${normal}\n"
 }
 
