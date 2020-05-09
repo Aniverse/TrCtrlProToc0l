@@ -15,8 +15,8 @@
 # https://teddysun.com/489.html
 #
 #################################################################################
-ScriptVersion=3.3.1
-ScriptDate=2020.04.23
+ScriptVersion=3.3.2
+ScriptDate=2020.05.09
 
 usage_guide() {
 bash <(wget -qO- https://git.io/AccTCP)
@@ -960,7 +960,7 @@ function serverspeeder_install() {
     ifconfig > /dev/null 2>&1
     [ $? -gt '1' ] && apt-get install -y net-tools
     # wget --no-check-certificate -qO /tmp/appex.sh https://github.com/Aniverse/ServerSpeeder/raw/master/install.sh && echo | bash /tmp/appex.sh 'install'
-    bash <(wget --no-check-certificate -qO- https://github.com/Aniverse/ServerSpeeder/raw/master/install.sh) install
+    echo | bash <(wget --no-check-certificate -qO- https://github.com/Aniverse/ServerSpeeder/raw/master/install.sh) install
     ps aux | grep -v grep | grep -q appex && echo -e "\n${bold}${green}锐速已在运行 ...${normal}\n" || echo -e "\n${bold}${red}锐速尚未在运行，可能安装失败！${normal}\n"
 }
 
