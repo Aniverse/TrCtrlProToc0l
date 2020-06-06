@@ -15,8 +15,8 @@
 # https://teddysun.com/489.html
 #
 #################################################################################
-ScriptVersion=3.3.2
-ScriptDate=2020.05.09
+ScriptVersion=3.3.3
+ScriptDate=2020.06.06
 
 usage_guide() {
 bash <(wget -qO- https://git.io/AccTCP)
@@ -421,21 +421,15 @@ function ls_install() {
 if [[ $LSKernel == "${green}是${jiacu}" ]]; then
     echo -e "\n  ${bold}理论上当前内核已支持 ${green}LotServer${jiacu}，直接安装 ... ${normal} \n"
     lotserver_install
-elif [[ $LSKernel == "${red}否${jiacu}" ]] && [[ $DISTRO == ubuntu ]]; then
+elif [[ $LSKernel == "${red}否${jiacu}" ]]; then
     ask_continue2
     ss_kernel_install_v2
     delete_other_kernel
     delete_other_kernel
     lotserver_autoinstall
     [[ ! $DeBUG == 1 ]] && echo -e "\n  ${bold}即将重启系统，重启后会自动安装 ${green}LotServer${jiacu} ... ${normal}\n" && reboot
-elif [[ $LSKernel == "${red}否${jiacu}" ]] && [[ $DISTRO == debian ]]; then
-    ask_continue2
-    ss_kernel_install_v2
-    delete_other_kernel
-    delete_other_kernel
-    lotserver_autoinstall
-    [[ ! $DeBUG == 1 ]] && echo -e "\n  ${bold}即将重启系统，重启后会自动安装 ${green}LotServer${jiacu} ... ${normal}\n" && reboot
-fi ; }
+fi
+}
 
 
 
@@ -545,7 +539,7 @@ echo ; }
 
 function ss_kernel_install_stretch_add_repo() {
     echo 'Acquire::Check-Valid-Until 0;' > /etc/apt/apt.conf.d/10-no-check-valid-until
-    cat << EOF > /etc/apt/sources.list.d/stretch.old.list 
+    cat << EOF > /etc/apt/sources.list.d/stretch.old.list
 deb http://snapshot.debian.org/archive/debian/20171224T175424Z/ stretch main non-free contrib
 deb http://snapshot.debian.org/archive/debian-security/20171224T175424Z/ stretch/updates main non-free contrib
 deb-src http://snapshot.debian.org/archive/debian/20171224T175424Z/ stretch main non-free contrib
@@ -567,23 +561,16 @@ if   [[ $CODENAME == bionic ]]; then
     apt-get -y install linux-image-$kernel_version linux-headers-$kernel_version linux-modules-$kernel_version linux-modules-extra-$kernel_version
     kernel_version=4.15.0-30
     dpkg -l | grep linux-image-$kernel_version -q || { echo -e "\n  ${bold}${red}错误${jiacu} 安装 内核 失败！${normal}" | tee -a $Outputs ; exit_1 ; }
-elif [[ $CODENAME == stretch ]]; then
+elif [[ $CODENAME =~ (stretch|buster) ]]; then
     echo -e "\n  ${bold}安装 ${green}4.9.0-4${jiacu} 内核 ...${normal} \n"
     kernel_version=4.9.0-4-amd64
     ss_kernel_install_stretch_add_repo
     apt-get update >> $Outputs 2>&1
+    apt-get update --fix-missing >> $Outputs 2>&1
     apt-get -y install linux-image-$kernel_version linux-headers-$kernel_version >> $Outputs 2>&1
     kernel_version=4.9.0-4
     dpkg -l | grep linux-image-$kernel_version -q || { echo -e "\n  ${bold}${red}错误${jiacu} 安装 内核 失败！${normal}" | tee -a $Outputs ; exit_1 ; }
-elif [[ $CODENAME == buster ]]; then
-    ss_kernel_install_stretch_add_repo
-    apt-get update >> $Outputs 2>&1
-    echo -e "\n  ${bold}安装 ${green}4.9.0-4${jiacu} 内核 ...${normal} \n"
-    kernel_version=4.9.0-4-amd64
-    apt-get -y --no-install-recommends install linux-image-$kernel_version linux-headers-$kernel_version >> $Outputs 2>&1
-    kernel_version=4.9.0-4
-    dpkg -l | grep linux-image-$kernel_version -q || { echo -e "\n  ${bold}${red}错误${jiacu} 安装 内核 失败！${normal}" | tee -a $Outputs ; exit_1 ; }
-    sed -i '$d' /etc/apt/sources.list
+    [[ $CODENAME == buster ]] && rm -f /etc/apt/sources.list.d/stretch.old.list && apt-get update >> $Outputs 2>&1
 else
     echo -e "\n  ${red}注意${jiacu} 本功能只支持 Debian 9／10／Ubuntu 18.04 ！${normal}"
     exit_1
