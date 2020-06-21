@@ -15,8 +15,8 @@
 # https://teddysun.com/489.html
 #
 #################################################################################
-ScriptVersion=3.3.3
-ScriptDate=2020.06.06
+ScriptVersion=3.3.4
+ScriptDate=2020.06.21
 
 usage_guide() {
 bash <(wget -qO- https://git.io/AccTCP)
@@ -482,7 +482,7 @@ case $input in
     *  ) echo ; read_response ;;
 esac
 [[ `grep "Advanced options for Ubuntu" /etc/default/grub` ]] && sed -i 's/GRUB_DEFAULT=.*/GRUB_DEFAULT=""/' /etc/default/grub && update-grub >> $Outputs 2>&1
-wget --no-check-certificate -qO /tmp/appex.sh "https://raw.githubusercontent.com/0oVicero0/serverSpeeder_Install/master/appex.sh" && echo | bash /tmp/appex.sh 'uninstall'
+wget --no-check-certificate -qO /tmp/appex.sh "https://github.com/Aniverse/ServerSpeeder/raw/master/install.sh" && echo | bash /tmp/appex.sh 'uninstall'
 echo -e "  ${bold}${red}已卸载 锐速，但安装的内核仍保留${normal}\n" ; }
 
 
