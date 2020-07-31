@@ -15,7 +15,7 @@
 # https://teddysun.com/489.html
 #
 #################################################################################
-ScriptVersion=3.3.7
+ScriptVersion=3.3.8
 ScriptDate=2020.07.31
 
 usage_guide() {
@@ -135,8 +135,8 @@ function script_menu() { clear ; echo
 
     kernel_vvv=$(uname -r | cut -d- -f1)
     if version_ge $kernel_vvv 4.9  ; then BBRKernel="${green}是${jiacu}" ; else BBRKernel="${red}否${jiacu}" ; fi
-    if version_ge $kernel_vvv 4.9.3 && ! version_ge $kernel_vvv 5.6 ; then YKKernel="${green}是${jiacu}"  ; else YKKernel="${red}否${jiacu}" ; fi
-    if version_ge $kernel_vvv 4.9.3 && ! version_ge $kernel_vvv 5.6 ; then NQLKernel="${green}是${jiacu}" ; else NQLKernel="${red}否${jiacu}" ; fi
+    if version_ge $kernel_vvv 4.9.3 && ! version_ge $kernel_vvv 5.8 ; then YKKernel="${green}是${jiacu}"  ; else YKKernel="${red}否${jiacu}" ; fi
+    if version_ge $kernel_vvv 4.9.3 && ! version_ge $kernel_vvv 5.8 ; then NQLKernel="${green}是${jiacu}" ; else NQLKernel="${red}否${jiacu}" ; fi
     # if version_ge $kernel_vvv 4.14  && ! version_ge $kernel_vvv 5.1 ; then BBRPKernel="${green}是${jiacu}"
     # elif version_ge $kernel_vvv 5.1 ; then BBRPKernel="${green}无需 bbrplus${jiacu}" ; else BBRPKernel="${red}否${jiacu}" ; fi
     if uname -r | grep -q bbrplus ; then BBRPKernel="${green}是${jiacu}" ; else BBRPKernel="${red}否${jiacu}" ; fi
