@@ -15,7 +15,7 @@
 # https://teddysun.com/489.html
 #
 #################################################################################
-ScriptVersion=3.3.8
+ScriptVersion=3.3.9
 ScriptDate=2020.07.31
 
 usage_guide() {
@@ -66,7 +66,7 @@ DISTROU=`  awk -F'[= "]' '/PRETTY_NAME/{print $3}' /etc/os-release  `
 CODENAME=`  cat /etc/os-release | grep VERSION= | tr '[A-Z]' '[a-z]' | sed 's/\"\|(\|)\|[0-9.,]\|version\|lts//g' | awk '{print $2}'  `
 [[ $DISTRO == ubuntu ]] && osversion=`  grep Ubuntu /etc/issue | head -1 | grep -oE  "[0-9.]+"  `
 [[ $DISTRO == debian ]] && osversion=`  cat /etc/debian_version  `
-[[ $CODENAME =~ (xenial|bionic|jessie|stretch|buster) ]] && SysSupport=1
+[[ $CODENAME =~ (xenial|bionic|jessie|stretch|buster|focal) ]] && SysSupport=1
 function version_ge(){ test "$(echo "$@" | tr " " "\n" | sort -rV | head -n 1)" == "$1" ; }
 
 #  -----------------------------------------------------------------------------------
@@ -74,11 +74,12 @@ function version_ge(){ test "$(echo "$@" | tr " " "\n" | sort -rV | head -n 1)" 
 [[ $EUID -ne 0 ]] && echo -e "\n${red}错误${jiacu} 请使用 root 运行本脚本！${normal}" && exit_1
 
 [[ ! $DeBUG == 1 ]] && {
-[[ -d /proc/vz ]] && echo -e "\n${red}错误${jiacu} 不支持 OpenVZ！${normal}" && exit_1
-# Xen-PV 也不支持，不过就不作检测了……
-[[ ! $KernelBit == 64 ]] && echo -e "\n${red}错误${jiacu} 不支持非 64 位系统！${normal}" && exit_1
-[[ -z "$(dpkg -l |grep 'grub-')" ]] && echo -e "\n${red}错误${jiacu} 未发现 grub！${normal}" && exit_1
-[[ ! $SysSupport == 1 ]] && echo -e "\n${red}错误${jiacu} 不支持 Debian 8/9/10、Ubuntu 16.04/18.04 以外的系统！${normal}" && exit_1 ; }
+    [[ -d /proc/vz ]] && echo -e "\n${red}错误${jiacu} 不支持 OpenVZ！${normal}" && exit_1
+    # Xen-PV 也不支持，不过就不作检测了……
+    [[ ! $KernelBit == 64 ]] && echo -e "\n${red}错误${jiacu} 不支持非 64 位系统！${normal}" && exit_1
+    [[ -z "$(dpkg -l |grep 'grub-')" ]] && echo -e "\n${red}错误${jiacu} 未发现 grub！${normal}" && exit_1
+    [[ ! $SysSupport == 1 ]] && echo -e "\n${red}错误${jiacu} 不支持 Debian 8/9/10、Ubuntu 16.04/18.04 以外的系统！${normal}" && exit_1
+}
 
 
 
