@@ -15,8 +15,8 @@
 # https://teddysun.com/489.html
 #
 #################################################################################
-ScriptVersion=3.3.9
-ScriptDate=2020.07.31
+ScriptVersion=3.4.0
+ScriptDate=2020.08.05
 
 usage_guide() {
     bash <(wget -qO- https://git.io/AccTCP)
@@ -1385,7 +1385,7 @@ function delete_other_kernel() {
     [[ $DeBUG == 1 ]] && cat /log/kernel_tobe_del_list
     kernel_total_num=` cat /log/kernel_tobe_del_list | wc -l `
 
-    if [ $kernel_total_num -gt 1 ]; then
+    if [[ $kernel_total_num -ge 1 ]]; then
         for (( integer = 1 ; integer <= ${kernel_total_num} ; integer++ )) ; do
           # kernel_tobe_del=` dpkg -l | grep -E linux-[image,headers,modules] | grep -v binutils | awk '{print $2}' | grep -v "${kernel_version}" | head -${integer} `
             kernel_tobe_del=` cat /log/kernel_tobe_del_list | sed -n "${integer}p" `
