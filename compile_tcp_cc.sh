@@ -3,8 +3,8 @@
 # https://github.com/Aniverse/TrCtrlProToc0l
 # Author: Aniverse
 #
-script_update=2020.07.31
-script_version=1.0.6
+script_update=2020.08.13
+script_version=r11007
 ########################################################################################################
 
 usage_guide() {
@@ -30,8 +30,14 @@ mkdir -p compile_tcp_cc
 cd compile_tcp_cc
 
 for supported_kernel in $supported_list ; do
-    [[ $kernel_v2 == $supported_kernel ]] &&
+    if [[ $kernel_v2 == $supported_kernel ]]; then
+        if   [[ $kernel_v2 ~= (4.9|4.10|4.11|4.12) ]]; then
+            supported_kernel="4.12_and_below"
+        elif [[ $kernel_v2 == 5.8 ]]; then
+            supported_kernel="5.8-rc"
+        fi
         wget https://raw.githubusercontent.com/KozakaiAya/TCP_BBR/master/code/v${supported_kernel}/$filename -O $filename --no-check-certificate
+    fi
 done
 
 [[ ! -f $filename ]] && echo -e "下载源码失败！" && exit 1
@@ -41,7 +47,7 @@ gcc_ver=$(gcc --version | grep -Eo '[0-9]+\.[0-9]+\.[0-9]+' | head -1)
 [[ $gcc_ver == 7.3 ]] && [[ $kernel_v2 == 4.15 ]] && echo "ccflags-y=-I/usr/lib/gcc/x86_64-linux-gnu/7/include" >> Makefile
 
 mkdir -p /lib/modules/$(uname -r)/build
-make -C /lib/modules/$(uname -r)/build M=$(pwd) modules CC=$(which gcc)
+make  -C /lib/modules/$(uname -r)/build M=$(pwd) modules CC=$(which gcc)
 cp -rf tcp_$tcp_cc.ko /lib/modules/$(uname -r)/kernel/net/ipv4
 insmod /lib/modules/$(uname -r)/kernel/net/ipv4/tcp_$tcp_cc.ko
 modprobe tcp_$tcp_cc
