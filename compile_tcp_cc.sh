@@ -3,8 +3,8 @@
 # https://github.com/Aniverse/TrCtrlProToc0l
 # Author: Aniverse
 #
-script_update=2020.08.13
-script_version=r11008
+script_update=2020.08.15
+script_version=r11009
 ########################################################################################################
 
 usage_guide() {
@@ -32,7 +32,7 @@ cd compile_tcp_cc
 
 for supported_kernel in $supported_list ; do
     if [[ $kernel_v2 == $supported_kernel ]]; then
-        if   [[ $kernel_v2 ~= (4.9|4.10|4.11|4.12) ]]; then
+        if   [[ $kernel_v2 =~ (4.9|4.10|4.11|4.12) ]]; then
             supported_kernel="4.12_and_below"
         elif [[ $kernel_v2 == 5.8 ]]; then
             supported_kernel="5.8-rc"
