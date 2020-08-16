@@ -15,8 +15,8 @@
 # https://teddysun.com/489.html
 #
 #################################################################################
-ScriptVersion=3.4.1
-ScriptDate=2020.08.16
+ScriptVersion=3.4.2
+ScriptDate=2020.08.17
 
 usage_guide() {
     bash <(wget -qO- https://git.io/AccTCP)
@@ -1039,28 +1039,7 @@ function online_ubuntu_bbr_firmware() {
 
 # 安装 4.11.12 的内核（For BBR）
 function bbr_kernel_4_11_12() {
-    if [[ $CODENAME == buster ]]; then
-        echo -ne "\n  ${bold}需要安装相关依赖以安装内核，先更新系统源 ...${normal} " | tee -a $Outputs
-        echo >> $Outputs
-        apt-get update >> $Outputs 2>&1
-        echo | tee -a $Outputs
-        echo -ne "\n  ${bold}修复可能存在的依赖问题 ...${normal} " | tee -a $Outputs
-        echo >> $Outputs
-        apt-get install -f -y >> $Outputs 2>&1
-        echo | tee -a $Outputs
-        apt-get install -y multiarch-support >> $Outputs 2>&1
-    fi
-    if [[ $CODENAME =~ (stretch|buster) ]]; then
-        [[ ! `dpkg -l | grep libssl1.0.0` ]] && {
-        echo -ne "\n  ${bold}安装 libssl1.0.0 ...${normal} " | tee -a $Outputs
-        wget --no-check-certificate https://sourceforge.net/projects/aboxx/files/deb/libssl1.0.0_1.0.1t-1%2Bdeb8u7_amd64.deb/download -O libssl1.0.deb >> $Outputs 2>&1
-        dpkg -i libssl1.0.deb >> $Outputs 2>&1
-        rm -f libssl1.0.deb ; echo | tee -a $Outputs
-        [[ ! `dpkg -l | grep libssl1.0.0` ]] && { echo -e "\n  ${red}错误${bold} 安装 libssl1.0.0 失败！${normal}" | tee -a $Outputs ; exit_1 ; } ; }
-    else
-        [[ ! `dpkg -l | grep libssl1.0.0` ]] && { echo -ne "\n  ${bold}安装 libssl1.0.0 ...${normal} " | tee -a $Outputs ; apt-get install -y libssl1.0.0 >> $Outputs 2>&1 ; echo | tee -a $Outputs
-        [[ ! `dpkg -l | grep libssl1.0.0` ]] && { echo -e  "\n$  ${red}错误${bold} 安装 libssl1.0.0 失败！${normal}" | tee -a $Outputs ; exit_1 ; } ; }
-    fi
+    install_libssl_100
     echo -ne "\n  ${bold}安装 4.11.12 内核及其头文件 ... ${normal} " | tee -a $Outputs ; echo >> $Outputs
     wget --no-check-certificate -qO 1.deb https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Linux.Kernel/BBR/linux-headers-4.11.12-all.deb
     wget --no-check-certificate -qO 2.deb https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Linux.Kernel/BBR/linux-headers-4.11.12-amd64.deb
@@ -1092,43 +1071,24 @@ function bbr_plus_kernel_4_14() {
 
 # 检查安装魔改版 BBR 所需的必要软件包
 function check_essential() {
-
     apt_install_needed=no
     [[ ! `command -v make` ]] && apt_install_needed=yes
     [[ ! `command -v awk`  ]] && apt_install_needed=yes
     [[ ! `command -v gcc`  ]] && apt_install_needed=yes
     [[ ! `dpkg -l | grep libelf-dev` ]]      && apt_install_needed=yes
-    [[ ! `dpkg -l | grep libssl1.0.0` ]]     && apt_install_needed=yes
     [[ ! `dpkg -l | grep build-essential` ]] && apt_install_needed=yes
 
-    [[ $apt_install_needed == yes ]] && { 
-    echo -ne "\n  ${bold}需要安装相关依赖以编译魔改 bbr / bbrplus，先更新系统源 ...${normal} " | tee -a $Outputs
-    apt-get update >> $Outputs 2>&1
-    echo | tee -a $Outputs
-    echo -ne "\n  ${bold}修复可能存在的依赖问题 ...${normal} " | tee -a $Outputs
-    apt-get install -f -y >> $Outputs 2>&1
-    echo | tee -a $Outputs
-    apt-get install -y multiarch-support >> $Outputs 2>&1 ; }
+    if [[ $apt_install_needed == yes ]]; then
+        echo -ne "\n  ${bold}需要安装相关依赖以编译魔改 bbr / bbrplus，先更新系统镜像源列表 ...${normal} " | tee -a $Outputs
+        apt-get update >> $Outputs 2>&1
+        echo | tee -a $Outputs
+        echo -ne "\n  ${bold}修复可能存在的依赖问题 ...${normal} " | tee -a $Outputs
+        apt-get install -f -y >> $Outputs 2>&1
+        echo | tee -a $Outputs
+    fi
 
     [[ ! `dpkg -l | grep libelf-dev` ]] && { echo -ne "\n  ${bold}安装 libelf-dev ...${normal} " | tee -a $Outputs ; apt-get install -y libelf1 libelf-dev >> $Outputs 2>&1 ; echo | tee -a $Outputs
     [[ ! `dpkg -l | grep libelf-dev` ]] && { echo -e  "\n  ${red}错误${bold} 安装 libelf-dev 失败！${normal}" | tee -a $Outputs ; exit_1 ; } ; }
-
-    if [[ $CODENAME =~ (stretch|buster) ]]; then
-        [[ ! `dpkg -l | grep libssl1.0.0` ]] && {
-        echo -ne "\n  ${bold}安装 libssl1.0.0 ...${normal} " | tee -a $Outputs
-        wget --no-check-certificate https://sourceforge.net/projects/aboxx/files/deb/libssl1.0.0_1.0.1t-1%2Bdeb8u7_amd64.deb/download -O libssl1.0.deb >> $Outputs 2>&1
-        dpkg -i libssl1.0.deb >> $Outputs 2>&1
-        rm -f libssl1.0.deb ; echo | tee -a $Outputs
-      # echo -e "\ndeb http://ftp.hk.debian.org/debian jessie main\c" >> /etc/apt/sources.list
-      # apt-get update >> $Outputs 2>&1
-      # apt-get install -y libssl1.0.0 >> $Outputs 2>&1
-      # sed  -i '/deb http:\/\/ftp\.hk\.debian\.org\/debian jessie main/d' /etc/apt/sources.list
-      # apt-get update >> $Outputs 2>&1 ; echo
-        [[ ! `dpkg -l | grep libssl1.0.0` ]] && { echo -e "\n  ${red}错误${bold} 安装 libssl1.0.0 失败！${normal}" | tee -a $Outputs ; exit_1 ; } ; }
-    else
-        [[ ! `dpkg -l | grep libssl1.0.0` ]] && { echo -ne "\n  ${bold}安装 libssl1.0.0 ...${normal} " | tee -a $Outputs ; apt-get install -y libssl1.0.0 >> $Outputs 2>&1 ; echo | tee -a $Outputs
-        [[ ! `dpkg -l | grep libssl1.0.0` ]] && { echo -e  "\n$  ${red}错误${bold} 安装 libssl1.0.0 失败！${normal}" | tee -a $Outputs ; exit_1 ; } ; }
-    fi
 
     # which make >> $Outputs 2>&1 ; [ $? -ne '0' ] && { echo -ne "\n  ${bold}安装 make ...${normal} "    | tee -a $Outputs  ; apt-get install -y make >> $Outputs 2>&1 ; echo | tee -a $Outputs
     # which make >> $Outputs 2>&1 ; [ $? -ne '0' ] && { echo -e  "\n  ${red}错误${bold} 安装 make 失败！${normal}" | tee -a $Outputs ; exit_1 ; } ; }
@@ -1236,31 +1196,6 @@ function get_version() {
 
 # 确定安装内核？
 function install_required() {
-    [[ ! `dpkg -l | grep libssl1.0.0` ]] && apt_install_needed=yes
-
-    [[ $apt_install_needed == yes ]] && { 
-    echo -ne "\n  ${bold}需要安装相关依赖以安装内核，先更新系统源 ...${normal} " | tee -a $Outputs
-    echo >> $Outputs
-    apt-get update >> $Outputs 2>&1
-    echo | tee -a $Outputs
-    echo -ne "\n  ${bold}修复可能存在的依赖问题 ...${normal} " | tee -a $Outputs
-    echo >> $Outputs
-    apt-get install -f -y >> $Outputs 2>&1
-    echo | tee -a $Outputs
-    [[ $CODENAME == buster ]] && apt-get install -y multiarch-support >> $Outputs 2>&1 ; }
-
-    if [[ $CODENAME =~ (stretch|buster) ]]; then
-        [[ ! `dpkg -l | grep libssl1.0.0` ]] && {
-        echo -ne "\n  ${bold}安装 libssl1.0.0 ...${normal} " | tee -a $Outputs
-        echo >> $Outputs
-        wget --no-check-certificate https://sourceforge.net/projects/aboxx/files/deb/libssl1.0.0_1.0.1t-1%2Bdeb8u7_amd64.deb/download -O libssl1.0.deb >> $Outputs 2>&1
-        dpkg -i libssl1.0.deb >> $Outputs 2>&1
-        rm -f libssl1.0.deb ; echo
-        [[ ! `dpkg -l | grep libssl1.0.0` ]] && { echo -e "\n  ${red}错误${bold} 安装 libssl1.0.0 失败！${normal}" | tee -a $Outputs ; exit_1 ; } ; }
-    else
-        [[ ! `dpkg -l | grep libssl1.0.0` ]] && { echo -ne "\n  ${bold}安装 libssl1.0.0 ...${normal} " | tee -a $Outputs ; echo >> $Outputs ; apt-get install -y libssl1.0.0 >> $Outputs 2>&1 ; echo
-        [[ ! `dpkg -l | grep libssl1.0.0` ]] && { echo -e  "\n$  ${red}错误${bold} 安装 libssl1.0.0 失败！${normal}" | tee -a $Outputs ; exit_1 ; } ; }
-    fi
 
     digit_ver_image=`dpkg -l | grep linux-image | awk '{print $2}' | awk -F '-' '{print $3}' | grep "${required_version}"`
     digit_ver_headers=`dpkg -l | grep linux-headers | awk '{print $2}' | awk -F '-' '{print $3}' | grep "${required_version}"`
@@ -1351,6 +1286,31 @@ function install_required_modules() {
 
 ###################################################################################################################################################################
 
+function install_libssl_100() {
+    [[ $apt_install_needed == yes ]] && { 
+    echo -ne "\n  ${bold}需要安装相关依赖以安装内核，先更新系统源 ...${normal} " | tee -a $Outputs
+    echo >> $Outputs
+    apt-get update >> $Outputs 2>&1
+    echo | tee -a $Outputs
+    echo -ne "\n  ${bold}修复可能存在的依赖问题 ...${normal} " | tee -a $Outputs
+    echo >> $Outputs
+    apt-get install -f -y >> $Outputs 2>&1
+    echo | tee -a $Outputs
+    [[ $CODENAME == buster ]] && apt-get install -y multiarch-support >> $Outputs 2>&1 ; }
+
+    if [[ $CODENAME =~ (stretch|buster) ]]; then
+        [[ ! `dpkg -l | grep libssl1.0.0` ]] && {
+        echo -ne "\n  ${bold}安装 libssl1.0.0 ...${normal} " | tee -a $Outputs
+        echo >> $Outputs
+        wget --no-check-certificate https://sourceforge.net/projects/aboxx/files/deb/libssl1.0.0_1.0.1t-1%2Bdeb8u7_amd64.deb/download -O libssl1.0.deb >> $Outputs 2>&1
+        dpkg -i libssl1.0.deb >> $Outputs 2>&1
+        rm -f libssl1.0.deb ; echo
+        [[ ! `dpkg -l | grep libssl1.0.0` ]] && { echo -e "\n  ${red}错误${bold} 安装 libssl1.0.0 失败！${normal}" | tee -a $Outputs ; exit_1 ; } ; }
+    else
+        [[ ! `dpkg -l | grep libssl1.0.0` ]] && { echo -ne "\n  ${bold}安装 libssl1.0.0 ...${normal} " | tee -a $Outputs ; echo >> $Outputs ; apt-get install -y libssl1.0.0 >> $Outputs 2>&1 ; echo
+        [[ ! `dpkg -l | grep libssl1.0.0` ]] && { echo -e  "\n$  ${red}错误${bold} 安装 libssl1.0.0 失败！${normal}" | tee -a $Outputs ; exit_1 ; } ; }
+    fi
+}
 
 
 # 禁用启动选项
