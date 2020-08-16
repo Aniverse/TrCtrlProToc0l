@@ -17,7 +17,7 @@
 # https://teddysun.com/489.html
 #
 #################################################################################
-ScriptVersion=3.4.8
+ScriptVersion=3.4.9
 ScriptDate=2020.08.17
 
 usage_guide() {
@@ -1405,7 +1405,7 @@ function echo_task() {
 # From QuickBox Lite
 function APT_UPGRADE() {
     rm -f /tmp/apt_status
-    echo_task "  ${bold}更新系统镜像源列表 ... ${normal}"
+    echo -e "\n  ${bold}更新系统镜像源列表 ... ${normal}"
     DEBIAN_FRONTEND=noninteractive apt-get -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" update  >> $OutputLOG 2>&1
     if [[ "$?" != 0 ]]; then
         echo "apt_update_failed=1" > /tmp/apt_status
@@ -1418,6 +1418,7 @@ function APT_UPGRADE() {
         echo_error "Something wrong with your apt sources or network connection, exiting ..."
         kill -s TERM $TOP_PID >> /dev/null 2>&1  ;   kill -s TERM $script_pid >> /dev/null 2>&1   ;   exit 1
     }
+    echo -e "\n  ${bold}升级软件包 ... ${normal}"
     DEBIAN_FRONTEND=noninteractive apt-get -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" upgrade >> $OutputLOG 2>&1
     ## auto solve lock
     if [ "$?" -eq 2 ]; then
