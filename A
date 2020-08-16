@@ -15,7 +15,7 @@
 # https://teddysun.com/489.html
 #
 #################################################################################
-ScriptVersion=3.4.3
+ScriptVersion=3.4.4
 ScriptDate=2020.08.17
 
 usage_guide() {
@@ -1055,9 +1055,9 @@ function bbr_kernel_4_11_12() {
 function bbr_kernel_4_19_102() {
     echo -ne "\n  ${bold}安装 4.19.102 内核及其头文件 ... ${normal} " | tee -a $Outputs ; echo >> $Outputs
     kernel_version=4.19.102-xanmod49
-    wget --no-check-certificate -q https://github.com/Aniverse/XanMod-DL/raw/master/linux-headers-$kernel_version.deb
-    wget --no-check-certificate -q https://github.com/Aniverse/XanMod-DL/raw/master/linux-image-$kernel_version.deb
-    dpkg -i linux-{headers,image}-$kernel_version.deb
+    wget --no-check-certificate https://github.com/Aniverse/XanMod-DL/raw/master/linux-headers-$kernel_version.deb >> $Outputs 2>&1
+    wget --no-check-certificate https://github.com/Aniverse/XanMod-DL/raw/master/linux-image-$kernel_version.deb   >> $Outputs 2>&1
+    dpkg -i linux-{headers,image}-$kernel_version.deb >> $Outputs 2>&1
     rm -rf linux-{headers,image}-$kernel_version.deb ; echo
     update_grub
 }
