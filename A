@@ -15,8 +15,8 @@
 # https://teddysun.com/489.html
 #
 #################################################################################
-ScriptVersion=3.4.0
-ScriptDate=2020.08.05
+ScriptVersion=3.4.1
+ScriptDate=2020.08.16
 
 usage_guide() {
     bash <(wget -qO- https://git.io/AccTCP)
@@ -685,8 +685,8 @@ function xanmod_apt_install_preparation() {
 
 
 function xanmod_dpkg_install() {
-    wget https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Linux.Kernel/Xanmod/linux-headers-$kernel_version.deb
-    wget https://github.com/Aniverse/BitTorrentClientCollection/raw/master/Linux.Kernel/Xanmod/linux-image-$kernel_version.deb
+    wget https://github.com/Aniverse/XanMod-DL/raw/master/linux-headers-$kernel_version.deb
+    wget https://github.com/Aniverse/XanMod-DL/raw/master/linux-image-$kernel_version.deb
     dpkg -i linux-image-$kernel_version.deb 
     dpkg -i linux-headers-$kernel_version.deb
     rm -rf linux-image-$kernel_version.deb linux-headers-$kernel_version.deb
@@ -701,8 +701,20 @@ function xanmod_install() {
     # https://sourceforge.net/projects/xanmod/files/releases/
     # https://xanmod.org/
 
-    if   [[ $XanmodVer == 4.12 ]]; then # 2017-09-20
+    if   [[ $XanmodVer == 4.9  ]]; then # 2018-03-25
+        kernel_version=4.9.90-xanmod88
+        xanmod_dpkg_install
+    elif [[ $XanmodVer == 4.10 ]]; then # 2017-05-22
+        kernel_version=4.10.17-xanmod19
+        xanmod_dpkg_install
+    elif [[ $XanmodVer == 4.11 ]]; then # 2017-07-21
+        kernel_version=4.11.12-xanmod16
+        xanmod_dpkg_install
+    elif [[ $XanmodVer == 4.12 ]]; then # 2017-09-20
         kernel_version=4.12.14-xanmod15
+        xanmod_dpkg_install
+    elif [[ $XanmodVer == 4.13 ]]; then # 2017-11-24
+        kernel_version=4.13.16-xanmod23
         xanmod_dpkg_install
     elif [[ $XanmodVer == 4.14 ]]; then # 2018-12-22
         kernel_version=4.14.90-xanmod54
@@ -737,15 +749,23 @@ function xanmod_install() {
     elif [[ $XanmodVer == 5.3 ]]; then # 2019-11-25
         kernel_version=5.3.13-xanmod9
         xanmod_dpkg_install
-
-    # Use LTS instead of 5.4
-
-    elif [[ $XanmodVer == 5.5 ]]; then # Use current
-        kernel_version=5.5.15-xanmod1
+    elif [[ $XanmodVer == 5.3 ]]; then # 2019-11-25
+        kernel_version=5.3.13-xanmod9
         xanmod_dpkg_install
-
-    # Use edge instead of 5.6
-
+    elif [[ $XanmodVer == 5.4 ]]; then # 2020-08-11 # Current LTS
+        kernel_version=5.4.58-xanmod1
+        xanmod_dpkg_install
+    elif [[ $XanmodVer == 5.5 ]]; then # 2020-04-13
+        kernel_version=5.4.58-xanmod1
+        xanmod_dpkg_install
+    elif [[ $XanmodVer == 5.6 ]]; then # 2020-06-17
+        kernel_version=5.6.19-xanmod1
+        xanmod_dpkg_install
+    elif [[ $XanmodVer == 5.7 ]]; then # 2020-08-11
+        kernel_version=5.7.15-xanmod1
+        xanmod_dpkg_install
+    elif [[ $XanmodVer == 5.8 ]]; then # Current Edge
+        echo -e "Use edge" && exit 1
     elif [[ $XanmodVer == apt ]]; then # Current 5.7
         xanmod_apt_install_preparation
         kernel_version=5.7
@@ -754,9 +774,9 @@ function xanmod_install() {
         xanmod_apt_install_preparation
         kernel_version=5.4
         apt-get install -y --allow-unauthenticated linux-xanmod-lts
-    elif [[ $XanmodVer == edge ]]; then  # Current 5.6
+    elif [[ $XanmodVer == edge ]]; then  # Current 5.8
         xanmod_apt_install_preparation
-        kernel_version=5.6
+        kernel_version=5.8
         apt-get install -y --allow-unauthenticated linux-xanmod-edge
     fi
 }
