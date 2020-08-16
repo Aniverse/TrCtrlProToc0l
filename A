@@ -15,7 +15,7 @@
 # https://teddysun.com/489.html
 #
 #################################################################################
-ScriptVersion=3.4.6
+ScriptVersion=3.4.7
 ScriptDate=2020.08.17
 
 usage_guide() {
@@ -1167,8 +1167,6 @@ function check_headers() {
 
 
 
-
-
 # 安装缺少的头文件
 function install_lost_headers() {
     apt-get update >> $OutputLOG 2>&1
@@ -1178,7 +1176,9 @@ function install_lost_headers() {
     fi
     echo -ne "\n  ${bold}安装${green} linux-headers-$current_kernel_v${jiacu} ... ${normal}"   | tee -a $OutputLOG
     echo >> $OutputLOG
-    apt-get install -y linux-headers-$current_kernel_v >> $OutputLOG 2>&1  || { echo -e "\n  ${red}错误${jiacu} headers 安装失败！${normal}\n" | tee -a $OutputLOG ; exit_1 ; }
+    headers_pkg=linux-headers-$current_kernel_v
+    [[ $DISTRO == Ubuntu ]] && headers_pkg=linux-headers-$current_kernel_v-generic
+    apt-get install -y $headers_pkg >> $OutputLOG 2>&1  || { echo -e "\n  ${red}错误${jiacu} headers 安装失败！${normal}\n" | tee -a $OutputLOG ; exit_1 ; }
     echo -e "${bold}${green}DONE${normal}"
 }
 
@@ -1402,7 +1402,7 @@ function echo_task() {
 # From QuickBox Lite
 function APT_UPGRADE() {
     rm -f /tmp/apt_status
-    echo_task "更新系统镜像源列表 ..."
+    echo_task "  ${bold}更新系统镜像源列表 ... ${normal}"
     DEBIAN_FRONTEND=noninteractive apt-get -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" update  >> $OutputLOG 2>&1
     if [[ "$?" != 0 ]]; then
         echo "apt_update_failed=1" > /tmp/apt_status
