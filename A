@@ -15,7 +15,7 @@
 # https://teddysun.com/489.html
 #
 #################################################################################
-ScriptVersion=3.4.4
+ScriptVersion=3.4.5
 ScriptDate=2020.08.17
 
 usage_guide() {
@@ -1090,12 +1090,7 @@ function check_essential() {
     [[ ! `dpkg -l | grep build-essential` ]] && apt_install_needed=yes
 
     if [[ $apt_install_needed == yes ]]; then
-        echo -ne "\n  ${bold}需要安装相关依赖以编译魔改 bbr / bbrplus，先更新系统镜像源列表 ...${normal} " | tee -a $Outputs
-        apt-get update >> $Outputs 2>&1
-        echo | tee -a $Outputs
-        echo -ne "\n  ${bold}修复可能存在的依赖问题 ...${normal} " | tee -a $Outputs
-        apt-get install -f -y >> $Outputs 2>&1
-        echo | tee -a $Outputs
+        APT_UPGRADE
     fi
 
     [[ ! `dpkg -l | grep libelf-dev` ]] && { echo -ne "\n  ${bold}安装 libelf-dev ...${normal} " | tee -a $Outputs ; apt-get install -y libelf1 libelf-dev >> $Outputs 2>&1 ; echo | tee -a $Outputs
@@ -1394,6 +1389,57 @@ function delete_other_kernel() {
 
 
 #######################################################################################################################
+
+
+function status_done() {
+    echo -e " ${green}${bold}DONE${normal}" | tee -a "$OutputLOG"
+}
+
+# From QuickBox Lite
+function APT_UPGRADE() {
+    rm -f /tmp/apt_status
+    echo_task "更新系统镜像源列表 ..."
+    DEBIAN_FRONTEND=noninteractive apt-get -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" update  >> $OutputLOG 2>&1
+    if [[ "$?" != 0 ]]; then
+        echo "apt_update_failed=1" > /tmp/apt_status
+        echo_error "Something wrong with your apt sources or network connection, exiting ..."
+        kill -s TERM $TOP_PID >> /dev/null 2>&1  ;   kill -s TERM $script_pid >> /dev/null 2>&1   ;   exit 1
+    fi
+    # if git is not found on apt source list, then we assume this source list is incorrect
+    apt policy git 2>&1 | grep -q http || {
+        echo "apt_update_failed=1" > /tmp/apt_status
+        echo_error "Something wrong with your apt sources or network connection, exiting ..."
+        kill -s TERM $TOP_PID >> /dev/null 2>&1  ;   kill -s TERM $script_pid >> /dev/null 2>&1   ;   exit 1
+    }
+    DEBIAN_FRONTEND=noninteractive apt-get -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" upgrade >> $OutputLOG 2>&1
+    ## auto solve lock
+    if [ "$?" -eq 2 ]; then
+        echo_error "dpkg database is locked"
+        echo_task "Try to fix dpkg lock ... "
+        rm -f /var/lib/dpkg/updates/0*
+        locks=$(find /var/lib/dpkg/lock* && find /var/cache/apt/archives/lock*)
+        if [[ ${locks} == $(find /var/lib/dpkg/lock* && find /var/cache/apt/archives/lock*) ]]; then
+            for l in ${locks}; do
+                rm -rf ${l}
+            done
+            _execute "dpkg --configure -a"
+            DEBIAN_FRONTEND=noninteractive apt-get -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" update  >> $OutputLOG 2>&1
+            DEBIAN_FRONTEND=noninteractive apt-get -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" upgrade >> $OutputLOG 2>&1
+        fi
+        if ! (apt-get check >/dev/null); then
+            apt-get install -f >> $OutputLOG 2>&1
+            if ! (apt-get check >/dev/null); then
+                echo "apt_install_failed=1" > /tmp/apt_status
+                echo_error "It seems there is something error when using apt-get, exiting ..."
+                kill -s TERM $TOP_PID >> /dev/null 2>&1  ;   kill -s TERM $script_pid >> /dev/null 2>&1   ;   exit 1
+            fi
+        fi
+        status_done
+    else
+        status_done
+        touch /tmp/apt.update.$(date "+%Y%m%d")
+    fi
+}
 
 
 # 启用 /etc/rc.local
