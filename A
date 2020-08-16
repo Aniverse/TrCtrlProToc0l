@@ -15,7 +15,7 @@
 # https://teddysun.com/489.html
 #
 #################################################################################
-ScriptVersion=3.4.2
+ScriptVersion=3.4.3
 ScriptDate=2020.08.17
 
 usage_guide() {
@@ -192,7 +192,7 @@ function script_menu() { clear ; echo
     echo -e  "  ${green}(06) ${jiacu}安装 锐速 / ServerSpeeder "
     [[ $DeBUG == 1 ]] &&
     echo -e  "  ${green}(11) ${jiacu}安装 指定内核"
-    echo -e  "  ${green}(12) ${jiacu}安装 4.11.12 内核"
+    echo -e  "  ${green}(12) ${jiacu}安装 4.19.102 内核"
     echo -e  "  ${green}(13) ${jiacu}安装 ServerSpeeder 内核（4.4.0-47  或 3.12.1）"
     echo -e  "  ${green}(14) ${jiacu}安装 ServerSpeeder 内核（3.16.0-43 或 3.16.0-4）"
     echo -e  "  ${green}(15) ${jiacu}安装 LotServer     内核（4.15.0-30 或 4.9.0-4）"
@@ -243,9 +243,9 @@ function read_response() {
                 ss_install ;;
             11) # 安装 最新内核
                 selected_kernel_install ;;
-            12) # 安装 4.11.12 内核
+            12) # 安装 4.19.102 内核
                 # online_ubuntu_bbr_firmware
-    			bbr_kernel_4_11_12 ;;
+    			bbr_kernel_4_19_102 ;;
             13) # 安装 特定的 ServerSpeeder 内核（4.4.0-47／3.12.1）
                 ss_kernel_install ;;
             14) # 安装 ServerSpeeder 内核（3.16.0-43／3.16.0-4）
@@ -322,7 +322,7 @@ function bbr_install() {
         ask_continue2
       # echo -e "  ${bold}当前内核不支持 BBR，先安装 ${green}4.11.12${jiacu} 内核以启用 BBR ...${normal} "
       # online_ubuntu_bbr_firmware
-        bbr_kernel_4_11_12
+        bbr_kernel_4_19_102
         enable_bbr
         [[ ! $DeBUG == 1 ]] && echo -ne "\n  ${bold}即将重启系统，重启后 ${green}BBR${jiacu} 将会启动 ... ${normal}\n" && reboot
     fi
@@ -345,8 +345,8 @@ function ykbbr_install() {
       # echo -e "  ${bold}当前内核不支持 ${green}Yankee${jiacu} 版魔改 BBR，先安装 ${green}4.11.12${jiacu} 内核 ...${normal} "
       # online_ubuntu_bbr_firmware
         check_essential
-        bbr_kernel_4_11_12
-        kernel_version=4.11.12 && delete_other_kernel
+        bbr_kernel_4_19_102
+        delete_other_kernel
         bbr_tsunami_autoinstall
         enable_bbr tsunami
         [[ ! $DeBUG == 1 ]] && echo -e "\n  ${bold}即将重启系统，重启后会自动安装 ${green}Yankee${jiacu} 版魔改 BBR ... ${normal}\n" && reboot
@@ -370,8 +370,8 @@ function nqlbbr_install() {
       # echo -e "  ${bold}当前内核不支持 ${green}南琴浪${jiacu} 版魔改 BBR，先安装 ${green}4.11.12${jiacu} 内核 ...${normal} "
       # online_ubuntu_bbr_firmware
         check_essential
-        bbr_kernel_4_11_12
-        kernel_version=4.11.12 && delete_other_kernel
+        bbr_kernel_4_19_102
+        delete_other_kernel
         bbr_nanqinlang_autoinstall
         enable_bbr nanqinlang
         [[ ! $DeBUG == 1 ]] && echo -e "\n  ${bold}即将重启系统，重启后会自动安装 ${green}南琴浪${jiacu} 版魔改 BBR ... ${normal}\n" && reboot
@@ -1050,6 +1050,17 @@ function bbr_kernel_4_11_12() {
 }
 
 
+
+# 安装 4.19.102 的内核
+function bbr_kernel_4_19_102() {
+    echo -ne "\n  ${bold}安装 4.19.102 内核及其头文件 ... ${normal} " | tee -a $Outputs ; echo >> $Outputs
+    kernel_version=4.19.102-xanmod49
+    wget --no-check-certificate -q https://github.com/Aniverse/XanMod-DL/raw/master/linux-headers-$kernel_version.deb
+    wget --no-check-certificate -q https://github.com/Aniverse/XanMod-DL/raw/master/linux-image-$kernel_version.deb
+    dpkg -i linux-{headers,image}-$kernel_version.deb
+    rm -rf linux-{headers,image}-$kernel_version.deb ; echo
+    update_grub
+}
 
 
 
