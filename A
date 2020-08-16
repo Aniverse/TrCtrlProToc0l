@@ -6,6 +6,8 @@
 #################################################################################
 #
 # Thanks to
+# https://github.com/KozakaiAya/TCP_BBR
+#
 # https://github.com/FunctionClub/YankeeBBR
 # https://sometimesnaive.org/article/linux/bash/tcp_nanqinlang
 # https://moeclub.org/2017/06/06/249/
@@ -15,7 +17,7 @@
 # https://teddysun.com/489.html
 #
 #################################################################################
-ScriptVersion=3.4.7
+ScriptVersion=3.4.8
 ScriptDate=2020.08.17
 
 usage_guide() {
@@ -190,7 +192,7 @@ function script_menu() { clear ; echo
     echo -e  "  ${green}(04) ${jiacu}安装 bbrplus "
     echo -e  "  ${green}(05) ${jiacu}安装 锐速 / LotServer "
     echo -e  "  ${green}(06) ${jiacu}安装 锐速 / ServerSpeeder "
-    [[ $DeBUG == 1 ]] &&
+    [[ $DeBUG == 1 ]] && {
     echo -e  "  ${green}(11) ${jiacu}安装 指定内核"
     echo -e  "  ${green}(12) ${jiacu}安装 4.19.102 内核"
     echo -e  "  ${green}(13) ${jiacu}安装 ServerSpeeder 内核（4.4.0-47  或 3.12.1）"
@@ -198,6 +200,7 @@ function script_menu() { clear ; echo
     echo -e  "  ${green}(15) ${jiacu}安装 LotServer     内核（4.15.0-30 或 4.9.0-4）"
     echo -e  "  ${green}(16) ${jiacu}安装 LotServer     内核（MoeClub 脚本）"
     echo -e  "  ${green}(17) ${jiacu}安装 4.14.129-bbrplus 内核"
+    }
     echo -e  "  ${green}(21) ${jiacu}卸载 BBR "
     echo -e  "  ${green}(22) ${jiacu}卸载 锐速 "
     echo -e  "  ${green}(23) ${jiacu}卸载 多余内核 "
@@ -1174,10 +1177,10 @@ function install_lost_headers() {
         echo -e  "\n  ${red}错误${jiacu} 镜像源列表里找不到所需的头文件，请自行解决！${normal} \n" | tee -a $OutputLOG
         exit_1
     fi
+    headers_pkg=linux-headers-$current_kernel_v
+    [[ $DISTRO == ubuntu ]] && headers_pkg=linux-headers-$current_kernel_v-generic
     echo -ne "\n  ${bold}安装${green} linux-headers-$current_kernel_v${jiacu} ... ${normal}"   | tee -a $OutputLOG
     echo >> $OutputLOG
-    headers_pkg=linux-headers-$current_kernel_v
-    [[ $DISTRO == Ubuntu ]] && headers_pkg=linux-headers-$current_kernel_v-generic
     apt-get install -y $headers_pkg >> $OutputLOG 2>&1  || { echo -e "\n  ${red}错误${jiacu} headers 安装失败！${normal}\n" | tee -a $OutputLOG ; exit_1 ; }
     echo -e "${bold}${green}DONE${normal}"
 }

@@ -3,8 +3,10 @@
 # https://github.com/Aniverse/TrCtrlProToc0l
 # Author: Aniverse
 #
-script_update=2020.08.15
-script_version=r11009
+# Thanks to https://github.com/KozakaiAya/TCP_BBR
+
+script_update=2020.08.17
+script_version=r11010
 ########################################################################################################
 
 usage_guide() {
